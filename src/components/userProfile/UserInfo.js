@@ -51,13 +51,14 @@ const UserInfo = ({ user }) => {
           friends: userDataFromApi.friends || [],
           followers: userDataFromApi.followers || [],
           following: userDataFromApi.following || [],
+          profilePicture: userDataFromApi.profilePicture || null,
         });
         setLoading(false);
       } catch (err) {
         setError(
           err.response?.data?.message ||
-          err.response?.data?.error ||
-          'Error al cargar el usuario'
+            err.response?.data?.error ||
+            'Error al cargar el usuario'
         );
        // console.error('Depuración - Error en fetchUserData:', err);
         setLoading(false);
@@ -69,12 +70,13 @@ const UserInfo = ({ user }) => {
     } else if (user) {
       setUserData({
         ...user,
-        isFriend: user.isFriend ?? (currentUser?.friends?.some(f => f._id.toString() === user._id.toString()) || false),
-        isFollowing: user.isFollowing ?? (currentUser?.following?.some(f => f._id.toString() === user._id.toString()) || false),
-        isBlocked: user.isBlocked ?? (currentUser?.blockedUsers?.some(b => b._id.toString() === user._id.toString()) || false),
+        isFriend: user.isFriend ?? (currentUser?.friends?.some(f => f._id?.toString() === user._id?.toString()) || false),
+        isFollowing: user.isFollowing ?? (currentUser?.following?.some(f => f._id?.toString() === user._id?.toString()) || false),
+        isBlocked: user.isBlocked ?? (currentUser?.blockedUsers?.some(b => b._id?.toString() === user._id?.toString()) || false),
         friends: user.friends || [],
         followers: user.followers || [],
         following: user.following || [],
+        profilePicture: user.profilePicture || null,
       });
      // console.log('Depuración - userData inicializado desde prop user:', user);
     }
@@ -133,7 +135,7 @@ const UserInfo = ({ user }) => {
       } else if (userData._id === followerId) {
         setUserData((prev) => ({
           ...prev,
-          followers: followers || prev.followers,
+          followers: followers || prev.friends,
         }));
       }
     });
@@ -509,14 +511,25 @@ const UserInfo = ({ user }) => {
     );
   }
 
+  console.log('Depuración - Renderizando userData:', {
+    userId: userData._id,
+    username: userData.username,
+    profilePicture: userData.profilePicture,
+    profilePictureUrl: getFullImageUrl(userData.profilePicture),
+  });
+
   return (
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, p: 3, bgcolor: 'white', borderRadius: 2, boxShadow: 1, maxWidth: '1000px', mx: 'auto' }}>
       <img
-        src={getFullImageUrl(userData.profilePicture || defaultProfile)}
+        src={getFullImageUrl(userData.profilePicture)}
         alt={`${userData.username || 'Usuario'}'s profile`}
         style={{ width: 128, height: 128, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e0e0' }}
         onError={(e) => {
-         // console.error('Error loading profile picture:', e.target.src);
+          console.error('Error loading profile picture:', {
+            attemptedUrl: e.target.src,
+            userId: userData._id,
+            username: userData.username,
+          });
           e.target.src = defaultProfile;
         }}
       />

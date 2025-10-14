@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { getFullImageUrl } from '../../utils/getProfilePicture';
+import defaultProfile from '../../assets/default-profile.png';
 
 const PhotoList = ({ photos = [], authUser, onDelete, onUpdateDescription }) => {
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
-
-  //console.log('Photos in PhotoList:', photos); 
 
   if (!Array.isArray(photos) || photos.length === 0) {
     return <p>No hay fotos disponibles.</p>;
@@ -21,10 +21,11 @@ const PhotoList = ({ photos = [], authUser, onDelete, onUpdateDescription }) => 
         {photos.map((photo) => (
           <div key={photo._id} className="relative">
             <img
-              src={photo.imageUrl || 'default-image.png'}
+              src={getFullImageUrl(photo.imageUrl) || defaultProfile}
               alt={photo.description || 'Foto'}
               className="w-full rounded shadow object-cover cursor-pointer"
               onClick={() => setLightboxPhoto(photo)}
+              onError={(e) => e.target.src = defaultProfile}
             />
             {authUser && isOwner(photo) && (
               <div className="absolute top-2 right-2">
@@ -55,9 +56,10 @@ const PhotoList = ({ photos = [], authUser, onDelete, onUpdateDescription }) => 
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={lightboxPhoto.imageUrl || 'default-image.png'}
+              src={getFullImageUrl(lightboxPhoto.imageUrl) || defaultProfile}
               alt={lightboxPhoto.description || 'Foto'}
               className="w-full rounded mb-2"
+              onError={(e) => e.target.src = defaultProfile}
             />
             <p className="mb-2">{lightboxPhoto.description}</p>
 

@@ -48,7 +48,7 @@ const Header = () => {
           
           <li><VideoButton /></li>
           <li><GaleryButton /></li>
-          <li><ShopingButton /></li>
+          
           <li><NotificationButton /></li>
           <li><SettingsButton /></li>
           <li><LogoutButton /></li>

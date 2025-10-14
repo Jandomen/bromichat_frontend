@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
+import { FaPaperclip } from 'react-icons/fa'; // 👈 Paperclip for file input
 import defaultProfile from '../../assets/default-profile.png';
 
 const ChangeProfilePicture = () => {
@@ -18,7 +19,6 @@ const ChangeProfilePicture = () => {
   useEffect(() => {
     if (user?.profilePicture) {
       setPreview(getFullImageUrl(user.profilePicture));
-     // console.log(getFullImageUrl(user.profilePicture))
     } else {
       setPreview(null);
     }
@@ -27,6 +27,11 @@ const ChangeProfilePicture = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se permiten imágenes');
+      return;
+    }
 
     if (file.size > 2 * 1024 * 1024) {
       alert('La imagen es demasiado grande. Máximo 2MB.');
@@ -47,7 +52,10 @@ const ChangeProfilePicture = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      alert('Por favor, selecciona una imagen.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('profilePicture', selectedFile);
@@ -68,7 +76,6 @@ const ChangeProfilePicture = () => {
       updateUserState(response.data.user);
       alert('Foto de perfil actualizada');
     } catch (err) {
-     // console.error('Error al subir la imagen:', err);
       alert('Hubo un error al actualizar la foto de perfil');
     } finally {
       setLoading(false);
@@ -76,52 +83,73 @@ const ChangeProfilePicture = () => {
   };
 
   const handleDelete = async () => {
-  try {
-    const response = await axios.delete(
-      `${process.env.REACT_APP_API_BACKEND}/user/profile-picture`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_BACKEND}/user/profile-picture`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    updateUserState(response.data.user);
-    setPreview(null);
-    alert('Foto de perfil eliminada');
-  } catch (err) {
-   // console.error('Error al eliminar la imagen:', err);
-    alert('No se pudo eliminar la foto de perfil');
-  }
-};
-
+      updateUserState(response.data.user);
+      setPreview(null);
+      setSelectedFile(null);
+      alert('Foto de perfil eliminada');
+    } catch (err) {
+      alert('No se pudo eliminar la foto de perfil');
+    }
+  };
 
   return (
-    <div className="p-4 border rounded-md shadow-md w-fit mx-auto text-center">
-      <h2 className="text-lg font-semibold mb-4">Actualizar Foto de Perfil</h2>
+    <div className="p-6 bg-white rounded-lg shadow-md w-fit mx-auto text-center">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Actualizar Foto de Perfil</h2>
 
-      <img
-        src={preview || defaultProfile}
-        alt="Vista previa"
-        className="w-32 h-32 object-cover rounded-full mx-auto mb-2 border"
-      />
+      {/* Image preview */}
+      <div className="relative w-32 h-32 mx-auto mb-4 group">
+        <img
+          src={preview || defaultProfile}
+          alt="Vista previa"
+          className="w-full h-full object-cover rounded-full border border-gray-300"
+        />
+        {selectedFile && (
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {selectedFile.name}
+          </div>
+        )}
+      </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="mb-3"
-      />
+      {/* Custom file input */}
+      <div className="relative mb-4">
+        <input
+          type="file"
+          id="file-upload"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        <label
+          htmlFor="file-upload"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200 mx-auto"
+        >
+          <FaPaperclip className="text-blue-700" />
+          <span className="font-medium">
+            {selectedFile ? selectedFile.name : 'Seleccionar imagen'}
+          </span>
+        </label>
+      </div>
 
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-4">
         <button
           onClick={handleUpload}
-          className="bg-blue-600 text-white px-4 py-1 rounded"
-          disabled={loading}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:bg-blue-400"
+          disabled={loading || !selectedFile}
         >
           {loading ? 'Subiendo...' : 'Guardar'}
         </button>
         <button
           onClick={handleDelete}
-          className="bg-red-500 text-white px-4 py-1 rounded"
+          className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
+          disabled={!user?.profilePicture}
         >
           Eliminar
         </button>

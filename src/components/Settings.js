@@ -92,25 +92,25 @@ const Settings = () => {
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        {/* Cambiar Foto de Perfil */}
+       
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-2">Cambiar Foto de Perfil</h3>
           <ChangeProfilePicture />
         </section>
 
-        {/* Editar Bio */}
+       
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-2">Editar Bio</h3>
           <EditBio />
         </section>
 
-        {/* Usuarios Bloqueados */}
+       
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-2">Usuarios Bloqueados</h3>
           <MyBlockedUsersList onUnblockUser={handleUnblockUser} />
         </section>
 
-        {/* Notificaciones */}
+       
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-2">Notificaciones</h3>
           <div className="flex items-center gap-2 mb-4">
@@ -141,7 +141,7 @@ const Settings = () => {
           )}
         </section>
 
-        {/* Eliminar Cuenta */}
+       
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-2 text-red-600">Eliminar Cuenta</h3>
           <DeleteAccount />

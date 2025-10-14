@@ -1,45 +1,51 @@
-import './tailwind.css';
-import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import Dashboard from './components/Dashboard';
-import UserProfile from './components/userProfile/UserProfile';
-import Profile from './components/Profile';
-import Messages from './components/Messages';
-import Group from './components/Group';
-import Videos from './components/Videos';
-import VideoDetail from './components/videos/VideoDetail';
-import Gallery from './components/Gallery';
-import Shop from './components/Shop';
-import Notifications from './components/Notifications';
-import Settings from './components/Settings';
-import ChatComponent from './components/messages/ChatComponent';
-import GroupDetails from './components/GroupChat/GroupDetails';
-import GroupChat from './components/GroupChat/GroupChat';
-import FriendsList from './components/friends/FriendsList';
-import FollowersList from './components/friends/FollowersList';
-import FollowingList from './components/friends/FollowingList';
-import BlockedUsersList from './components/Settings/BlockedUsersList';
-import PostDetail from './components/posts/PostDetail';
-import NotFound from './components/NotFound';
-import ProtectedRoute from './middlewares/ProtectedRoute';
+import "./tailwind.css";
+import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Dashboard from "./components/Dashboard";
+import UserProfile from "./components/userProfile/UserProfile";
+import Profile from "./components/Profile";
+import Messages from "./components/Messages";
+import Group from "./components/Group";
+import Videos from "./components/Videos";
+import VideoDetail from "./components/videos/VideoDetail";
+import Gallery from "./components/Gallery";
+import Shop from "./components/Shop";
+import Notifications from "./components/Notifications";
+import Settings from "./components/Settings";
+import ChatComponent from "./components/messages/ChatComponent";
+import GroupDetails from "./components/GroupChat/GroupDetails";
+import GroupEdit from "./components/GroupChat/GroupEdit";
+import GroupChat from "./components/GroupChat/GroupChat";
+import FriendsList from "./components/friends/FriendsList";
+import FollowersList from "./components/friends/FollowersList";
+import FollowingList from "./components/friends/FollowingList";
+import BlockedUsersList from "./components/Settings/BlockedUsersList";
+import PostDetail from "./components/posts/PostDetail";
+import NotFound from "./components/NotFound";
+import ProtectedRoute from "./middlewares/ProtectedRoute";
 
 function ChatRouteWrapper() {
   const { conversationId } = useParams();
   return <ChatComponent conversationId={conversationId} />;
 }
 
+function GroupChatRouteWrapper() {
+  const { groupId } = useParams();
+  return <GroupChat groupId={groupId} />;
+}
+
 export default function App() {
   return (
     <Router>
       <Routes>
-       
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -81,10 +87,18 @@ export default function App() {
           }
         />
         <Route
-          path="/groups/:groupId/chat"
+          path="/groups/:groupId/edit"
           element={
             <ProtectedRoute>
-              <GroupChat />
+              <GroupEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/group/:groupId"
+          element={
+            <ProtectedRoute>
+              <GroupChatRouteWrapper />
             </ProtectedRoute>
           }
         />
@@ -128,8 +142,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
-       
         <Route
           path="/user/:userId"
           element={
@@ -170,8 +182,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
-       
         <Route
           path="/videos"
           element={
@@ -197,7 +207,7 @@ export default function App() {
           }
         />
 
-       
+        {/* Fallback Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

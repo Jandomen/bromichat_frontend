@@ -6,8 +6,11 @@ import api from "../../services/api";
 import defaultProfile from "../../assets/default-profile.png";
 import debounce from "lodash.debounce";
 
-const getFullImageUrl = (path) =>
-  path ? `${process.env.REACT_APP_API_BACKEND}${path}` : defaultProfile;
+const getFullImageUrl = (path) => {
+  if (!path) return defaultProfile; // si no hay foto
+  if (path.startsWith("http")) return path; // si ya es URL absoluta (Cloudinary)
+  return `${process.env.REACT_APP_API_BACKEND}${path}`; // si es relativa desde backend
+};
 
 const ProductSearchLive = () => {
   const { token, user } = useContext(AuthContext);
@@ -23,10 +26,9 @@ const ProductSearchLive = () => {
     }
     try {
       const res = await searchProducts(term);
-      // filtra productos que tengan usuario
-      setResults(res.filter(p => p.user));
+      setResults(res.filter((p) => p.user)); // solo productos con user
     } catch (err) {
-      //console.error("Error al buscar productos:", err);
+      // console.error("Error al buscar productos:", err);
       setResults([]);
     }
   }, 500);
@@ -47,7 +49,7 @@ const ProductSearchLive = () => {
       if (!convoId) return console.error("No se pudo obtener el ID de la conversación");
       navigate(`/chat/${convoId}`);
     } catch (err) {
-     // console.error("No se pudo iniciar la conversación", err);
+      // console.error("No se pudo iniciar la conversación", err);
     }
   };
 
@@ -75,13 +77,15 @@ const ProductSearchLive = () => {
                 onClick={() => setLightboxProduct(product)}
               />
               <p className="font-bold mt-2">{product.title}</p>
-              <p>{currency} {product.price}</p>
+              <p>
+                {currency} {product.price}
+              </p>
 
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center space-x-2">
                   <img
                     src={getFullImageUrl(publisher?.profilePicture)}
-                    alt={publisher?.username}
+                    alt={publisher?.username || "Usuario"}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <span className="text-sm">{publisher?.username}</span>
@@ -116,8 +120,12 @@ const ProductSearchLive = () => {
               className="w-full rounded mb-2"
             />
             <p className="mb-2 font-bold">{lightboxProduct.title}</p>
-            <p className="mb-2">{lightboxProduct.currency || "USD"} {lightboxProduct.price}</p>
-            <p className="mb-2 text-sm">Publicado por {lightboxProduct.user?.username}</p>
+            <p className="mb-2">
+              {lightboxProduct.currency || "USD"} {lightboxProduct.price}
+            </p>
+            <p className="mb-2 text-sm">
+              Publicado por {lightboxProduct.user?.username}
+            </p>
 
             {lightboxProduct.user?._id !== user?._id && (
               <button

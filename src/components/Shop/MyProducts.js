@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { getUserProducts, updateProduct, deleteProduct } from "../../services/productService";
+import defaultProfile from "../../assets/default-profile.png";
+
+// Helper para obtener la URL completa de la imagen de perfil
+const getFullImageUrl = (path) => {
+  if (!path) return defaultProfile; // fallback
+  if (path.startsWith("http")) return path; // Cloudinary u otra URL absoluta
+  return `${process.env.REACT_APP_API_BACKEND}${path}`; // ruta relativa del backend
+};
 
 const MyProducts = () => {
   const { user, token, loadingUser } = useContext(AuthContext);
@@ -12,16 +20,14 @@ const MyProducts = () => {
   const [newPrice, setNewPrice] = useState("");
   const [newCurrency, setNewCurrency] = useState("USD");
 
-  // Fetch products del usuario
   useEffect(() => {
     const fetchProducts = async () => {
       if (!user?._id) return;
       try {
         const res = await getUserProducts(user._id, token);
-        // Filtra productos que tengan usuario
-        setProducts(res.filter(p => p.user));
+        setProducts(res.filter(p => p.user)); // solo productos con usuario
       } catch (err) {
-       // console.error("❌ Error al obtener productos:", err);
+       // console.error("Error al obtener productos:", err);
       }
     };
     if (!loadingUser) fetchProducts();
@@ -29,7 +35,6 @@ const MyProducts = () => {
 
   if (loadingUser) return <p>Cargando productos...</p>;
 
-  // Editar producto
   const handleEdit = async (product) => {
     try {
       const updatedData = {
@@ -40,7 +45,6 @@ const MyProducts = () => {
       };
 
       const res = await updateProduct(product._id, updatedData, token);
-      // Actualiza la lista con el producto editado
       setProducts(products.map(p => (p._id === product._id ? res : p)));
 
       setEditingProduct(null);
@@ -49,11 +53,10 @@ const MyProducts = () => {
       setNewPrice("");
       setNewCurrency("USD");
     } catch (err) {
-     // console.error("❌ Error al actualizar producto:", err);
+     // console.error("Error al actualizar producto:", err);
     }
   };
 
-  // Eliminar producto
   const handleDelete = async (productId) => {
     if (!window.confirm("¿Seguro que quieres eliminar este producto?")) return;
     try {
@@ -61,7 +64,7 @@ const MyProducts = () => {
       setProducts(products.filter(p => p._id !== productId));
       setLightboxProduct(null);
     } catch (err) {
-     // console.error("❌ Error al eliminar producto:", err);
+     // console.error("Error al eliminar producto:", err);
     }
   };
 
@@ -82,6 +85,15 @@ const MyProducts = () => {
             <p className="font-bold mt-2">{product.title}</p>
             <p className="text-sm text-gray-700">{product.description}</p>
             <p>{product.currency || "USD"} {product.price}</p>
+
+            <div className="flex items-center space-x-2 mt-2">
+              <img
+                src={getFullImageUrl(product.user?.profilePicture)}
+                alt={product.user?.username || "Usuario"}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="text-sm">{product.user?.username}</span>
+            </div>
 
             {product.user?._id === user?._id && (
               <div className="absolute top-2 right-2">

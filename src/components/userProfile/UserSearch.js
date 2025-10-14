@@ -5,8 +5,12 @@ import api from '../../services/api';
 import defaultProfile from '../../assets/default-profile.png';
 import debounce from 'lodash.debounce';
 
-const getFullImageUrl = (path) =>
-  path ? `${process.env.REACT_APP_API_BACKEND}${path}` : defaultProfile;
+// Helper que soporta Cloudinary y fallback
+const getFullImageUrl = (path) => {
+  if (!path) return defaultProfile;         // fallback si no hay path
+  if (path.startsWith('http')) return path; // URL absoluta (Cloudinary)
+  return `${process.env.REACT_APP_API_BACKEND}${path}`; // ruta relativa
+};
 
 const UserSearch = () => {
   const { token, user } = useContext(AuthContext);
@@ -29,6 +33,7 @@ const UserSearch = () => {
       const res = await api.get(`/user/search?query=${encodeURIComponent(term)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const sortedResults = res.data.users.sort((a, b) =>
         a.username.toLowerCase().startsWith(term.toLowerCase()) ? -1 : 1
       );

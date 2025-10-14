@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
         socket.disconnect();
         setSocket(null);
       }
-      //console.warn('Token o userId no disponibles, socket no inicializado');
+      console.warn('Token or userId not available, socket not initialized');
       return;
     }
 
@@ -28,39 +28,16 @@ export const SocketProvider = ({ children }) => {
       reconnectionDelay: 1000,
     });
 
-    const joinRooms = async () => {
-      s.emit('join', user._id);
-      //console.log(`Unido a la sala privada: ${user._id}`);
-
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_BACKEND}/group/groups`, {
-  headers: { Authorization: `Bearer ${token}` },
-});
-
-
-
-        const data = await res.json();
-        const groups = data.groups || data; 
-        groups.forEach(group => {
-          s.emit('join_group', { groupId: group._id });
-          //console.log(`Unido a la sala del grupo: ${group._id}`);
-        });
-      } catch (err) {
-        //console.error('Error al obtener grupos:', err);
-      }
-    };
-
     s.on('connect', () => {
-      //console.log('Conectado al servidor de sockets:', s.id);
-      joinRooms();
+      console.log('Connected to socket server:', s.id);
     });
 
     s.on('connect_error', (err) => {
-      //console.error('Error de conexión al socket:', err.message);
+      console.error('Socket connection error:', err.message);
     });
 
     s.on('disconnect', (reason) => {
-      //console.warn('Desconectado del servidor de sockets:', reason);
+      console.warn('Disconnected from socket server:', reason);
     });
 
     setSocket(s);

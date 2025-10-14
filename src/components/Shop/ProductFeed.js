@@ -5,8 +5,11 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import defaultProfile from "../../assets/default-profile.png";
 
-const getFullImageUrl = (path) =>
-  path ? `${process.env.REACT_APP_API_BACKEND}${path}` : defaultProfile;
+const getFullImageUrl = (path) => {
+  if (!path) return defaultProfile; // si no tiene foto -> default
+  if (path.startsWith("http")) return path; // si ya es URL absoluta (Cloudinary)
+  return `${process.env.REACT_APP_API_BACKEND}${path}`; // si es ruta relativa en backend
+};
 
 const ProductFeedLightbox = () => {
   const { token, user } = useContext(AuthContext);
@@ -19,7 +22,7 @@ const ProductFeedLightbox = () => {
       const res = await getRandomProducts(1, token);
       setProducts(res);
     } catch (err) {
-     // console.error("Error al obtener feed:", err);
+      // console.error("Error al obtener feed:", err);
     }
   };
 
@@ -38,7 +41,7 @@ const ProductFeedLightbox = () => {
       if (!convoId) return console.error("No se pudo obtener el ID de la conversación");
       navigate(`/chat/${convoId}`);
     } catch (err) {
-     //console.error("No se pudo iniciar la conversación", err);
+      // console.error("No se pudo iniciar la conversación", err);
     }
   };
 
@@ -47,7 +50,7 @@ const ProductFeedLightbox = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {products.map((product) => {
           const publisher = product.user;
-          const currency = product.currency || "USD"; // Valor por defecto si no tiene
+          const currency = product.currency || "USD";
           return (
             <div key={product._id} className="border p-2 rounded">
               <img
@@ -101,7 +104,9 @@ const ProductFeedLightbox = () => {
             <p className="mb-2">
               {lightboxProduct.currency || "USD"} {lightboxProduct.price}
             </p>
-            <p className="mb-2 text-sm">Publicado por {lightboxProduct.user.username}</p>
+            <p className="mb-2 text-sm">
+              Publicado por {lightboxProduct.user.username}
+            </p>
 
             {lightboxProduct.user._id !== user?._id && (
               <button

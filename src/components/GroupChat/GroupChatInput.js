@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
-import { PaperAirplaneIcon, PaperClipIcon } from "@heroicons/react/24/outline";
+import React, { useState, useRef } from 'react';
+import { PaperAirplaneIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 
-export default function GroupChatInput({ onSend }) {
-  const [text, setText] = useState("");
+export default function GroupChatInput({ onSend, conversationId }) {
+  const [text, setText] = useState('');
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [isSending, setIsSending] = useState(false);
@@ -11,8 +11,14 @@ export default function GroupChatInput({ onSend }) {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        alert('File size exceeds 100MB limit'); // Correct limit
+        return;
+      }
       setFile(selectedFile);
-      if (selectedFile.type.startsWith("image/")) {
+      if (selectedFile.type.startsWith('image/')) {
+        setFilePreview(URL.createObjectURL(selectedFile));
+      } else if (selectedFile.type.startsWith('video/')) {
         setFilePreview(URL.createObjectURL(selectedFile));
       } else {
         setFilePreview(null);
@@ -21,7 +27,7 @@ export default function GroupChatInput({ onSend }) {
       setFile(null);
       setFilePreview(null);
     }
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleRemoveFile = () => {
@@ -34,12 +40,13 @@ export default function GroupChatInput({ onSend }) {
     if (!text.trim() && !file) return;
     setIsSending(true);
     try {
-      await onSend({ content: text, file });
-      setText("");
+      await onSend({ content: text, file, conversationId });
+      setText('');
       setFile(null);
       setFilePreview(null);
     } catch (err) {
-     // console.error("Error sending message:", err);
+     // console.error('Error sending message:', err.response?.data || err.message);
+      // Rely on parent component for error display
     } finally {
       setIsSending(false);
     }
@@ -50,11 +57,19 @@ export default function GroupChatInput({ onSend }) {
       {file && (
         <div className="flex items-center gap-2">
           {filePreview ? (
-            <img
-              src={filePreview}
-              alt="Previsualización"
-              className="max-w-[100px] max-h-[100px] rounded object-cover"
-            />
+            file.type.startsWith('image/') ? (
+              <img
+                src={filePreview}
+                alt="Preview"
+                className="max-w-[100px] max-h-[100px] rounded object-cover"
+              />
+            ) : (
+              <video
+                src={filePreview}
+                className="max-w-[100px] max-h-[100px] rounded"
+                controls
+              />
+            )
           ) : (
             <span className="text-sm text-gray-600 truncate max-w-[200px]">
               {file.name}
@@ -63,7 +78,7 @@ export default function GroupChatInput({ onSend }) {
           <button
             onClick={handleRemoveFile}
             className="text-red-500 text-sm hover:text-red-600"
-            aria-label="Quitar archivo"
+            aria-label="Remove file"
           >
             ✕
           </button>
@@ -73,18 +88,18 @@ export default function GroupChatInput({ onSend }) {
         <input
           type="text"
           className="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-base"
-          placeholder="Escribe un mensaje..."
+          placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !isSending && handleSend()}
+          onKeyDown={(e) => e.key === 'Enter' && !isSending && handleSend()}
           disabled={isSending}
-          aria-label="Escribir mensaje"
+          aria-label="Type message"
         />
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="p-2 text-gray-500 hover:text-blue-500 focus:outline-none"
-          aria-label="Adjuntar archivo"
+          aria-label="Attach file"
           disabled={isSending}
         >
           <PaperClipIcon className="w-6 h-6" />
@@ -94,17 +109,18 @@ export default function GroupChatInput({ onSend }) {
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
+          accept="image/*,video/*,.pdf,.doc,.docx"
           aria-hidden="true"
         />
         <button
           onClick={handleSend}
           className={`p-2 rounded-full ${
             isSending || (!text.trim() && !file)
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-blue-500 hover:text-blue-600"
+              ? 'text-gray-400 cursor-not-allowed'
+              : 'text-blue-500 hover:text-blue-600'
           } focus:outline-none`}
           disabled={isSending || (!text.trim() && !file)}
-          aria-label="Enviar mensaje"
+          aria-label="Send message"
         >
           <PaperAirplaneIcon className="w-6 h-6" />
         </button>

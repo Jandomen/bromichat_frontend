@@ -32,7 +32,6 @@ const PostDetail = () => {
       setPost(res.data);
     } catch (err) {
       setError('Error al cargar la publicación');
-     // console.error('Error fetching post:', err);
     } finally {
       setLoading(false);
     }
@@ -51,7 +50,7 @@ const PostDetail = () => {
       );
       fetchPost();
     } catch (error) {
-     // console.error('Error al dar like', error);
+     // console.error('Error al dar like:', error);
     }
   };
 
@@ -64,7 +63,7 @@ const PostDetail = () => {
       );
       fetchPost();
     } catch (error) {
-     // console.error('Error al dar dislike', error);
+     // console.error('Error al dar dislike:', error);
     }
   };
 
@@ -77,14 +76,11 @@ const PostDetail = () => {
       );
       fetchPost();
     } catch (error) {
-     // console.error('Error al comentar', error);
+     // console.error('Error al comentar:', error);
     }
   };
 
-  const handleEditPost = () => {
-    setEditingPostId(postId);
-  };
-
+  const handleEditPost = () => setEditingPostId(postId);
   const handleSavePost = async (newContent) => {
     try {
       await axios.put(
@@ -95,13 +91,10 @@ const PostDetail = () => {
       setEditingPostId(null);
       fetchPost();
     } catch (error) {
-     // console.error('Error al editar post', error);
+     // console.error('Error al editar post:', error);
     }
   };
-
-  const handleCancelEditPost = () => {
-    setEditingPostId(null);
-  };
+  const handleCancelEditPost = () => setEditingPostId(null);
 
   const handleDeletePost = async () => {
     if (!window.confirm('¿Seguro que quieres eliminar esta publicación?')) return;
@@ -109,16 +102,13 @@ const PostDetail = () => {
       await axios.delete(`${process.env.REACT_APP_API_BACKEND}/posts/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      window.location.href = '/'; // Adjust based on your routing
+      window.location.href = '/';
     } catch (error) {
-     // console.error('Error al eliminar post', error);
+     // console.error('Error al eliminar post:', error);
     }
   };
 
-  const handleEditComment = (commentId) => {
-    setEditingComment({ postId, commentId });
-  };
-
+  const handleEditComment = (commentId) => setEditingComment({ postId, commentId });
   const handleSaveComment = async (newComment) => {
     try {
       await axios.put(
@@ -129,33 +119,27 @@ const PostDetail = () => {
       setEditingComment({ postId: null, commentId: null });
       fetchPost();
     } catch (error) {
-     // console.error('Error al editar comentario', error);
+     // console.error('Error al editar comentario:', error);
     }
   };
-
-  const handleCancelEditComment = () => {
-    setEditingComment({ postId: null, commentId: null });
-  };
+  const handleCancelEditComment = () => setEditingComment({ postId: null, commentId: null });
 
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('¿Seguro que quieres eliminar este comentario?')) return;
     try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_BACKEND}/posts/${postId}/comment/${commentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`${process.env.REACT_APP_API_BACKEND}/posts/${postId}/comment/${commentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchPost();
     } catch (error) {
-     // console.error('Error al eliminar comentario', error);
+     // console.error('Error al eliminar comentario:', error);
     }
   };
 
   const chunkComments = (comments) => {
     const chunkSize = 10;
     const chunks = [];
-    for (let i = 0; i < comments.length; i += chunkSize) {
-      chunks.push(comments.slice(i, i + chunkSize));
-    }
+    for (let i = 0; i < comments.length; i += chunkSize) chunks.push(comments.slice(i, i + chunkSize));
     return chunks;
   };
 
@@ -177,10 +161,7 @@ const PostDetail = () => {
                 src={getFullImageUrl(post.user?.profilePicture) || defaultProfile}
                 alt={post.user?.username || 'Usuario'}
                 className="w-10 h-10 rounded-full object-cover"
-                onError={(e) => {
-                 // console.error('Error loading profile picture:', e.target.src);
-                  e.target.src = defaultProfile;
-                }}
+                onError={(e) => (e.target.src = defaultProfile)}
               />
               <div>
                 <p className="font-semibold">{post.user?.username || 'Usuario'}</p>
@@ -209,6 +190,7 @@ const PostDetail = () => {
               </div>
             )}
           </div>
+
           {editingPostId === postId ? (
             <EditPostForm
               initialContent={post.content}
@@ -218,7 +200,8 @@ const PostDetail = () => {
           ) : (
             <p className="mb-4 text-xl text-gray-900 font-semibold">{post.content}</p>
           )}
-          {post.media && post.media.length > 0 && (
+
+          {post.media?.length > 0 && (
             <Swiper
               modules={[Navigation, Pagination]}
               navigation
@@ -233,29 +216,41 @@ const PostDetail = () => {
                       src={getFullImageUrl(file.url)}
                       alt={`media-${idx}`}
                       className="max-h-full max-w-full object-contain rounded"
+                      onError={(e) => (e.target.src = defaultProfile)}
                     />
-                  ) : (
+                  ) : file.mediaType === 'video' ? (
                     <video
                       src={getFullImageUrl(file.url)}
                       controls
                       className="max-h-full max-w-full object-contain rounded"
                     />
+                  ) : (
+                    <a
+                      href={getFullImageUrl(file.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 underline break-words"
+                    >
+                      Descargar PDF: {file.url.split('/').pop()}
+                    </a>
                   )}
                 </SwiperSlide>
               ))}
             </Swiper>
           )}
+
           <div className="flex items-center gap-4 my-2">
             <button onClick={handleLike} className="text-green-600">
-              ❤️ {post.likes.length}
+              ❤️ {post.likes?.length || 0}
             </button>
             <button onClick={handleDislike} className="text-red-600">
-              👎 {post.dislikes.length}
+              👎 {post.dislikes?.length || 0}
             </button>
           </div>
+
           <div className="border-t pt-2 mt-2">
             <p className="font-semibold">Comentarios:</p>
-            {post.comments.length <= 10 ? (
+            {post.comments?.length <= 10 ? (
               post.comments.map((c) => (
                 <div key={c._id} className="flex items-start gap-2 my-2 text-sm">
                   <Link
@@ -266,10 +261,7 @@ const PostDetail = () => {
                       src={getFullImageUrl(c.user?.profilePicture) || defaultProfile}
                       alt={c.user?.username || 'Usuario'}
                       className="w-8 h-8 rounded-full object-cover"
-                      onError={(e) => {
-                       // console.error('Error loading profile picture:', e.target.src);
-                        e.target.src = defaultProfile;
-                      }}
+                      onError={(e) => (e.target.src = defaultProfile)}
                     />
                     <span className="font-bold">{c.user?.username || 'Usuario'}</span>
                   </Link>
@@ -325,10 +317,7 @@ const PostDetail = () => {
                             src={getFullImageUrl(c.user?.profilePicture) || defaultProfile}
                             alt={c.user?.username || 'Usuario'}
                             className="w-8 h-8 rounded-full object-cover"
-                            onError={(e) => {
-                             // console.error('Error loading profile picture:', e.target.src);
-                              e.target.src = defaultProfile;
-                            }}
+                            onError={(e) => (e.target.src = defaultProfile)}
                           />
                           <span className="font-bold">{c.user?.username || 'Usuario'}</span>
                         </Link>

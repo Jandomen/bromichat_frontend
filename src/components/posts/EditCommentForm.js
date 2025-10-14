@@ -4,7 +4,7 @@ import { FaTimes, FaCheck } from 'react-icons/fa';
 const EditCommentForm = ({ initialComment, onSave, onCancel }) => {
   const [comment, setComment] = useState(initialComment);
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (comment.trim()) onSave(comment);
   };
@@ -12,11 +12,12 @@ const EditCommentForm = ({ initialComment, onSave, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="p-2 border rounded shadow-sm bg-white">
       <input
-        className="w-full p-1 border rounded text-sm"
         type="text"
-        value={comment}
-        onChange={e => setComment(e.target.value)}
+        aria-label="Editar comentario"
         placeholder="Edita tu comentario..."
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        className="w-full p-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
       />
       <div className="flex justify-end gap-2 mt-2">
         <button
