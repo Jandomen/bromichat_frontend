@@ -12,7 +12,7 @@ import { getFullImageUrl } from "../../utils/getProfilePicture";
 const GroupChat = ({ groupId, onBack }) => {
   const { user } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
-  const { ongoingCalls, callGroup, isWaitingAdmission, requestAdmission } = useContext(CallContext);
+  const { ongoingCalls, callGroup } = useContext(CallContext);
   const [messages, setMessages] = useState([]);
   const [group, setGroup] = useState(null);
   const [users, setUsers] = useState({});
@@ -20,9 +20,7 @@ const GroupChat = ({ groupId, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(null);
-  const [editingMessageId, setEditingMessageId] = useState(null);
-  const [editContent, setEditContent] = useState("");
+
   const [lastSentMessageId, setLastSentMessageId] = useState(null);
   const messagesEndRef = useRef(null);
 

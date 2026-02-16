@@ -5,6 +5,14 @@ import { AuthContext } from './AuthContext';
 import { useUI } from './UIContext';
 import defaultProfile from '../assets/default-profile.png';
 
+const commonIceServers = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+];
+
 export const CallContext = createContext();
 
 export const CallProvider = ({ children }) => {
@@ -59,20 +67,8 @@ export const CallProvider = ({ children }) => {
         callerRef.current = caller;
     });
 
-    // Efecto para aplicar el stream local a myVideo cuando esté disponible
-    useEffect(() => {
-        if (stream && myVideo.current) {
-            myVideo.current.srcObject = stream;
-        }
-    }, [stream, videoOff]);
+    // --- Helper Functions Definitions (Moved up for dependency resolution) ---
 
-    useEffect(() => {
-        if (remoteStream && userVideo.current && callAccepted) {
-            userVideo.current.srcObject = remoteStream;
-        }
-    }, [remoteStream, callAccepted]);
-
-    // --- Gestión de sonidos (Ringtones) ---
     const stopAudio = (ref) => {
         if (ref.current) {
             try {
@@ -88,31 +84,314 @@ export const CallProvider = ({ children }) => {
         }
     };
 
+    const stopScreenShare = React.useCallback((screenTrack, videoTrack) => {
+        if (screenTrack) screenTrack.stop();
+
+        if (connectionRef.current && !connectionRef.current.destroyed) {
+            try {
+                if (videoTrack && screenTrack) {
+                    connectionRef.current.replaceTrack(screenTrack, videoTrack, stream);
+                }
+            } catch (e) { console.error("Error reverting P2P track:", e); }
+        }
+
+        Object.values(peersRef.current).forEach(peer => {
+            if (peer && !peer.destroyed) {
+                try {
+                    if (videoTrack && screenTrack) {
+                        peer.replaceTrack(screenTrack, videoTrack, stream);
+                    }
+                } catch (e) { console.error("Error reverting Group peer track:", e); }
+            }
+        });
+
+        setScreenStream(null);
+        if (myVideo.current) myVideo.current.srcObject = stream;
+
+        // Notificar a otros que dejamos de compartir
+        if (socket && groupIdRef.current) {
+            socket.emit('screen-sharing-status', {
+                groupId: groupIdRef.current,
+                to: targetIdRef.current || callerRef.current,
+                isSharing: false
+            });
+        }
+    }, [socket, stream]);
+
+    const leaveCall = React.useCallback(() => {
+        // Reset de estados
+        setReceivingCall(false);
+        setCallAccepted(false);
+        setIsCalling(false);
+        setCallEnded(false); // Reset para la próxima
+        setName("");
+        setCaller("");
+        setCallerAvatar("");
+        setTargetId(null);
+        setGroupId(null);
+        setIsGroupCall(false);
+        setActiveParticipants([]);
+        setRemoteStream(null);
+        setIsMinimized(false);
+        setIsWaitingAdmission(false);
+        setAdmissionRequests([]);
+        setRemoteIsScreenSharing(false);
+
+        if (connectionRef.current) {
+            connectionRef.current.destroy();
+            connectionRef.current = null;
+        }
+
+        // Limpiar peers grupales
+        Object.values(peersRef.current).forEach(peer => peer.destroy());
+        peersRef.current = {};
+        setRemoteStreams({});
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            setStream(null);
+        }
+
+        if (callTimeoutRef.current) {
+            clearTimeout(callTimeoutRef.current);
+            callTimeoutRef.current = null;
+        }
+
+        // Parar ringtones manualmente con limpieza agresiva
+        stopAudio(ringtoneRef);
+        stopAudio(callingSoundRef);
+
+        if (screenStream) {
+            screenStream.getTracks().forEach(track => track.stop());
+            setScreenStream(null);
+        }
+    }, [stream, screenStream]);
+
+    const declineCall = React.useCallback(() => {
+        if (socket) socket.emit("decline-call", { to: caller });
+        leaveCall();
+    }, [socket, caller, leaveCall]);
+
+    // Movemos requestAdmission, accept/reject aquí para que estén definidos
+    const requestAdmission = React.useCallback((gid, groupName, groupImage) => {
+        setIsWaitingAdmission(true);
+        setGroupId(gid);
+        setName(groupName);
+        setCallerAvatar(groupImage);
+        socket.emit('request-group-admission', {
+            groupId: gid,
+            from: user._id,
+            name: user.username,
+            avatar: user.profilePicture
+        });
+    }, [socket, user]);
+
+    const acceptAdmission = React.useCallback((gid, requesterId) => {
+        socket.emit('accept-admission', { groupId: gid, requesterId });
+        setAdmissionRequests(prev => prev.filter(r => r.requesterId !== requesterId));
+    }, [socket]);
+
+    const rejectAdmission = React.useCallback((gid, requesterId) => {
+        socket.emit('reject-admission', { groupId: gid, requesterId });
+        setAdmissionRequests(prev => prev.filter(r => r.requesterId !== requesterId));
+    }, [socket]);
+
+    const createPeer = React.useCallback((userIdToCall, callerId, localStream, gid) => {
+        const peer = new Peer({
+            initiator: true,
+            trickle: true,
+            stream: localStream,
+            config: { iceServers: commonIceServers }
+        });
+
+        peer.on("error", err => {
+            console.error("Group Peer Error (initiator):", err.message);
+        });
+
+        peer.on("signal", signal => {
+            socket.emit("group-signal", {
+                signal,
+                to: userIdToCall,
+                from: callerId,
+                groupId: gid,
+                name: user.username,
+                avatar: user.profilePicture
+            });
+        });
+
+        peer.on("stream", streamData => {
+            // Buscaremos el nombre en activeParticipants si no lo tenemos todavía
+            setRemoteStreams(prev => ({
+                ...prev,
+                [userIdToCall]: {
+                    stream: streamData,
+                    name: `Usuario ${userIdToCall.substring(0, 4)}`, // Fallback
+                    avatar: defaultProfile
+                }
+            }));
+        });
+
+        return peer;
+    }, [socket, user]);
+
+    const addPeer = React.useCallback((incomingSignal, callerId, localStream, gid, callerName, callerAvatar) => {
+        const peer = new Peer({
+            initiator: false,
+            trickle: true,
+            stream: localStream,
+            config: { iceServers: commonIceServers }
+        });
+
+        peer.on("error", err => {
+            console.error("Group Peer Error (receiver):", err.message);
+        });
+
+        peer.on("signal", signal => {
+            socket.emit("group-signal", {
+                signal,
+                to: callerId,
+                from: user._id,
+                groupId: gid,
+                name: user.username,
+                avatar: user.profilePicture
+            });
+        });
+
+        peer.on("stream", streamData => {
+            setRemoteStreams(prev => ({
+                ...prev,
+                [callerId]: {
+                    stream: streamData,
+                    name: callerName || `Usuario ${callerId.substring(0, 4)}`,
+                    avatar: callerAvatar || defaultProfile
+                }
+            }));
+        });
+
+        if (incomingSignal && !peer.destroyed) {
+            try {
+                peer.signal(incomingSignal);
+            } catch (err) {
+                console.error("Error signaling addPeer:", err);
+            }
+        }
+        return peer;
+    }, [socket, user]);
+
+    const answerCall = React.useCallback(() => {
+        setCallAccepted(true);
+        setIsMinimized(false);
+
+        navigator.mediaDevices.getUserMedia({ video: callType === "video", audio: true })
+            .then((currentStream) => {
+                setStream(currentStream);
+                if (myVideo.current) {
+                    myVideo.current.srcObject = currentStream;
+                }
+
+                if (isGroupCall) {
+                    socket.emit("join-group-call", { groupId, userId: user._id });
+                }
+
+                if (!isGroupCall) {
+                    const peer = new Peer({
+                        initiator: false,
+                        trickle: true,
+                        stream: currentStream,
+                        config: { iceServers: commonIceServers }
+                    });
+
+                    peer.on("error", err => {
+                        console.error("P2P Peer Error (receiver):", err.message);
+                    });
+
+                    let signalCount = 0;
+                    peer.on("signal", (data) => {
+                        if (signalCount === 0) {
+                            socket.emit("answer-call", { signal: data, to: caller });
+                        } else {
+                            socket.emit("p2p-signal", { signal: data, to: caller });
+                        }
+                        signalCount++;
+                    });
+
+                    peer.on("stream", (remoteStreamData) => {
+                        setRemoteStream(remoteStreamData);
+                        if (userVideo.current) {
+                            userVideo.current.srcObject = remoteStreamData;
+                        }
+                    });
+
+                    if (callerSignal && !peer.destroyed) {
+                        try {
+                            peer.signal(callerSignal);
+                        } catch (err) {
+                            console.error("Error signaling answerCall:", err);
+                        }
+                    }
+                    connectionRef.current = peer;
+                }
+            })
+            .catch(err => {
+                console.error("Error accessing media devices:", err);
+                showToast("No se pudo acceder a la cámara o micrófono. Por favor verifica tus permisos.", "error");
+            });
+    }, [callType, isGroupCall, socket, groupId, user, caller, callerSignal, showToast]);
+
+
+    const endCall = React.useCallback((targetIdParam) => {
+        if (isGroupCall || groupId) {
+            socket.emit("leave-group-call", { groupId: groupId || targetId, userId: user._id });
+        } else {
+            socket.emit("end-call", {
+                to: targetIdParam || targetId || caller,
+                groupId: groupId,
+                participants: groupParticipants
+            });
+        }
+        leaveCall();
+    }, [isGroupCall, groupId, socket, targetId, user, caller, groupParticipants, leaveCall]);
+
+    const cancelCall = React.useCallback(() => {
+        if (isGroupCall || groupId) {
+            socket.emit("leave-group-call", { groupId: groupId || targetId, userId: user._id });
+        } else {
+            socket.emit("cancel-call", {
+                to: targetId,
+                groupId: groupId,
+                participants: groupParticipants
+            });
+        }
+        if (callTimeoutRef.current) clearTimeout(callTimeoutRef.current);
+        leaveCall();
+    }, [isGroupCall, groupId, socket, targetId, user, groupParticipants, leaveCall]);
+
+    // --- useEffect Hooks for Logic ---
+
+    // 1. Gestión de sonidos (Ringtones)
     useEffect(() => {
         let audio = null;
         if (receivingCall && !callAccepted) {
-            // Sonidos más "llamativos" para llamadas
             const soundUrl = isGroupCall
-                ? "https://assets.mixkit.co/active_storage/sfx/1358/1358-preview.mp3" // Ringtone rítmico para grupos
-                : "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"; // Ringtone clásico para P2P
+                ? "https://assets.mixkit.co/active_storage/sfx/1358/1358-preview.mp3"
+                : "https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3";
 
             audio = new Audio(soundUrl);
             audio.loop = true;
             ringtoneRef.current = audio;
             audio.play().catch(e => console.log("Audio play blocked by browser. Interaction required."));
         }
-
         return () => {
             if (audio) {
                 stopAudio({ current: audio });
             }
         };
-    }, [receivingCall, callAccepted, name]);
+    }, [receivingCall, callAccepted, isGroupCall]);
 
     useEffect(() => {
         let audio = null;
         if (isCalling) {
-            audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"); // Sonido de espera al llamar
+            audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3");
             audio.loop = true;
             callingSoundRef.current = audio;
             audio.play().catch(e => { });
@@ -124,19 +403,12 @@ export const CallProvider = ({ children }) => {
         };
     }, [isCalling]);
 
-    const commonIceServers = [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' },
-        { urls: 'stun:stun4.l.google.com:19302' },
-    ];
-
+    // 2. Socket Event Listeners (Incoming calls, etc.)
     useEffect(() => {
         if (!socket) return;
 
         socket.on('incoming-call', ({ from, name: callerName, signal, avatar, callType: incomingType }) => {
-            setIsGroupCall(false); // Asegurarse de que no sea grupal
+            setIsGroupCall(false);
             setReceivingCall(true);
             setCaller(from);
             setName(callerName);
@@ -144,7 +416,6 @@ export const CallProvider = ({ children }) => {
             setCallerAvatar(avatar);
             setCallType(incomingType || "video");
 
-            // Timeout de 60s para contestar
             if (callTimeoutRef.current) clearTimeout(callTimeoutRef.current);
             callTimeoutRef.current = setTimeout(() => {
                 if (!callAccepted) {
@@ -187,7 +458,6 @@ export const CallProvider = ({ children }) => {
         socket.on('participant-joined', ({ userId, username }) => {
             setActiveParticipants(prev => [...new Set([...prev, userId])]);
 
-            // Si yo estoy compartiendo pantalla, notificar al nuevo participante específicamente
             if (screenStreamRef.current) {
                 socket.emit('screen-sharing-status', {
                     groupId: groupIdRef.current,
@@ -200,7 +470,6 @@ export const CallProvider = ({ children }) => {
         socket.on('participant-left', ({ userId, count }) => {
             setActiveParticipants(prev => prev.filter(id => id !== userId));
 
-            // Cerrar peer específico
             if (peersRef.current[userId]) {
                 peersRef.current[userId].destroy();
                 delete peersRef.current[userId];
@@ -210,9 +479,6 @@ export const CallProvider = ({ children }) => {
                 delete next[userId];
                 return next;
             });
-
-            // Eliminada la lógica de auto-cerrar si quedan < 2 personas
-            // para permitir que el último usuario quede esperando.
         });
 
         socket.on('admission-request', ({ from, name: requesterName, avatar, groupId: gid }) => {
@@ -221,8 +487,6 @@ export const CallProvider = ({ children }) => {
 
         socket.on('admission-accepted', ({ groupId: gid }) => {
             setIsWaitingAdmission(false);
-            // El usuario que aceptó ya lo notificó. Ahora realmente entramos.
-            // Procedemos a unirse formalmente.
             answerCall();
         });
 
@@ -232,7 +496,6 @@ export const CallProvider = ({ children }) => {
             setIsCalling(false);
             setName("");
             setCaller("");
-            // Podrías mostrar un toast o alerta aquí.
         });
 
         socket.on('call-ended', () => {
@@ -293,116 +556,9 @@ export const CallProvider = ({ children }) => {
             socket.off('participant-left');
             socket.off('remote-screen-sharing');
         };
-    }, [socket]);
+    }, [socket, user, answerCall, declineCall, callAccepted]);
 
-    useEffect(() => {
-        if (!socket) return;
-
-        socket.on('remote-screen-sharing', ({ userId, isSharing }) => {
-            console.log(`User ${userId} screen sharing: ${isSharing}`);
-            if (isGroupCall) {
-                setRemoteStreams(prev => {
-                    if (prev[userId]) {
-                        return {
-                            ...prev,
-                            [userId]: { ...prev[userId], isScreenSharing: isSharing }
-                        };
-                    }
-                    return prev;
-                });
-            } else {
-                setRemoteIsScreenSharing(isSharing);
-            }
-        });
-
-        return () => {
-            socket.off('remote-screen-sharing');
-        };
-    }, [socket, isGroupCall]);
-
-    // --- Group Call Mesh Helpers ---
-    const createPeer = (userIdToCall, callerId, localStream, gid) => {
-        const peer = new Peer({
-            initiator: true,
-            trickle: true,
-            stream: localStream,
-            config: { iceServers: commonIceServers }
-        });
-
-        peer.on("error", err => {
-            console.error("Group Peer Error (initiator):", err.message);
-        });
-
-        peer.on("signal", signal => {
-            socket.emit("group-signal", {
-                signal,
-                to: userIdToCall,
-                from: callerId,
-                groupId: gid,
-                name: user.username,
-                avatar: user.profilePicture
-            });
-        });
-
-        peer.on("stream", streamData => {
-            // Buscaremos el nombre en activeParticipants si no lo tenemos todavía
-            setRemoteStreams(prev => ({
-                ...prev,
-                [userIdToCall]: {
-                    stream: streamData,
-                    name: `Usuario ${userIdToCall.substring(0, 4)}`, // Fallback
-                    avatar: defaultProfile
-                }
-            }));
-        });
-
-        return peer;
-    };
-
-    const addPeer = (incomingSignal, callerId, localStream, gid, callerName, callerAvatar) => {
-        const peer = new Peer({
-            initiator: false,
-            trickle: true,
-            stream: localStream,
-            config: { iceServers: commonIceServers }
-        });
-
-        peer.on("error", err => {
-            console.error("Group Peer Error (receiver):", err.message);
-        });
-
-        peer.on("signal", signal => {
-            socket.emit("group-signal", {
-                signal,
-                to: callerId,
-                from: user._id,
-                groupId: gid,
-                name: user.username,
-                avatar: user.profilePicture
-            });
-        });
-
-        peer.on("stream", streamData => {
-            setRemoteStreams(prev => ({
-                ...prev,
-                [callerId]: {
-                    stream: streamData,
-                    name: callerName || `Usuario ${callerId.substring(0, 4)}`,
-                    avatar: callerAvatar || defaultProfile
-                }
-            }));
-        });
-
-        if (incomingSignal && !peer.destroyed) {
-            try {
-                peer.signal(incomingSignal);
-            } catch (err) {
-                console.error("Error signaling addPeer:", err);
-            }
-        }
-        return peer;
-    };
-
+    // 3. Group Mesh Logic (Join & Signal)
     useEffect(() => {
         if (!socket || !isGroupCall || !stream) return;
 
@@ -412,7 +568,6 @@ export const CallProvider = ({ children }) => {
                 if (pId === user._id) return;
                 const peer = createPeer(pId, user._id, stream, groupId);
 
-                // Si ya estamos compartiendo pantalla, reemplazar track para el nuevo peer
                 if (screenStream) {
                     const screenTrack = screenStream.getVideoTracks()[0];
                     const videoTrack = stream.getVideoTracks()[0];
@@ -447,8 +602,6 @@ export const CallProvider = ({ children }) => {
             } else if (!targetPeer) {
                 const peer = addPeer(signal, from, stream, gid, callerName, callerAvatar);
 
-                // Si ya estamos compartiendo pantalla y somos los receptores del signal (el que se une), 
-                // también debemos asegurar que este peer reciba nuestra pantalla.
                 if (screenStream) {
                     const screenTrack = screenStream.getVideoTracks()[0];
                     const videoTrack = stream.getVideoTracks()[0];
@@ -468,67 +621,50 @@ export const CallProvider = ({ children }) => {
             socket.off('current-participants');
             socket.off('group-signal-receive');
         };
-    }, [socket, isGroupCall, stream, groupId]);
+    }, [socket, isGroupCall, stream, groupId, user, createPeer, addPeer, screenStream]);
 
-    const answerCall = () => {
-        setCallAccepted(true);
-        setIsMinimized(false);
+    // Efecto para aplicar el stream local a myVideo cuando esté disponible
+    useEffect(() => {
+        if (stream && myVideo.current) {
+            myVideo.current.srcObject = stream;
+        }
+    }, [stream, videoOff]);
 
-        navigator.mediaDevices.getUserMedia({ video: callType === "video", audio: true })
-            .then((currentStream) => {
-                setStream(currentStream);
-                if (myVideo.current) {
-                    myVideo.current.srcObject = currentStream;
-                }
+    useEffect(() => {
+        if (remoteStream && userVideo.current && callAccepted) {
+            userVideo.current.srcObject = remoteStream;
+        }
+    }, [remoteStream, callAccepted]);
 
-                if (isGroupCall) {
-                    socket.emit("join-group-call", { groupId, userId: user._id });
-                }
 
-                if (!isGroupCall) {
-                    const peer = new Peer({
-                        initiator: false,
-                        trickle: true,
-                        stream: currentStream,
-                        config: { iceServers: commonIceServers }
-                    });
 
-                    peer.on("error", err => {
-                        console.error("P2P Peer Error (receiver):", err.message);
-                    });
+    useEffect(() => {
+        if (!socket) return;
 
-                    let signalCount = 0;
-                    peer.on("signal", (data) => {
-                        if (signalCount === 0) {
-                            socket.emit("answer-call", { signal: data, to: caller });
-                        } else {
-                            socket.emit("p2p-signal", { signal: data, to: caller });
-                        }
-                        signalCount++;
-                    });
-
-                    peer.on("stream", (remoteStreamData) => {
-                        setRemoteStream(remoteStreamData);
-                        if (userVideo.current) {
-                            userVideo.current.srcObject = remoteStreamData;
-                        }
-                    });
-
-                    if (callerSignal && !peer.destroyed) {
-                        try {
-                            peer.signal(callerSignal);
-                        } catch (err) {
-                            console.error("Error signaling answerCall:", err);
-                        }
+        socket.on('remote-screen-sharing', ({ userId, isSharing }) => {
+            console.log(`User ${userId} screen sharing: ${isSharing}`);
+            if (isGroupCall) {
+                setRemoteStreams(prev => {
+                    if (prev[userId]) {
+                        return {
+                            ...prev,
+                            [userId]: { ...prev[userId], isScreenSharing: isSharing }
+                        };
                     }
-                    connectionRef.current = peer;
-                }
-            })
-            .catch(err => {
-                console.error("Error accessing media devices:", err);
-                showToast("No se pudo acceder a la cámara o micrófono. Por favor verifica tus permisos.", "error");
-            });
-    };
+                    return prev;
+                });
+            } else {
+                setRemoteIsScreenSharing(isSharing);
+            }
+        });
+
+        return () => {
+            socket.off('remote-screen-sharing');
+        };
+    }, [socket, isGroupCall]);
+
+    // --- Group Call Mesh Helpers ---
+
 
     const callUser = (id, targetName, targetAvatar, type = "video", convId = null) => {
         setCallType(type);
@@ -595,111 +731,9 @@ export const CallProvider = ({ children }) => {
             });
     };
 
-    const requestAdmission = (gid, groupName, groupImage) => {
-        setIsWaitingAdmission(true);
-        setGroupId(gid);
-        setName(groupName);
-        setCallerAvatar(groupImage);
-        socket.emit('request-group-admission', {
-            groupId: gid,
-            from: user._id,
-            name: user.username,
-            avatar: user.profilePicture
-        });
-    };
 
-    const acceptAdmission = (gid, requesterId) => {
-        socket.emit('accept-admission', { groupId: gid, requesterId });
-        setAdmissionRequests(prev => prev.filter(r => r.requesterId !== requesterId));
-    };
 
-    const rejectAdmission = (gid, requesterId) => {
-        socket.emit('reject-admission', { groupId: gid, requesterId });
-        setAdmissionRequests(prev => prev.filter(r => r.requesterId !== requesterId));
-    };
-
-    const leaveCall = () => {
-        // Reset de estados
-        setReceivingCall(false);
-        setCallAccepted(false);
-        setIsCalling(false);
-        setCallEnded(false); // Reset para la próxima
-        setName("");
-        setCaller("");
-        setCallerAvatar("");
-        setTargetId(null);
-        setGroupId(null);
-        setIsGroupCall(false);
-        setActiveParticipants([]);
-        setRemoteStream(null);
-        setIsMinimized(false);
-        setIsWaitingAdmission(false);
-        setAdmissionRequests([]);
-        setRemoteIsScreenSharing(false);
-
-        if (connectionRef.current) {
-            connectionRef.current.destroy();
-            connectionRef.current = null;
-        }
-
-        // Limpiar peers grupales
-        Object.values(peersRef.current).forEach(peer => peer.destroy());
-        peersRef.current = {};
-        setRemoteStreams({});
-
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(null);
-        }
-
-        if (callTimeoutRef.current) {
-            clearTimeout(callTimeoutRef.current);
-            callTimeoutRef.current = null;
-        }
-
-        // Parar ringtones manualmente con limpieza agresiva
-        stopAudio(ringtoneRef);
-        stopAudio(callingSoundRef);
-
-        if (screenStream) {
-            screenStream.getTracks().forEach(track => track.stop());
-            setScreenStream(null);
-        }
-    };
-
-    const declineCall = () => {
-        socket.emit("decline-call", { to: caller });
-        leaveCall();
-    };
-
-    const endCall = (targetIdParam) => {
-        if (isGroupCall || groupId) {
-            socket.emit("leave-group-call", { groupId: groupId || targetId, userId: user._id });
-        } else {
-            socket.emit("end-call", {
-                to: targetIdParam || targetId || caller,
-                groupId: groupId,
-                participants: groupParticipants
-            });
-        }
-        leaveCall();
-    };
-
-    const cancelCall = () => {
-        if (isGroupCall || groupId) {
-            socket.emit("leave-group-call", { groupId: groupId || targetId, userId: user._id });
-        } else {
-            socket.emit("cancel-call", {
-                to: targetId,
-                groupId: groupId,
-                participants: groupParticipants
-            });
-        }
-        if (callTimeoutRef.current) clearTimeout(callTimeoutRef.current);
-        leaveCall();
-    };
-
-    const toggleScreenShare = () => {
+    const toggleScreenShare = React.useCallback(() => {
         if (!screenStream) {
             navigator.mediaDevices.getDisplayMedia({
                 video: {
@@ -756,42 +790,12 @@ export const CallProvider = ({ children }) => {
             const videoTrack = stream.getVideoTracks()[0];
             stopScreenShare(screenTrack, videoTrack);
         }
-    };
-
-    const stopScreenShare = (screenTrack, videoTrack) => {
-        if (screenTrack) screenTrack.stop();
-
-        if (connectionRef.current && !connectionRef.current.destroyed) {
-            try {
-                if (videoTrack && screenTrack) {
-                    connectionRef.current.replaceTrack(screenTrack, videoTrack, stream);
-                }
-            } catch (e) { console.error("Error reverting P2P track:", e); }
-        }
-
-        Object.values(peersRef.current).forEach(peer => {
-            if (peer && !peer.destroyed) {
-                try {
-                    if (videoTrack && screenTrack) {
-                        peer.replaceTrack(screenTrack, videoTrack, stream);
-                    }
-                } catch (e) { console.error("Error reverting Group peer track:", e); }
-            }
-        });
-
-        setScreenStream(null);
-        if (myVideo.current) myVideo.current.srcObject = stream;
-
-        // Notificar a otros que dejamos de compartir
-        socket.emit('screen-sharing-status', {
-            groupId: groupIdRef.current,
-            to: targetIdRef.current || callerRef.current,
-            isSharing: false
-        });
-    };
+    }, [screenStream, stream, stopScreenShare, socket]);
 
 
-    const callGroup = (id, groupName, groupImage, participants = []) => {
+
+
+    const callGroup = React.useCallback((id, groupName, groupImage, participants = []) => {
         setGroupId(id);
         const memberIds = participants.map(p => typeof p === 'string' ? p : p._id);
         setGroupParticipants(memberIds);
@@ -821,7 +825,7 @@ export const CallProvider = ({ children }) => {
                 }
             })
             .catch(err => console.error(err));
-    };
+    }, [user, socket]);
 
     const toggleMute = () => {
         if (stream) {

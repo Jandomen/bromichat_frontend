@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { useUI } from '../../context/UIContext';
-import { AlertTriangle, Plus, Trash2, Save, Power, User, Phone, MessageSquare } from 'lucide-react';
+import { AlertTriangle, Plus, Trash2, Save, User, Phone, MessageSquare } from 'lucide-react';
 
 const SosSettings = () => {
     const { user, token, setUser } = useContext(AuthContext);
@@ -150,8 +150,8 @@ const SosSettings = () => {
                 onClick={handleSave}
                 disabled={loading}
                 className={`w-full py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl flex items-center justify-center gap-3 ${loading
-                        ? 'bg-gray-100 text-gray-400'
-                        : 'bg-red-600 text-white hover:bg-red-700 shadow-red-200 active:scale-95'
+                    ? 'bg-gray-100 text-gray-400'
+                    : 'bg-red-600 text-white hover:bg-red-700 shadow-red-200 active:scale-95'
                     }`}
             >
                 {loading ? 'Sincronizando...' : (

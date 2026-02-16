@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
 import { FaPlus, FaUsers, FaSearch } from 'react-icons/fa';
@@ -20,30 +20,30 @@ const Groups = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        if (token) {
-            fetchGroups();
-            fetchFriends();
-        }
-    }, [token]);
-
-    const fetchGroups = async () => {
+    const fetchGroups = useCallback(async () => {
         try {
             const res = await api.get('/communities');
             setGroups(res.data);
         } catch (error) {
             console.error('Error fetching groups:', error);
         }
-    };
+    }, []);
 
-    const fetchFriends = async () => {
+    const fetchFriends = useCallback(async () => {
         try {
             const res = await api.get(`/friend/friends/${user._id}`);
             setFriends(res.data.friends || []);
         } catch (error) {
             console.error('Error fetching friends:', error);
         }
-    };
+    }, [user._id]);
+
+    useEffect(() => {
+        if (token && user?._id) {
+            fetchGroups();
+            fetchFriends();
+        }
+    }, [token, user, fetchGroups, fetchFriends]);
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();

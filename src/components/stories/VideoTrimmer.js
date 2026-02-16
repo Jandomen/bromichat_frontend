@@ -4,7 +4,7 @@ import { X, Scissors, Play, Pause, Check } from 'lucide-react';
 const VideoTrimmer = ({ file, onConfirm, onCancel }) => {
     const videoRef = useRef(null);
     const [duration, setDuration] = useState(0);
-    const [currentTime, setCurrentTime] = useState(0);
+
     const [isPlaying, setIsPlaying] = useState(false);
     const [startOffset, setStartOffset] = useState(0);
     const [videoUrl, setVideoUrl] = useState('');
@@ -31,7 +31,7 @@ const VideoTrimmer = ({ file, onConfirm, onCancel }) => {
 
     const handleTimeUpdate = () => {
         if (videoRef.current) {
-            setCurrentTime(videoRef.current.currentTime);
+
 
             // Auto-loop within the 20s window during preview
             if (duration > 20 && videoRef.current.currentTime > startOffset + 20) {

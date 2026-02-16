@@ -48,7 +48,8 @@ const CommentItem = ({
 
         let currentTargetId = highlightedCommentId;
         while (currentTargetId) {
-            const current = allComments.find(c => (c._id?.toString() || c._id) === currentTargetId.toString());
+            const targetId = currentTargetId;
+            const current = allComments.find(c => (c._id?.toString() || c._id) === targetId.toString());
             if (!current) break;
 
             const pId = current.parentId?._id || current.parentId;

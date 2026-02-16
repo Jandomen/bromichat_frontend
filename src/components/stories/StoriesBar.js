@@ -19,6 +19,10 @@ const StoriesBar = () => {
     const [trimmingFile, setTrimmingFile] = useState(null);
     const fileInputRef = useRef(null);
 
+    const [showCreateOptions, setShowCreateOptions] = useState(false);
+    const [showTextCreator, setShowTextCreator] = useState(false);
+    const [textStory, setTextStory] = useState({ content: '', backgroundColor: '#ec4899' });
+
     const fetchStories = useCallback(async () => {
         if (!token) return;
         try {
@@ -51,45 +55,7 @@ const StoriesBar = () => {
         return () => socket.off('newStory', fetchStories);
     }, [socket, fetchStories]);
 
-    const [showCreateOptions, setShowCreateOptions] = useState(false);
-    const [showTextCreator, setShowTextCreator] = useState(false);
-    const [textStory, setTextStory] = useState({ content: '', backgroundColor: '#ec4899' }); // Default pinkish
-
-    // Safety check for video duration
-    const checkVideoDuration = (file) => {
-        return new Promise((resolve, reject) => {
-            const video = document.createElement('video');
-            video.preload = 'metadata';
-            video.onloadedmetadata = function () {
-                window.URL.revokeObjectURL(video.src);
-                resolve(video.duration);
-            };
-            video.onerror = function () {
-                reject("Invalid video");
-            }
-            video.src = URL.createObjectURL(file);
-        });
-    };
-
-    const handleFileUpload = useCallback((e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (file.type.startsWith('video')) {
-            setTrimmingFile(file);
-            return;
-        }
-
-        performUpload(file);
-    }, [token, currentUser]);
-
-    const handleTrimConfirm = useCallback((startOffset) => {
-        const file = trimmingFile;
-        setTrimmingFile(null);
-        performUpload(file, startOffset);
-    }, [trimmingFile, token, currentUser]);
-
-    const performUpload = async (file, startOffset = 0) => {
+    const performUpload = useCallback(async (file, startOffset = 0) => {
         setUploading(true);
         const formData = new FormData();
         formData.append('media', file);
@@ -115,7 +81,25 @@ const StoriesBar = () => {
             setUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
         }
-    };
+    }, [token, fetchStories, showToast]);
+
+    const handleFileUpload = useCallback((e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.type.startsWith('video')) {
+            setTrimmingFile(file);
+            return;
+        }
+
+        performUpload(file);
+    }, [performUpload]);
+
+    const handleTrimConfirm = useCallback((startOffset) => {
+        const file = trimmingFile;
+        setTrimmingFile(null);
+        performUpload(file, startOffset);
+    }, [trimmingFile, performUpload]);
 
     const handleTextStorySubmit = useCallback(async (e) => {
         e.preventDefault();
@@ -141,7 +125,7 @@ const StoriesBar = () => {
         } finally {
             setUploading(false);
         }
-    }, [textStory, token, currentUser]);
+    }, [textStory, token, fetchStories, showToast]);
 
     const handleMyStoryClick = () => {
         setShowCreateOptions(true);
@@ -154,7 +138,7 @@ const StoriesBar = () => {
     const handleCloseViewer = useCallback(() => {
         setSelectedUserIndex(null);
         fetchStories();
-    }, [token]);
+    }, [fetchStories]);
 
     // Find my existing stories group
     const myId = currentUser?._id?.toString();

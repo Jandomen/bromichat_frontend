@@ -83,7 +83,7 @@ const ChangeProfilePicture = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `${process.env.REACT_APP_API_BACKEND}/user/profile-picture`,
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { searchProducts } from "../../services/productService";
 import { AuthContext } from "../../context/AuthContext";
 import { getFullImageUrl } from "../../utils/getProfilePicture";
@@ -7,7 +7,7 @@ import debounce from "lodash.debounce";
 import { Search, Loader2, MessageCircle, X, Tag } from "lucide-react";
 
 const ProductSearch = () => {
-  const { token, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,27 +16,37 @@ const ProductSearch = () => {
 
   const categories = ["Todas", "Electrónica", "Moda", "Hogar", "Vehículos", "Mascotas", "Deportes", "Otros"];
 
-  const debouncedSearch = debounce(async (term) => {
-    if (!term.trim()) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await searchProducts(term, selectedCategory);
-      setResults(res.filter((p) => p.user));
-    } catch (err) {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, 500);
+  const debouncedSearch = useMemo(
+    () => debounce(async (term) => {
+      if (!term.trim()) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await searchProducts(term, selectedCategory); // Captures current selectedCategory?
+        // Wait, selectedCategory is state.
+        // If debouncedSearch is recreated when selectedCategory changes (dep array), then `term` from input matches new category?
+        // Yes, because query is passed to debouncedSearch(query).
+        // If selectedCategory changes, debouncedSearch is recreated.
+        // But debounce cancels pending? debounce is new instance.
+        // So pending search for OLD category is lost (good).
+        // BUT wait, searchProducts uses selectedCategory from closure.
+        setResults(res.filter((p) => p.user));
+      } catch (err) {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500),
+    [selectedCategory]
+  );
 
   useEffect(() => {
     debouncedSearch(query);
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory]);
+  }, [query, debouncedSearch]);
 
   return (
     <div className="space-y-12 animate-slide-up">

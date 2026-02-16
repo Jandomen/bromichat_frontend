@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -8,43 +8,47 @@ import { getFullImageUrl } from '../../utils/getProfilePicture';
 import SendMessageButton from '../../buttons/SendMessageButton';
 
 const UserSearch = () => {
-  const { token, user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const debouncedSearch = debounce(async (term) => {
-    if (!term.trim()) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (term) => {
+        if (!term.trim()) {
+          setResults([]);
+          setLoading(false);
+          return;
+        }
 
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get(`/user/search?query=${encodeURIComponent(term)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        setLoading(true);
+        setError(null);
+        try {
+          const res = await api.get(`/user/search?query=${encodeURIComponent(term)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
 
-      const sortedResults = res.data.users.sort((a, b) =>
-        a.username.toLowerCase().startsWith(term.toLowerCase()) ? -1 : 1
-      );
-      setResults(sortedResults);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Error al buscar usuarios');
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, 500);
+          const sortedResults = res.data.users.sort((a, b) =>
+            a.username.toLowerCase().startsWith(term.toLowerCase()) ? -1 : 1
+          );
+          setResults(sortedResults);
+        } catch (err) {
+          setError(err.response?.data?.error || 'Error al buscar usuarios');
+          setResults([]);
+        } finally {
+          setLoading(false);
+        }
+      }, 500),
+    [token]
+  );
 
   useEffect(() => {
     debouncedSearch(searchTerm);
     return () => debouncedSearch.cancel();
-  }, [searchTerm, token]);
+  }, [searchTerm, debouncedSearch]);
 
   return (
     <div className="max-w-4xl mx-auto p-0">

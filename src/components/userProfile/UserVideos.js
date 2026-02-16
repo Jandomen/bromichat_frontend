@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
 import api from '../../services/api';
 import { useUI } from '../../context/UIContext';
@@ -7,6 +7,13 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
   const { showToast, showConfirm } = useUI();
   const [openMenuId, setOpenMenuId] = useState(null);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(null);
+
+  const validVideos = useMemo(() => {
+    if (!Array.isArray(videos)) return [];
+    return videos.filter(
+      (video) => video && typeof video === 'object' && video.videoUrl
+    );
+  }, [videos]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -23,7 +30,7 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMediaIndex, videos]);
+  }, [selectedMediaIndex, validVideos]);
 
   const getFullVideoUrl = (videoUrl) => {
     if (!videoUrl) return '';
@@ -56,13 +63,8 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
   };
 
   if (!Array.isArray(videos)) {
-    // console.warn('UserVideos: videos prop is not an array:', videos);
     return <p>No hay videos.</p>;
   }
-
-  const validVideos = videos.filter(
-    (video) => video && typeof video === 'object' && video.videoUrl
-  );
 
   if (!validVideos.length) {
     return <p>No hay videos disponibles.</p>;
@@ -81,7 +83,7 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
             >
               <video
                 src={getFullVideoUrl(video.videoUrl)}
-                poster={video.thumbnailUrl || ''} // removed default generic image to let black bg show if none
+                poster={video.thumbnailUrl || ''}
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
                 preload="metadata"
               />
@@ -93,7 +95,6 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
                 </div>
               </div>
 
-              {/* Duration or other badges could go here */}
             </div>
 
             {/* Info Area */}
@@ -198,6 +199,5 @@ const UserVideos = ({ videos = [], authUser, onDelete, scrollToTop }) => {
     </>
   );
 };
-
 
 export default UserVideos;

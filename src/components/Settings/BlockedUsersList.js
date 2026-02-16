@@ -4,10 +4,10 @@ import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
-import defaultProfile from '../../assets/default-profile.png';
+
 
 const BlockedUsersList = () => {
-  const { token, user: currentUser } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [loading, setLoading] = useState(true);

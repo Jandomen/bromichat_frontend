@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { Search, X } from 'lucide-react';
 
 const PhotoSearch = ({ onSearch, placeholder = "Buscar fotos por descripción..." }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const debouncedSearch = debounce((term) => {
-        onSearch(term.trim());
-    }, 400);
+    const debouncedSearch = useMemo(
+        () => debounce((term) => {
+            onSearch(term.trim());
+        }, 400),
+        [onSearch]
+    );
 
     useEffect(() => {
         debouncedSearch(searchTerm);
         return () => debouncedSearch.cancel();
-    }, [searchTerm]);
+    }, [searchTerm, debouncedSearch]);
 
     return (
         <div className="relative group max-w-2xl mx-auto w-full px-4">

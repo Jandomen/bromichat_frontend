@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import VideoUpload from './videos/VideoUpload';
@@ -15,12 +15,11 @@ const Videos = () => {
   const { token, user } = useContext(AuthContext);
   const [videos, setVideos] = useState([]);
   const [discoverVideos, setDiscoverVideos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [view, setView] = useState('discover'); // 'feed' (Shorts), 'my' (Gallery), 'discover' (Grid)
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  const fetchUserVideos = async () => {
+  const fetchUserVideos = useCallback(async () => {
     if (!token) return;
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_BACKEND}/videos/user/videos`, {
@@ -28,9 +27,9 @@ const Videos = () => {
       });
       setVideos(res.data);
     } catch (err) { }
-  };
+  }, [token]);
 
-  const fetchGlobalFeed = async (cat = selectedCategory) => {
+  const fetchGlobalFeed = useCallback(async (cat = selectedCategory) => {
     if (!token) return;
     setLoading(true);
     try {
@@ -42,12 +41,12 @@ const Videos = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, selectedCategory]);
 
   useEffect(() => {
     fetchUserVideos();
     fetchGlobalFeed();
-  }, [token]);
+  }, [fetchUserVideos, fetchGlobalFeed]);
 
   const handleUpload = async (formData) => {
     try {
@@ -57,7 +56,6 @@ const Videos = () => {
   };
 
   const handleSearch = async (term) => {
-    setSearchTerm(term);
     if (!token) return;
 
     if (!term) {

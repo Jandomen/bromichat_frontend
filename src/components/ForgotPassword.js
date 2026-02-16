@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ChevronLeft, Send, Sparkles } from 'lucide-react';
+import { Mail, ChevronLeft, Sparkles } from 'lucide-react';
 
 import bImg from '../assets/b-removebg-preview.png';
 import rImg from '../assets/r-removebg-preview.png';
@@ -16,7 +16,7 @@ import tImg from '../assets/t-removebg-preview.png';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(false);
+
     const { showToast } = useUI();
     const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const ForgotPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+
 
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_BACKEND}/auth/forgot-password`, { email });
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         } catch (error) {
             showToast(error.response?.data?.message || 'Error al procesar la solicitud.', 'error');
         } finally {
-            setLoading(false);
+
         }
     };
 

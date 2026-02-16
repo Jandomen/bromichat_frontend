@@ -14,7 +14,7 @@ const ProductFeed = () => {
 
   const categories = ["Todas", "Electrónica", "Moda", "Hogar", "Vehículos", "Mascotas", "Deportes", "Otros"];
 
-  const fetchProducts = async (cat = selectedCategory) => {
+  const fetchProducts = React.useCallback(async (cat = selectedCategory) => {
     setLoading(true);
     try {
       const res = await getRandomProducts(1, token, cat);
@@ -24,11 +24,11 @@ const ProductFeed = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, selectedCategory]);
 
   useEffect(() => {
     fetchProducts();
-  }, [token, selectedCategory]);
+  }, [fetchProducts]);
 
   return (
     <div className="space-y-10">

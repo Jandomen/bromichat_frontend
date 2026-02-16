@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { SocketContext } from "../../context/SocketContext";
 import { AuthContext } from "../../context/AuthContext";
@@ -9,18 +9,11 @@ import UserInfo from "../userProfile/UserInfo";
 import UserPosts from "../userProfile/UserPosts";
 import UserGallery from "../userProfile/UserGallery";
 import MyFriendsList from '../friends/FriendsList';
-import MyFollowersList from '../friends/FollowersList';
-import MyFollowingList from '../friends/FollowingList';
 import UserVideos from "../userProfile/UserVideos";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import defaultProfile from '../../assets/default-profile.png';
 import { getFullImageUrl } from "../../utils/getProfilePicture";
-import Layout from '../Layout/Layout';
-
-// ... inside component ...
-
-
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -34,14 +27,10 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const userInfoRef = useRef(null);
-  const postsRef = useRef(null);
-  const photosRef = useRef(null);
-  const videosRef = useRef(null);
   const footerRef = useRef(null);
 
   // Fetch all user data
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     const cancelTokenSource = axios.CancelToken.source();
     try {
       const [userRes, postsRes, videosRes, photosRes] = await Promise.all([
@@ -76,13 +65,18 @@ const UserProfile = () => {
     }
 
     return () => cancelTokenSource.cancel("Unmounted");
-  };
+  }, [userId]);
 
   useEffect(() => {
     setLoading(true);
     setPosts([]);
-    fetchUserData();
-  }, [userId, token]);
+    const promise = fetchUserData();
+
+    // Attempt to handle cleanup if fetchUserData returns one (it returns a promise resolving to one)
+    return () => {
+      promise.then(cleanup => typeof cleanup === 'function' && cleanup());
+    };
+  }, [userId, token, fetchUserData]);
 
   // Socket events for friends/followers/blocked
   useEffect(() => {

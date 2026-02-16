@@ -87,7 +87,7 @@ const NetworkStatus = () => {
                 navigator.connection.removeEventListener('change', handleConnectionChange);
             }
         };
-    }, []);
+    }, [queue, token, showToast, removeFromQueue]);
 
     if (!showStatus && isOnline) return (
         <div className="fixed top-6 right-6 z-[1000] flex items-center gap-2 pointer-events-none">

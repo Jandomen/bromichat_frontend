@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import api from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
@@ -17,7 +17,7 @@ const GroupProfile = () => {
     const [group, setGroup] = useState(null);
     const [posts, setPosts] = useState([]);
     const [isMember, setIsMember] = useState(false);
-    const [newPostContent, setNewPostContent] = useState('');
+
     const [loading, setLoading] = useState(true);
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [friends, setFriends] = useState([]);
@@ -27,13 +27,7 @@ const GroupProfile = () => {
     const [editPreview, setEditPreview] = useState(null);
     const { showToast, showConfirm } = useUI();
 
-    useEffect(() => {
-        fetchGroupDetails();
-        fetchGroupPosts();
-        if (currentUser) fetchFriends();
-    }, [groupId, currentUser]);
-
-    const fetchGroupDetails = async () => {
+    const fetchGroupDetails = useCallback(async () => {
         try {
             const res = await api.get(`/communities/${groupId}`);
             setGroup(res.data);
@@ -55,9 +49,9 @@ const GroupProfile = () => {
             console.error('Error fetching group details:', error);
             setLoading(false);
         }
-    };
+    }, [groupId, currentUser]);
 
-    const fetchFriends = async () => {
+    const fetchFriends = useCallback(async () => {
         try {
             const res = await api.get(`/friend/friends/${currentUser._id}`);
             // Fix: res.data is likely { friends: [...] }
@@ -66,16 +60,22 @@ const GroupProfile = () => {
             console.error('Error fetching friends:', error);
             setFriends([]);
         }
-    };
+    }, [currentUser]);
 
-    const fetchGroupPosts = async () => {
+    const fetchGroupPosts = useCallback(async () => {
         try {
             const res = await api.get(`/communities/${groupId}/posts`);
             setPosts(res.data);
         } catch (error) {
             console.error('Error fetching group posts:', error);
         }
-    };
+    }, [groupId]);
+
+    useEffect(() => {
+        fetchGroupDetails();
+        fetchGroupPosts();
+        if (currentUser) fetchFriends();
+    }, [fetchGroupDetails, fetchGroupPosts, fetchFriends, currentUser]);
 
     const handleJoinLeave = async () => {
         // Optimistic Update
@@ -153,25 +153,12 @@ const GroupProfile = () => {
         );
     };
 
-    const handleCreatePost = async (e) => {
-        e.preventDefault();
-        if (!newPostContent.trim()) return;
 
-        try {
-            await api.post(`/communities/${groupId}/posts`, {
-                content: newPostContent
-            });
-            setNewPostContent('');
-            fetchGroupPosts();
-        } catch (error) {
-            console.error('Error creating post:', error);
-        }
-    };
 
     if (loading) return <Layout><div className="flex items-center justify-center min-h-screen">Cargando...</div></Layout>;
     if (!group) return <Layout><div className="flex items-center justify-center min-h-screen">Grupo no encontrado</div></Layout>;
 
-    const isAdmin = group.admins?.some(admin => (admin._id || admin) === currentUser?._id) || group.creator?._id === currentUser?._id;
+
 
     return (
         <Layout>

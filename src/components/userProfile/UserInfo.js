@@ -5,15 +5,11 @@ import { SocketContext } from '../../context/SocketContext';
 import api from '../../services/api';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
-import MyFriendsList from '../friends/FriendsList';
-import MyFollowersList from '../friends/FollowersList';
-import MyFollowingList from '../friends/FollowingList';
-import { Button, CircularProgress, Typography, Box, Tabs, Tab } from '@mui/material';
+import { CircularProgress, Typography, Box } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import ChatIcon from '@mui/icons-material/Chat';
 import BlockIcon from '@mui/icons-material/Block';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import SendMessageButton from '../../buttons/SendMessageButton';
@@ -29,20 +25,15 @@ const UserInfo = ({ user }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [activeTab, setActiveTab] = useState('friends');
   const [selectedImage, setSelectedImage] = useState(null);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
   const [showStoryViewer, setShowStoryViewer] = useState(false);
 
   useEffect(() => {
-    // console.log('Depuración - Current User:', currentUser);
-    // console.log('Depuración - User prop:', user);
     const fetchUserData = async () => {
       if (!id || !token || !currentUser) {
-        setError('ID de usuario, token o usuario actual no disponible');
-        // console.log('Depuración - Error en fetchUserData: Falta id, token o currentUser', { id, token, currentUser });
+        console.error('ID de usuario, token o usuario actual no disponible');
         return;
       }
       setLoading(true);
@@ -51,7 +42,6 @@ const UserInfo = ({ user }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userDataFromApi = res.data;
-        // console.log('Depuración - Datos del usuario desde API:', userDataFromApi);
         setUserData({
           ...userDataFromApi,
           isFriend: userDataFromApi.isFriend || false,
@@ -64,12 +54,11 @@ const UserInfo = ({ user }) => {
         });
         setLoading(false);
       } catch (err) {
-        setError(
+        console.error(
           err.response?.data?.message ||
           err.response?.data?.error ||
           'Error al cargar el usuario'
         );
-        // console.error('Depuración - Error en fetchUserData:', err);
         setLoading(false);
       }
     };
@@ -87,165 +76,137 @@ const UserInfo = ({ user }) => {
         following: user.following || [],
         profilePicture: user.profilePicture || null,
       });
-      // console.log('Depuración - userData inicializado desde prop user:', user);
     }
   }, [id, token, user, currentUser]);
 
   useEffect(() => {
     if (!socket || !userData || !currentUser) return;
 
-    socket.on('friendAdded', ({ friendId, friends, isFriend }) => {
-      // console.log('Depuración - Evento friendAdded:', { friendId, friends, isFriend });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, friends }));
-        setCurrentUser((prev) => ({ ...prev, friends }));
-      } else if (userData._id === friendId) {
-        setUserData((prev) => ({
-          ...prev,
-          friends: friends || prev.friends,
-          isFriend: isFriend ?? true,
-        }));
-      }
-    });
+    const handlers = {
+      friendAdded: ({ friendId, friends, isFriend }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, friends }));
+          setCurrentUser((prev) => ({ ...prev, friends }));
+        } else if (userData._id === friendId) {
+          setUserData((prev) => ({
+            ...prev,
+            friends: friends || prev.friends,
+            isFriend: isFriend ?? true,
+          }));
+        }
+      },
+      friendRemoved: ({ friendId, friends, isFriend }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, friends }));
+          setCurrentUser((prev) => ({ ...prev, friends }));
+        } else if (userData._id === friendId) {
+          setUserData((prev) => ({
+            ...prev,
+            friends: friends || prev.friends,
+            isFriend: isFriend ?? false,
+          }));
+        }
+      },
+      followed: ({ targetId, following, isFollowing }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, following }));
+          setCurrentUser((prev) => ({ ...prev, following }));
+        } else if (userData._id === targetId) {
+          setUserData((prev) => ({
+            ...prev,
+            followers: prev.followers ? [...prev.followers, currentUser] : [currentUser],
+            isFollowing: isFollowing ?? true,
+          }));
+        }
+      },
+      newFollower: ({ followerId, followers }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, followers }));
+          setCurrentUser((prev) => ({ ...prev, followers }));
+        } else if (userData._id === followerId) {
+          setUserData((prev) => ({
+            ...prev,
+            followers: followers || prev.friends,
+          }));
+        }
+      },
+      unfollowed: ({ targetId, following, isFollowing }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, following }));
+          setCurrentUser((prev) => ({ ...prev, following }));
+        } else if (userData._id === targetId) {
+          setUserData((prev) => ({
+            ...prev,
+            followers: prev.followers ? prev.followers.filter(f => f._id.toString() !== currentUser._id.toString()) : [],
+            isFollowing: isFollowing ?? false,
+          }));
+        }
+      },
+      followerRemoved: ({ followerId, followers }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, followers }));
+          setCurrentUser((prev) => ({ ...prev, followers }));
+        } else if (userData._id === followerId) {
+          setUserData((prev) => ({
+            ...prev,
+            followers: followers || prev.followers,
+          }));
+        }
+      },
+      userBlocked: ({ targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, blockedUsers, friends, following }));
+          setCurrentUser((prev) => ({ ...prev, blockedUsers, friends, following }));
+        } else if (userData._id === targetId) {
+          setUserData((prev) => ({
+            ...prev,
+            isBlocked: isBlocked ?? true,
+            isFriend: isFriend ?? false,
+            isFollowing: isFollowing ?? false,
+          }));
+        }
+      },
+      blockedByUser: ({ blockerId, friends, followers }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, friends, followers }));
+          setCurrentUser((prev) => ({ ...prev, friends, followers }));
+        } else if (userData._id === blockerId) {
+          setUserData((prev) => ({
+            ...prev,
+            friends: friends || prev.friends,
+            followers: followers || prev.followers,
+            isFriend: false,
+            isFollowing: false,
+          }));
+        }
+      },
+      userUnblocked: ({ targetId, blockedUsers, isBlocked }) => {
+        if (userData._id === currentUser._id) {
+          setUserData((prev) => ({ ...prev, blockedUsers }));
+          setCurrentUser((prev) => ({ ...prev, blockedUsers }));
+        } else if (userData._id === targetId) {
+          setUserData((prev) => ({
+            ...prev,
+            isBlocked: isBlocked ?? false,
+          }));
+        }
+      },
+      unblockedByUser: ({ blockerId }) => {
+        if (userData._id === blockerId) {
+          setUserData((prev) => ({ ...prev }));
+        }
+      },
+    };
 
-    socket.on('friendRemoved', ({ friendId, friends, isFriend }) => {
-      // console.log('Depuración - Evento friendRemoved:', { friendId, friends, isFriend });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, friends }));
-        setCurrentUser((prev) => ({ ...prev, friends }));
-      } else if (userData._id === friendId) {
-        setUserData((prev) => ({
-          ...prev,
-          friends: friends || prev.friends,
-          isFriend: isFriend ?? false,
-        }));
-      }
-    });
-
-    socket.on('followed', ({ targetId, following, isFollowing }) => {
-      // console.log('Depuración - Evento followed:', { targetId, following, isFollowing });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, following }));
-        setCurrentUser((prev) => ({ ...prev, following }));
-      } else if (userData._id === targetId) {
-        setUserData((prev) => ({
-          ...prev,
-          followers: prev.followers ? [...prev.followers, currentUser] : [currentUser],
-          isFollowing: isFollowing ?? true,
-        }));
-      }
-    });
-
-    socket.on('newFollower', ({ followerId, followers }) => {
-      // console.log('Depuración - Evento newFollower:', { followerId, followers });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, followers }));
-        setCurrentUser((prev) => ({ ...prev, followers }));
-      } else if (userData._id === followerId) {
-        setUserData((prev) => ({
-          ...prev,
-          followers: followers || prev.friends,
-        }));
-      }
-    });
-
-    socket.on('unfollowed', ({ targetId, following, isFollowing }) => {
-      // console.log('Depuración - Evento unfollowed:', { targetId, following, isFollowing });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, following }));
-        setCurrentUser((prev) => ({ ...prev, following }));
-      } else if (userData._id === targetId) {
-        setUserData((prev) => ({
-          ...prev,
-          followers: prev.followers ? prev.followers.filter(f => f._id.toString() !== currentUser._id.toString()) : [],
-          isFollowing: isFollowing ?? false,
-        }));
-      }
-    });
-
-    socket.on('followerRemoved', ({ followerId, followers }) => {
-      // console.log('Depuración - Evento followerRemoved:', { followerId, followers });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, followers }));
-        setCurrentUser((prev) => ({ ...prev, followers }));
-      } else if (userData._id === followerId) {
-        setUserData((prev) => ({
-          ...prev,
-          followers: followers || prev.followers,
-        }));
-      }
-    });
-
-    socket.on('userBlocked', ({ targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing }) => {
-      // console.log('Depuración - Evento userBlocked:', { targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, blockedUsers, friends, following }));
-        setCurrentUser((prev) => ({ ...prev, blockedUsers, friends, following }));
-      } else if (userData._id === targetId) {
-        setUserData((prev) => ({
-          ...prev,
-          isBlocked: isBlocked ?? true,
-          isFriend: isFriend ?? false,
-          isFollowing: isFollowing ?? false,
-        }));
-      }
-    });
-
-    socket.on('blockedByUser', ({ blockerId, friends, followers }) => {
-      // console.log('Depuración - Evento blockedByUser:', { blockerId, friends, followers });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, friends, followers }));
-        setCurrentUser((prev) => ({ ...prev, friends, followers }));
-      } else if (userData._id === blockerId) {
-        setUserData((prev) => ({
-          ...prev,
-          friends: friends || prev.friends,
-          followers: followers || prev.followers,
-          isFriend: false,
-          isFollowing: false,
-        }));
-      }
-    });
-
-    socket.on('userUnblocked', ({ targetId, blockedUsers, isBlocked }) => {
-      // console.log('Depuración - Evento userUnblocked:', { targetId, blockedUsers, isBlocked });
-      if (userData._id === currentUser._id) {
-        setUserData((prev) => ({ ...prev, blockedUsers }));
-        setCurrentUser((prev) => ({ ...prev, blockedUsers }));
-      } else if (userData._id === targetId) {
-        setUserData((prev) => ({
-          ...prev,
-          isBlocked: isBlocked ?? false,
-        }));
-      }
-    });
-
-    socket.on('unblockedByUser', ({ blockerId }) => {
-      // console.log('Depuración - Evento unblockedByUser:', { blockerId });
-      if (userData._id === currentUser._id) {
-        // No se necesita actualizar el estado
-      } else if (userData._id === blockerId) {
-        setUserData((prev) => ({ ...prev }));
-      }
-    });
+    Object.entries(handlers).forEach(([event, handler]) => socket.on(event, handler));
 
     return () => {
-      socket.off('friendAdded');
-      socket.off('friendRemoved');
-      socket.off('followed');
-      socket.off('newFollower');
-      socket.off('unfollowed');
-      socket.off('followerRemoved');
-      socket.off('userBlocked');
-      socket.off('blockedByUser');
-      socket.off('userUnblocked');
-      socket.off('unblockedByUser');
+      Object.keys(handlers).forEach((event) => socket.off(event));
     };
   }, [socket, userData, currentUser, setCurrentUser]);
 
 
   const handleAddFriend = async (friendId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -255,7 +216,6 @@ const UserInfo = ({ user }) => {
       friends: [...(prev.friends || []), { _id: friendId }]
     }));
 
-    setError(null);
     try {
       const res = await api.put(
         `/friend/add/${friendId}`,
@@ -280,8 +240,7 @@ const UserInfo = ({ user }) => {
       if (err.response?.status === 400 && errorMessage === 'Ya son amigos') {
         setUserData((prev) => ({ ...prev, isFriend: true }));
       } else {
-        setError(errorMessage);
-        // Rollback
+        console.error(errorMessage);
         setUserData(previousUserData);
         setCurrentUser(previousCurrentUser);
       }
@@ -289,7 +248,6 @@ const UserInfo = ({ user }) => {
   };
 
   const handleRemoveFriend = async (friendId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -299,7 +257,6 @@ const UserInfo = ({ user }) => {
       friends: (prev.friends || []).filter(f => (f._id || f) !== friendId)
     }));
 
-    setError(null);
     try {
       const res = await api.delete(`/friend/remove/${friendId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -318,15 +275,13 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo eliminar amigo';
-      setError(errorMessage);
-      // Rollback
+      console.error(errorMessage);
       setUserData(previousUserData);
       setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleFollow = async (userId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -336,7 +291,6 @@ const UserInfo = ({ user }) => {
       following: [...(prev.following || []), { _id: userId }]
     }));
 
-    setError(null);
     try {
       const res = await api.put(
         `/friend/follow/${userId}`,
@@ -361,8 +315,7 @@ const UserInfo = ({ user }) => {
       if (err.response?.status === 400 && errorMessage === 'Ya sigues a este usuario') {
         setUserData((prev) => ({ ...prev, isFollowing: true }));
       } else {
-        setError(errorMessage);
-        // Rollback
+        console.error(errorMessage);
         setUserData(previousUserData);
         setCurrentUser(previousCurrentUser);
       }
@@ -370,7 +323,6 @@ const UserInfo = ({ user }) => {
   };
 
   const handleUnfollow = async (userId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -380,7 +332,6 @@ const UserInfo = ({ user }) => {
       following: (prev.following || []).filter(f => (f._id || f) !== userId)
     }));
 
-    setError(null);
     try {
       const res = await api.delete(`/friend/unfollow/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -399,15 +350,13 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo dejar de seguir al usuario';
-      setError(errorMessage);
-      // Rollback
+      console.error(errorMessage);
       setUserData(previousUserData);
       setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleBlockUser = async (userId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -422,7 +371,6 @@ const UserInfo = ({ user }) => {
       blockedUsers: [...(prev.blockedUsers || []), { _id: userId }]
     }));
 
-    setError(null);
     try {
       const res = await api.put(
         `/friend/block/${userId}`,
@@ -449,15 +397,13 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo bloquear al usuario';
-      setError(errorMessage);
-      // Rollback
+      console.error(errorMessage);
       setUserData(previousUserData);
       setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleUnblockUser = async (userId) => {
-    // Optimistic Update
     const previousUserData = { ...userData };
     const previousCurrentUser = { ...currentUser };
 
@@ -467,7 +413,6 @@ const UserInfo = ({ user }) => {
       blockedUsers: (prev.blockedUsers || []).filter(b => (b._id || b) !== userId)
     }));
 
-    setError(null);
     try {
       const res = await api.delete(`/friend/unblock/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -486,8 +431,7 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo desbloquear al usuario';
-      setError(errorMessage);
-      // Rollback
+      console.error(errorMessage);
       setUserData(previousUserData);
       setCurrentUser(previousCurrentUser);
     }
@@ -510,7 +454,6 @@ const UserInfo = ({ user }) => {
     );
   }
 
-  // Cover Photo Logic
   const handleCoverPhotoChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -532,14 +475,13 @@ const UserInfo = ({ user }) => {
         coverPhoto: res.data.user.coverPhoto,
       }));
 
-      // Update current user if it's their profile
       if (currentUser._id === userData._id) {
         setCurrentUser(prev => ({ ...prev, coverPhoto: res.data.user.coverPhoto }));
       }
 
     } catch (err) {
       console.error("Error upgrading cover photo:", err);
-      setError("Error al actualizar la foto de portada");
+      // Removed setError, just logging
     } finally {
       setLoading(false);
     }
@@ -548,7 +490,7 @@ const UserInfo = ({ user }) => {
 
   return (
     <div className="relative">
-      {/* Cover Image - Modern height and subtle overlay */}
+      {/* Cover Image */}
       <div className="h-64 md:h-80 w-full relative group overflow-hidden">
         <img
           src={userData.coverPhoto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"}
@@ -558,7 +500,6 @@ const UserInfo = ({ user }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
 
-        {/* Change Cover Button (Only for owner) */}
         {userData._id === currentUser._id && (
           <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
             <input
@@ -583,7 +524,7 @@ const UserInfo = ({ user }) => {
       <div className="px-8 pb-8 relative">
         <div className="flex flex-col md:flex-row-reverse items-center md:items-end -mt-20 md:-mt-24 mb-6 gap-8 text-center md:text-left">
 
-          {/* Profile Picture - Modern shadow and border */}
+          {/* Profile Picture */}
           <div className="relative group">
             <div className={`w-40 h-40 md:w-48 md:h-48 rounded-3xl p-1.5 transition-all duration-500 hover:rotate-2 shadow-2xl ${userData?.hasStories
               ? userData.allStoriesViewed
@@ -609,10 +550,8 @@ const UserInfo = ({ user }) => {
                   onError={(e) => e.target.src = defaultProfile}
                 />
 
-                {/* Online Status Indicator */}
                 <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
 
-                {/* Story Badge */}
                 {userData?.hasStories && !userData.allStoriesViewed && (
                   <div className="absolute top-2 right-2 bg-yellow-500 text-[8px] font-black text-white px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg animate-pulse">
                     Historia
@@ -622,7 +561,7 @@ const UserInfo = ({ user }) => {
             </div>
           </div>
 
-          {/* Name & Bio - Modern typography */}
+          {/* Name & Bio */}
           <div className="flex-1 md:pb-4">
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
               <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight flex items-center gap-4">
@@ -671,13 +610,12 @@ const UserInfo = ({ user }) => {
             </div>
           </div>
 
-          {/* Action Buttons - Moved to the far left in reverse layout */}
+          {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center md:justify-start md:pb-6">
             {userData._id !== currentUser._id && (
               <>
                 {!userData.isBlocked && (
                   <>
-                    {/* Friend Action */}
                     {userData.isFriend ? (
                       <button
                         onClick={() => handleRemoveFriend(userData._id)}
@@ -696,7 +634,6 @@ const UserInfo = ({ user }) => {
                       </button>
                     )}
 
-                    {/* Follow/Unfollow with pill style */}
                     <button
                       onClick={() => userData.isFollowing ? handleUnfollow(userData._id) : handleFollow(userData._id)}
                       disabled={loading}
@@ -725,7 +662,6 @@ const UserInfo = ({ user }) => {
               </>
             )}
 
-            {/* Edit Profile - Premium gray button */}
             {userData._id === currentUser?._id && (
               <div className="flex flex-wrap gap-3">
                 <button
@@ -799,6 +735,5 @@ const UserInfo = ({ user }) => {
     </div>
   );
 };
-
 
 export default UserInfo;

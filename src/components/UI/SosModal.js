@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, ShieldAlert, Phone, Send, X } from 'lucide-react';
+import { AlertCircle, ShieldAlert, Send, X } from 'lucide-react';
 
 const SosModal = ({ isOpen, onClose, onConfirm, contacts, message }) => {
     const [step, setStep] = useState(1); // 1: Confirmation, 2: Sending, 3: Success

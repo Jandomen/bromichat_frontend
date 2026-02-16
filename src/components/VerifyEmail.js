@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUI } from '../context/UIContext';
-import { CheckCircle2, XCircle, Loader2, Mail, ChevronLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 import bImg from '../assets/b-removebg-preview.png';
 import rImg from '../assets/r-removebg-preview.png';

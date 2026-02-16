@@ -12,10 +12,10 @@ import tImg from '../assets/t-removebg-preview.png';
 
 import DashBoard from '../buttons/DashboardButton';
 import Profile from '../buttons/ProfileButton';
-import User from '../buttons/UserButton';
+
 import LogoutButton from '../buttons/LogoutButton';
 import SendMessageButton from '../buttons/SendMessageButton';
-import FriendsButton from '../buttons/FriendsButton';
+
 import ShopingButton from '../buttons/ShopingButton';
 import VideoButton from '../buttons/VideoButton';
 import GaleryButton from '../buttons/GaleryButton';

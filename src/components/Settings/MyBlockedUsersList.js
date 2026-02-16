@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { SocketContext } from '../../context/SocketContext';
 import api from '../../services/api';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
-import defaultProfile from '../../assets/default-profile.png';
+
 
 const MyBlockedUsersList = ({ onUnblockUser }) => {
   const { user: currentUser, token } = useContext(AuthContext);

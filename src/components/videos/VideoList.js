@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { useUI } from '../../context/UIContext';
@@ -23,18 +23,10 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [currentVideoDetails, setCurrentVideoDetails] = useState(null);
   const [commentText, setCommentText] = useState('');
-  const [replyText, setReplyText] = useState('');
-  const [replyTo, setReplyTo] = useState(null);
+
   const [editingVideo, setEditingVideo] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '', isPrivate: false, allowFeed: true, category: 'Todos' });
   const videoRefs = useRef({});
-
-  const handlers = useSwipe(
-    () => handleNext(),
-    () => handlePrev(),
-    null,
-    null
-  );
 
   useEffect(() => {
     Object.entries(videoRefs.current).forEach(([id, videoEl]) => {
@@ -45,6 +37,23 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
       }
     });
   }, [activeVideoId, lightboxIndex]);
+
+  const handleNext = useCallback(() => {
+    if (!videos || videos.length === 0) return;
+    setLightboxIndex((prev) => (prev + 1) % videos.length);
+  }, [videos]);
+
+  const handlePrev = useCallback(() => {
+    if (!videos || videos.length === 0) return;
+    setLightboxIndex((prev) => (prev - 1 + videos.length) % videos.length);
+  }, [videos]);
+
+  const handlers = useSwipe(
+    () => handleNext(),
+    () => handlePrev(),
+    null,
+    null
+  );
 
   useEffect(() => {
     if (lightboxIndex === null) {
@@ -79,7 +88,7 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxIndex, videos]);
+  }, [lightboxIndex, videos, handleNext, handlePrev, token]);
 
   const handleDelete = async (videoPublicId) => {
     showConfirm('Eliminar video', '¿Seguro que quieres eliminar este video?', async () => {
@@ -134,16 +143,6 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
         setActiveVideoId(null);
       }
     }
-  };
-
-  const handleNext = () => {
-    if (videos.length === 0) return;
-    setLightboxIndex((prev) => (prev + 1) % videos.length);
-  };
-
-  const handlePrev = () => {
-    if (videos.length === 0) return;
-    setLightboxIndex((prev) => (prev - 1 + videos.length) % videos.length);
   };
 
   const handleReact = async (type) => {
@@ -346,7 +345,7 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
       </div>
 
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
+        <div {...handlers} className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
           <div className="relative w-screen h-screen bg-black flex flex-col md:flex-row" onClick={e => e.stopPropagation()}>
             {/* Close button - high visibility */}
             <button

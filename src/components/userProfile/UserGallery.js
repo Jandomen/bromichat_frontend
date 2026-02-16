@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 
 const UserGallery = ({ photos = [], scrollToTop }) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(null);
+
+  const validPhotos = useMemo(() => {
+    if (!Array.isArray(photos)) return [];
+    return photos.filter(
+      (photo) => photo && typeof photo === 'object' && photo.imageUrl
+    );
+  }, [photos]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -20,16 +27,11 @@ const UserGallery = ({ photos = [], scrollToTop }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMediaIndex, photos]);
+  }, [selectedMediaIndex, validPhotos]);
 
   if (!Array.isArray(photos)) {
-    // console.warn('UserGallery: photos prop is not an array:', photos);
     return <p>No hay fotos.</p>;
   }
-
-  const validPhotos = photos.filter(
-    (photo) => photo && typeof photo === 'object' && photo.imageUrl
-  );
 
   if (!validPhotos.length) {
     return <p>No hay fotos.</p>;

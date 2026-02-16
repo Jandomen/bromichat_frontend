@@ -47,7 +47,7 @@ const Settings = () => {
     setArchivoSonido,
   } = useNotificaciones();
 
-  const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(true); // Control focus on mobile
@@ -57,7 +57,7 @@ const Settings = () => {
       setError("Debes iniciar sesión para desbloquear usuarios.");
       return;
     }
-    setLoading(true);
+
     setError(null);
 
     try {
@@ -71,7 +71,7 @@ const Settings = () => {
         "No se pudo desbloquear al usuario";
       setError(errorMessage);
     } finally {
-      setLoading(false);
+
     }
   };
 

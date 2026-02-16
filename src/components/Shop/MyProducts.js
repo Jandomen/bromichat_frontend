@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useUI } from "../../context/UIContext";
 import { getUserProducts, updateProduct, deleteProduct } from "../../services/productService";
-import { getFullImageUrl } from "../../utils/getProfilePicture";
+
 import { Edit3, Trash2, X, Tag, IndianRupee, Banknote, FileText, PackageSearch } from "lucide-react";
 
 const MyProducts = () => {
@@ -16,7 +16,7 @@ const MyProducts = () => {
   const [newPrice, setNewPrice] = useState("");
   const [newCurrency, setNewCurrency] = useState("USD");
 
-  const fetchProducts = async () => {
+  const fetchProducts = React.useCallback(async () => {
     if (!user?._id) return;
     try {
       const res = await getUserProducts(user._id, token);
@@ -24,11 +24,11 @@ const MyProducts = () => {
     } catch (err) {
       // console.error("Error al obtener productos:", err);
     }
-  };
+  }, [user, token]);
 
   useEffect(() => {
     if (!loadingUser) fetchProducts();
-  }, [user, token, loadingUser]);
+  }, [loadingUser, fetchProducts]);
 
   if (loadingUser) return (
     <div className="flex flex-col items-center justify-center py-20 animate-pulse">

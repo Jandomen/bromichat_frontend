@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash.debounce';
 import { Search, X } from 'lucide-react';
 
 const VideoSearch = ({ onSearch, placeholder = "Buscar videos por título..." }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const debouncedSearch = debounce((term) => {
-    onSearch(term.trim());
-  }, 400);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((term) => {
+      onSearch(term.trim());
+    }, 400),
+    [] // Empty dependency array means this function is created once
+  );
 
   useEffect(() => {
     debouncedSearch(searchTerm);
     return () => debouncedSearch.cancel();
-  }, [searchTerm]);
+  }, [searchTerm, debouncedSearch]);
 
   return (
     <div className="relative group max-w-2xl mx-auto w-full px-4">

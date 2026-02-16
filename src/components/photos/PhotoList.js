@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { useUI } from '../../context/UIContext';
@@ -17,8 +17,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [currentPhotoDetails, setCurrentPhotoDetails] = useState(null);
   const [commentText, setCommentText] = useState('');
-  const [replyText, setReplyText] = useState('');
-  const [replyTo, setReplyTo] = useState(null);
+
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [editForm, setEditForm] = useState({ description: '', isPrivate: false, allowFeed: true, category: 'Mundo' });
   const [showUI, setShowUI] = useState(true);
@@ -38,6 +37,16 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
       }
     }
   }, [initialPhotoId, photos]);
+
+  const handleNext = useCallback(() => {
+    if (!photos || photos.length === 0) return;
+    setLightboxIndex((prev) => (prev + 1) % photos.length);
+  }, [photos]);
+
+  const handlePrev = useCallback(() => {
+    if (!photos || photos.length === 0) return;
+    setLightboxIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  }, [photos]);
 
   const handlers = useSwipe(
     () => handleNext(),
@@ -89,7 +98,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
       window.removeEventListener('touchstart', handleInteraction);
       if (uiTimeoutRef.current) clearTimeout(uiTimeoutRef.current);
     };
-  }, [lightboxIndex, photos]);
+  }, [lightboxIndex, photos, handleNext, handlePrev, token]);
 
   const handleDelete = async (photoId) => {
     showConfirm('Eliminar foto', '¿Seguro que quieres eliminar esta foto?', async () => {
@@ -127,16 +136,6 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
     } catch (err) {
       showToast('Error al actualizar foto', 'error');
     }
-  };
-
-  const handleNext = () => {
-    if (photos.length === 0) return;
-    setLightboxIndex((prev) => (prev + 1) % photos.length);
-  };
-
-  const handlePrev = () => {
-    if (photos.length === 0) return;
-    setLightboxIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
   const handleReact = async (type) => {
@@ -353,7 +352,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
       </div>
 
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
+        <div {...handlers} className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
           <div className="relative w-screen h-screen bg-black flex flex-col md:flex-row" onClick={e => e.stopPropagation()}>
             {/* Close button - high visibility */}
             <button

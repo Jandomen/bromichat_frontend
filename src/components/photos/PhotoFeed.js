@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
-import { Heart, MessageCircle, Share2, Camera, X, Send, MoreVertical } from 'lucide-react';
+import { Heart, MessageCircle, Share2, X, Send } from 'lucide-react';
 import defaultProfile from '../../assets/default-profile.png';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
@@ -115,8 +115,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
     const [showInfo, setShowInfo] = useState(true);
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState('');
-    const [replyText, setReplyText] = useState('');
-    const [replyTo, setReplyTo] = useState(null);
+
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const { showToast } = useUI();
     const infoTimeoutRef = useRef(null);

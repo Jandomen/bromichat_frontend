@@ -45,7 +45,7 @@ const GroupEdit = () => {
   const handleUpdateGroup = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.put(
+      await api.put(
         `/group/${groupId}`,
         { name },
         { headers: { Authorization: `Bearer ${token}` } }

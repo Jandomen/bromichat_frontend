@@ -44,7 +44,7 @@ const CallModal = () => {
         cancelCall,
         endCall,
         callType,
-        stream,
+
         isCalling,
         muted,
         videoOff,
@@ -54,7 +54,7 @@ const CallModal = () => {
         isScreenSharing,
         isGroupCall,
         groupId,
-        activeParticipants,
+
         remoteStreams,
         isMinimized,
         setIsMinimized,

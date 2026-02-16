@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUI } from '../context/UIContext';
-import { Lock, ShieldCheck, Sparkles, KeyRound } from 'lucide-react';
+import { Lock, ShieldCheck, Sparkles } from 'lucide-react';
 
 import bImg from '../assets/b-removebg-preview.png';
 import rImg from '../assets/r-removebg-preview.png';

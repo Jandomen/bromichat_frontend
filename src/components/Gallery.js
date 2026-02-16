@@ -12,7 +12,7 @@ import PhotoFeed from './photos/PhotoFeed';
 import { LayoutGrid, Image as ImageIcon } from 'lucide-react';
 
 import PhotoSearch from './photos/PhotoSearch';
-import { PlayCircle, Search, RefreshCcw } from 'lucide-react';
+import { Search, RefreshCcw } from 'lucide-react';
 
 const Gallery = () => {
   const { photoId } = useParams();
@@ -20,20 +20,20 @@ const Gallery = () => {
   const { showConfirm, showToast } = useUI();
   const [photos, setPhotos] = useState([]);
   const [discoverPhotos, setDiscoverPhotos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+
   const [view, setView] = useState('discover');
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Mundo');
 
-  const fetchUserPhotos = async () => {
+  const fetchUserPhotos = React.useCallback(async () => {
     if (!token || !user?._id) return;
     try {
       const data = await photoService.getUserPhotos(user._id, token);
       setPhotos(Array.isArray(data) ? data : []);
     } catch (err) { }
-  };
+  }, [token, user?._id]);
 
-  const fetchGlobalFeed = async (cat = selectedCategory) => {
+  const fetchGlobalFeed = React.useCallback(async (cat = selectedCategory) => {
     if (!token) return;
     setLoading(true);
     try {
@@ -43,12 +43,12 @@ const Gallery = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, selectedCategory]);
 
   useEffect(() => {
     fetchUserPhotos();
     fetchGlobalFeed();
-  }, [token, user?._id]);
+  }, [fetchUserPhotos, fetchGlobalFeed]);
 
   const handleDelete = async (photoId) => {
     showConfirm(
@@ -74,7 +74,7 @@ const Gallery = () => {
   };
 
   const handleSearch = async (term) => {
-    setSearchTerm(term);
+
     if (!token) return;
 
     if (!term) {

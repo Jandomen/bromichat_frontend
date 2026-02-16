@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { useUI } from "../../context/UIContext";
 import { AuthContext } from "../../context/AuthContext";
 import { uploadProduct, uploadProductImage } from "../../services/productService";
-import { ImagePlus, X, Tag, FileText, IndianRupee, Banknote, CheckCircle2 } from "lucide-react";
+import { ImagePlus, X, Tag, FileText, Banknote, CheckCircle2 } from "lucide-react";
 
 const ProductUpload = () => {
   const { token } = useContext(AuthContext);

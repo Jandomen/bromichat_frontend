@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useContext, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
@@ -9,6 +9,20 @@ import ChatInput from '../GroupChat/GroupChatInput';
 import { NotificationContext } from '../../context/NotificationContext';
 import { CallContext } from '../../context/CallContext';
 import { Phone, Video, MoreVertical, ChevronLeft } from 'lucide-react';
+
+const getDownloadUrl = (url, fileName = '') => {
+  if (!url) return '';
+  if (url.includes('cloudinary.com')) {
+    const uploadPattern = /\/(?:raw\/)?upload\//;
+    const match = url.match(uploadPattern);
+
+    if (match) {
+      const replacement = match[0].replace('/upload/', '/upload/fl_attachment/');
+      return url.replace(match[0], replacement);
+    }
+  }
+  return url;
+};
 
 const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGroup = false, participants: propParticipants = [], onBack }) => {
   const { user } = useContext(AuthContext);
@@ -37,8 +51,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
   const scrollRef = useRef(null);
   const skipScrollRef = useRef(false);
 
-  const isImage = (url) => /\.(png|jpe?g|gif|webp|avif)$/i.test(url);
-  const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
   const scrollToEnd = () => endRef.current?.scrollIntoView({ behavior: 'smooth' });
 
   const setMessagesWithDebug = (update, source) => {
@@ -47,7 +59,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
     } else if (Array.isArray(update)) {
       setMessages(update);
     } else {
-      // console.error(`Invalid messages from ${source}:`, update);
       setError(`Error: Invalid message data from ${source}`);
       setMessages([]);
     }
@@ -55,7 +66,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
 
   useEffect(() => {
     setConversationId(propConversationId || null);
-    // console.log('Conversation ID updated:', propConversationId);
   }, [propConversationId]);
 
   useEffect(() => {
@@ -64,7 +74,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       try {
         setLoading(true);
         const convRes = await api.get(`/conversation/${conversationId}`);
-        // console.log('Conversation API Response:', convRes.data);
         const conv = convRes.data;
         setIsGroup(Boolean(conv.isGroup));
         setChatType(conv.chatType || 'group');
@@ -72,22 +81,19 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
         setGroupName(conv.name || 'Grupo sin nombre');
         setGroupImage(conv.groupImage || '');
         const msgRes = await api.get(`/messages/conversation/${conversationId}?page=1&limit=20`);
-        // console.log('Messages API Response:', msgRes.data);
         const messages = Array.isArray(msgRes.data.messages) ? msgRes.data.messages : [];
         setMessagesWithDebug(messages, 'fetchData');
         setHasMore(messages.length === 20);
 
-        // 🔔 Mark notifications as read for this conversation
         markConversationAsRead(conversationId);
       } catch (err) {
         setError(err.response?.data?.message || 'Error loading conversation');
-        // console.error('Error fetching conversation:', err);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [conversationId]);
+  }, [conversationId, markConversationAsRead]);
 
   const loadMoreMessages = async () => {
     if (loadingMore || !hasMore) return;
@@ -108,7 +114,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       setMessagesWithDebug((prev) => [...newMessages, ...prev], 'loadMoreMessages');
       setPage(page + 1);
 
-      // Restore scroll position after render
       setTimeout(() => {
         if (scrollElement) {
           scrollElement.scrollTop = scrollElement.scrollHeight - previousScrollHeight;
@@ -137,7 +142,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
         setUsers(map);
       } catch (err) {
         setError('Error fetching user details');
-        // console.error('Error fetching user details:', err);
       }
     };
     fetchUserDetails();
@@ -147,34 +151,27 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
     if (!socket || !conversationId || !user?._id) return;
 
     const roomEvent = isGroup ? 'join_group' : 'join_conversation';
-    const roomId = isGroup ? `group:${conversationId}` : `conversation:${conversationId}`;
+
     socket.emit(roomEvent, {
       [isGroup ? 'groupId' : 'conversationId']: conversationId,
       userId: user._id,
     });
-    // console.log('Socket joined:', roomId);
 
     const handleIncoming = (data) => {
-      // console.log('Socket Incoming Message:', data);
       if (!data || data.conversationId !== conversationId || !data.message?._id) {
-        // console.warn('Invalid message data:', data);
         return;
       }
       if (data.message._id === lastSentMessageId) {
-        // console.log('Ignoring own message:', data.message._id);
         return;
       }
       setMessages((prev) => {
         if (!Array.isArray(prev)) {
-          // console.error('Messages is not an array, resetting:', prev);
           return [data.message];
         }
         if (prev.some((msg) => msg._id === data.message._id)) {
-          // console.log('Duplicate message ignored:', data.message._id);
           return prev;
         }
 
-        // 🔔 If we are viewing this conversation, mark any new notification as read
         markConversationAsRead(conversationId);
 
         return [...prev, data.message];
@@ -182,14 +179,11 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
     };
 
     const handleMessageUpdated = (data) => {
-      // console.log('Socket Message Updated:', data);
       if (!data || data.conversationId !== conversationId || !data.message?._id) {
-        // console.warn('Invalid updated message data:', data);
         return;
       }
       setMessages((prev) => {
         if (!Array.isArray(prev)) {
-          // console.error('Messages is not an array, resetting:', prev);
           return [data.message];
         }
         return prev.map((msg) => (msg._id === data.message._id ? { ...msg, ...data.message } : msg));
@@ -197,14 +191,11 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
     };
 
     const handleMessageDeleted = (data) => {
-      // console.log('Socket Message Deleted:', data);
       if (!data || data.conversationId !== conversationId || !data.messageId) {
-        // console.warn('Invalid deleted message data:', data);
         return;
       }
       setMessages((prev) => {
         if (!Array.isArray(prev)) {
-          // console.error('Messages is not an array, resetting:', prev);
           return [];
         }
         return prev.filter((msg) => msg._id !== data.messageId);
@@ -222,11 +213,9 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       socket.emit(isGroup ? 'leave_group' : 'leave_conversation', {
         [isGroup ? 'groupId' : 'conversationId']: conversationId,
       });
-      // console.log('Socket left:', roomId);
     };
-  }, [socket, conversationId, isGroup, user._id, lastSentMessageId]);
+  }, [socket, conversationId, isGroup, user._id, lastSentMessageId, markConversationAsRead]);
 
-  // ⌨️ Close modal on Escape key
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') setSelectedMedia(null);
@@ -257,23 +246,17 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       formData.append('conversationId', cid || conversationId);
       formData.append('content', content);
       if (file) formData.append('file', file);
-      // console.log('Sending FormData:', [...formData.entries()]);
 
-      // Unify endpoint to /messages/send
       const res = await api.post('/messages/send', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // console.log('API response:', res.data);
 
-      // Optimistically update UI
       const newMessage = res.data.message;
       setMessages((prev) => {
         if (!Array.isArray(prev)) {
-          // console.error('Messages is not an array, resetting:', prev);
           return [newMessage];
         }
         if (prev.some((msg) => msg._id === newMessage._id)) {
-          // console.log('Duplicate message ignored:', newMessage._id);
           return prev;
         }
         return [...prev, newMessage];
@@ -281,7 +264,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       setLastSentMessageId(newMessage._id);
       scrollToEnd();
     } catch (err) {
-      // console.error('Error sending message:', err.response?.data || err.message);
       setError(err.response?.data?.error || 'Error al enviar el mensaje');
     } finally {
       setLoading(false);
@@ -305,7 +287,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       setMenuOpen(null);
     } catch (err) {
       setError(err.response?.data?.error || 'Error editing message');
-      // console.error('Error editing message:', err);
     } finally {
       setLoading(false);
     }
@@ -322,13 +303,12 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       setMenuOpen(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Error deleting message');
-      // console.error('Error deleting message:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const getUserInfo = (senderId) => {
+  const getUserInfo = useCallback((senderId) => {
     const id = typeof senderId === 'string' ? senderId : senderId?._id;
     const u = users[id] || {};
     const profilePicture = u.profilePicture && u.profilePicture !== '' ? getFullImageUrl(u.profilePicture) : defaultProfile;
@@ -336,27 +316,8 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       username: u.username || 'User',
       profilePicture,
     };
-  };
+  }, [users]);
 
-  const getDownloadUrl = (url, fileName = '') => {
-    if (!url) return '';
-    if (url.includes('cloudinary.com')) {
-      // Handle both /upload/ and /raw/upload/
-      const uploadPattern = /\/(?:raw\/)?upload\//;
-      const match = url.match(uploadPattern);
-
-      if (match) {
-        const replacement = match[0].replace('/upload/', '/upload/fl_attachment/');
-        let finalUrl = url.replace(match[0], replacement);
-
-        // If we have a specific filename, we could try to inject it, 
-        // but Cloudinary fl_attachment usually uses the publicId.
-        // We ensure it opens in a new tab or triggers download.
-        return finalUrl;
-      }
-    }
-    return url;
-  };
 
   const recipientInfo = useMemo(() => {
     if (isGroup) {
@@ -372,7 +333,7 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
     }
     const userInfo = getUserInfo(recipient);
     return { ...userInfo, id: typeof recipient === 'string' ? recipient : recipient._id };
-  }, [isGroup, groupName, groupImage, participants, users, user._id]);
+  }, [isGroup, groupName, groupImage, participants, user._id, getUserInfo]);
 
   return (
     <div className="flex flex-col h-full w-full bg-[#f0f2f5] overflow-hidden relative">
@@ -485,7 +446,6 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
             const { username, profilePicture } = getUserInfo(sid);
             const isOwn = sid === user._id.toString() || sid === user.id;
             const fileAbs = msg.fileUrl ? getFullImageUrl(msg.fileUrl) : null;
-            const isLast = index === messages.length - 1;
 
             return (
               <div
@@ -637,7 +597,7 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
                       </button>
                       <button
                         onClick={() => handleDeleteMessage(msg._id)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 flex items-center gap-2"
                       >
                         🗑️ Delete
                       </button>

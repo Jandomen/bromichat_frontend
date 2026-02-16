@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../../services/api';
-import { Lock, Save } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 const ChangePassword = () => {
     const [currentPassword, setCurrentPassword] = useState('');
