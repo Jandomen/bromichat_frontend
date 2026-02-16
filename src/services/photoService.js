@@ -11,7 +11,7 @@ const photoService = {
         },
         cancelToken: cancelTokenSource.token,
       });
-     // console.log('Raw API response in getUserPhotos:', res.data); 
+      // console.log('Raw API response in getUserPhotos:', res.data); 
       cancelTokenSource = null;
       if (Array.isArray(res.data)) {
         return res.data;
@@ -21,9 +21,9 @@ const photoService = {
       return [];
     } catch (err) {
       if (axios.isCancel(err)) {
-       // console.log('Request canceled:', err.message);
+        // console.log('Request canceled:', err.message);
       } else {
-       // console.error('[photoService] Error al obtener fotos:', err);
+        // console.error('[photoService] Error al obtener fotos:', err);
       }
       cancelTokenSource = null;
       return [];
@@ -38,10 +38,10 @@ const photoService = {
           Authorization: `Bearer ${token}`,
         },
       });
-     // console.log('Uploaded photo response:', res.data); 
+      // console.log('Uploaded photo response:', res.data); 
       return res.data;
     } catch (err) {
-     // console.error('[photoService] Error al subir foto:', err);
+      // console.error('[photoService] Error al subir foto:', err);
       throw err;
     }
   },
@@ -53,10 +53,10 @@ const photoService = {
           Authorization: `Bearer ${token}`,
         },
       });
-     // console.log('Delete photo response:', res.data); 
+      // console.log('Delete photo response:', res.data); 
       return res.data;
     } catch (err) {
-     // console.error('[photoService] Error al eliminar foto:', err);
+      // console.error('[photoService] Error al eliminar foto:', err);
       throw err;
     }
   },
@@ -68,13 +68,42 @@ const photoService = {
           Authorization: `Bearer ${token}`,
         },
       });
-     // console.log('Update photo response:', res.data); 
+      // console.log('Update photo response:', res.data); 
       return res.data;
     } catch (err) {
-     // console.error('[photoService] Error al actualizar foto:', err);
       throw err;
     }
   },
+  getPhotoById: async (photoId, token) => {
+    try {
+      const res = await api.get(`/gallery/${photoId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (err) {
+      throw err;
+    }
+  },
+  searchPhotos: async (query, token) => {
+    try {
+      const res = await api.get(`/gallery/search?query=${encodeURIComponent(query)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (err) {
+      throw err;
+    }
+  },
+  getPhotoFeed: async (token, category = 'Mundo') => {
+    try {
+      const res = await api.get(`/gallery/feed?category=${category}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (err) {
+      throw err;
+    }
+  }
 };
 
 export default photoService;

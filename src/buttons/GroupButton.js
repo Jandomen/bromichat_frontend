@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserGroup } from '@fortawesome/free-solid-svg-icons'; 
+import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 
 const GroupButton = () => {
   const navigate = useNavigate();
@@ -11,8 +11,8 @@ const GroupButton = () => {
   };
 
   return (
-    <button onClick={handleClick}>
-      <FontAwesomeIcon icon={faUserGroup} /> 
+    <button onClick={handleClick} className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95 text-gray-300 hover:text-white">
+      <FontAwesomeIcon icon={faUserGroup} className="text-xl" />
     </button>
   );
 };

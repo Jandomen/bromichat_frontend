@@ -2,25 +2,27 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useUI } from '../../context/UIContext';
 
 const ChangeBio = ({ bio, setBio }) => {
   const { user, setUser } = useContext(AuthContext);
+  const { showToast } = useUI();
   const [newBio, setNewBio] = useState(bio);
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      const res = await axios.put(`${process.env.REACT_APP_API_BACKEND}/user/bio`, 
+      const res = await axios.put(`${process.env.REACT_APP_API_BACKEND}/user/bio`,
         { bio: newBio },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       setBio(res.data.bio);
       setUser(prev => ({ ...prev, bio: res.data.bio }));
-      alert('Bio actualizada correctamente');
+      showToast('Bio actualizada correctamente', 'success');
     } catch (err) {
       //console.error(err);
-      alert('Error al actualizar la bio');
+      showToast('Error al actualizar la bio', 'error');
     }
     setLoading(false);
   };

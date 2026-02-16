@@ -32,7 +32,7 @@ const MyFollowingList = ({ users = [] }) => {
                 }}
               >
                 <img
-                  src={getFullImageUrl(user.profilePicture || defaultProfile)}
+                  src={getFullImageUrl(user.profilePicture)}
                   alt={`${user.username || 'Usuario'}'s profile`}
                   style={{
                     width: 80,
@@ -42,7 +42,7 @@ const MyFollowingList = ({ users = [] }) => {
                     border: '2px solid #e0e0e0',
                   }}
                   onError={(e) => {
-                   // console.error('Error loading profile picture:', e.target.src);
+                    // console.error('Error loading profile picture:', e.target.src);
                     e.target.src = defaultProfile;
                   }}
                 />

@@ -13,9 +13,15 @@ const Home = () => {
   const letters = [b, r, o, m, i, c, h, a, t];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black to-red-600 text-center p-8 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-red-900 to-black text-center p-8 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-red-800/20 blur-[120px] rounded-full animate-pulse-slow"></div>
+        <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] bg-red-900/10 blur-[100px] rounded-full"></div>
+      </div>
+
       {/* Logo con letras */}
-      <div className="flex flex-nowrap justify-center gap-2 sm:gap-4 mb-10 overflow-hidden">
+      <div className="flex flex-nowrap justify-center gap-2 sm:gap-4 mb-16 overflow-hidden relative z-10">
         {letters.map((letter, index) => {
           const scaleFactor = 1 - index * 0.05;
           return (
@@ -23,11 +29,11 @@ const Home = () => {
               key={index}
               src={letter}
               alt={`letter-${index}`}
-              className="drop-shadow-lg hover:scale-110 transition-transform"
+              className="drop-shadow-[0_4px_10px_rgba(255,0,0,0.3)] hover:scale-110 hover:rotate-3 transition-transform duration-300"
               style={{
                 width: `calc(${scaleFactor * 10}vw)`,
                 maxWidth: "120px",
-                minWidth: "28px",
+                minWidth: "32px",
               }}
             />
           );
@@ -35,18 +41,20 @@ const Home = () => {
       </div>
 
       {/* Botones estilizados */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 relative z-10">
         <a href="/login">
           <button
             className="
-              relative w-full sm:w-auto px-8 py-3 rounded-xl
-              text-white font-semibold tracking-wide
-              bg-gradient-to-r from-red-700 via-black to-red-700
-              border border-red-400/30
-              shadow-[0_0_20px_rgba(255,0,0,0.4)]
-              hover:shadow-[0_0_30px_rgba(255,0,0,0.6)]
-              hover:scale-105
+              relative w-full sm:w-auto px-10 py-4 rounded-full
+              text-white font-bold tracking-wider text-sm uppercase
+              bg-transparent border border-red-500
+              shadow-[0_0_15px_rgba(255,0,0,0.2)]
+              hover:bg-red-600 hover:text-white hover:border-red-600
+              hover:shadow-[0_0_25px_rgba(255,0,0,0.6)]
+              hover:-translate-y-1
+              active:scale-95
               transition-all duration-300
+              group
             "
           >
             Iniciar Sesión
@@ -55,13 +63,14 @@ const Home = () => {
         <a href="/register">
           <button
             className="
-              relative w-full sm:w-auto px-8 py-3 rounded-xl
-              text-white font-semibold tracking-wide
-              bg-gradient-to-r from-black via-red-700 to-black
-              border border-red-400/30
-              shadow-[0_0_20px_rgba(0,0,0,0.5)]
-              hover:shadow-[0_0_30px_rgba(255,0,0,0.6)]
-              hover:scale-105
+              relative w-full sm:w-auto px-10 py-4 rounded-full
+              text-white font-bold tracking-wider text-sm uppercase
+              bg-red-700 border border-transparent
+              shadow-[0_0_20px_rgba(220,38,38,0.4)]
+              hover:bg-red-800 hover:text-white
+              hover:shadow-[0_0_30px_rgba(220,38,38,0.7)]
+              hover:-translate-y-1
+              active:scale-95
               transition-all duration-300
             "
           >
@@ -69,6 +78,10 @@ const Home = () => {
           </button>
         </a>
       </div>
+
+      <footer className="absolute bottom-6 text-white/30 text-xs z-10">
+        &copy; {new Date().getFullYear()} BromiChat. Todos los derechos reservados.
+      </footer>
     </div>
   );
 };

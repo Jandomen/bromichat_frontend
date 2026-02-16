@@ -10,8 +10,8 @@ const VideoButton = () => {
     };
 
     return (
-        <button onClick={handleVideoClick} className="video-link">
-            <FontAwesomeIcon icon={faVideo} />
+        <button onClick={handleVideoClick} className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95 text-gray-300 hover:text-white">
+            <FontAwesomeIcon icon={faVideo} className="text-xl" />
         </button>
     );
 };

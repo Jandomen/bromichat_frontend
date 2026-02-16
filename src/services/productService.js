@@ -18,7 +18,7 @@ export const uploadProductImage = async (imageFile, token) => {
     },
   });
 
-  return res.data; 
+  return res.data;
 };
 
 export const getUserProducts = async (userId, token) => {
@@ -28,13 +28,15 @@ export const getUserProducts = async (userId, token) => {
   return res.data;
 };
 
-export const searchProducts = async (query) => {
-  const res = await api.get(`/api/products/search?query=${encodeURIComponent(query)}`);
+export const searchProducts = async (query, category = "Todas") => {
+  const catParam = category && category !== "Todas" ? `&category=${encodeURIComponent(category)}` : "";
+  const res = await api.get(`/api/products/search?query=${encodeURIComponent(query)}${catParam}`);
   return res.data;
 };
 
-export const getRandomProducts = async (page = 1, token) => {
-  const res = await api.get(`/api/products/feed?page=${page}`, {
+export const getRandomProducts = async (page = 1, token, category = "Todas") => {
+  const catParam = category && category !== "Todas" ? `&category=${encodeURIComponent(category)}` : "";
+  const res = await api.get(`/api/products/feed?page=${page}${catParam}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   return res.data;

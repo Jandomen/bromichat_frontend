@@ -16,17 +16,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (token && !user) {
+      if (token) {
         try {
           const res = await api.get('/auth/me', {
             headers: { Authorization: `Bearer ${token}` },
           });
-         // console.log('Depuración - currentUser cargado desde /auth/me:', res.data);
+          // console.log('Depuración - currentUser cargado desde /auth/me:', res.data);
           const userWithToken = { ...res.data, token };
           setUser(userWithToken);
           localStorage.setItem('user', JSON.stringify(userWithToken));
         } catch (err) {
-         // console.error('Error al cargar currentUser:', err);
+          // console.error('Error al cargar currentUser:', err);
           setUser(null);
           setToken(null);
           localStorage.removeItem('user');

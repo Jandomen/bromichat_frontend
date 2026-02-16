@@ -9,16 +9,17 @@ const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();           
-    navigate('/login'); 
+    logout();
+    navigate('/login');
   };
 
   return (
     <button
       onClick={handleLogout}
-      className="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition duration-300"
+      className="relative flex items-center justify-center p-2 rounded-full bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-lg border border-red-600/30"
+      title="Cerrar sesión"
     >
-      <FontAwesomeIcon icon={faPowerOff} />
+      <FontAwesomeIcon icon={faPowerOff} className="text-xl" />
     </button>
   );
 };

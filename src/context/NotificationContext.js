@@ -1,16 +1,18 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { SocketContext } from "./SocketContext";
 import { AuthContext } from "./AuthContext";
+import { useUI } from "./UIContext";
+import { getFullImageUrl } from '../utils/getProfilePicture';
 
 export const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const { socket } = useContext(SocketContext);
   const { token, user } = useContext(AuthContext);
+  const { showNotification } = useUI();
 
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [sonidoHabilitado, setSonidoHabilitado] = useState(
     localStorage.getItem("soundEnabled") !== "false"
   );
@@ -19,51 +21,70 @@ export const NotificationProvider = ({ children }) => {
   );
   const [error, setError] = useState(null);
 
-  // 🔊 referencia única para el audio
   const audioRef = useRef(null);
 
   useEffect(() => {
     audioRef.current = new Audio(archivoSonido);
   }, [archivoSonido]);
 
+  const playNotificationSound = useCallback(() => {
+    if (sonidoHabilitado && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((err) =>
+        console.error("🔇 Error reproduciendo sonido:", err)
+      );
+    }
+  }, [sonidoHabilitado]);
+
   const habilitarSonido = () => setSonidoHabilitado(true);
   const deshabilitarSonido = () => setSonidoHabilitado(false);
 
+  // Derived state
+  const messageNotifications = notifications.filter(
+    (n) => ['message', 'group_message'].includes(n.type)
+  );
+  const generalNotifications = notifications.filter(
+    (n) => !['message', 'group_message'].includes(n.type)
+  );
+
+  const unreadGeneralCount = generalNotifications.filter((n) => !n.isRead).length;
+  const unreadMessageCount = messageNotifications.filter((n) => !n.isRead).length;
+  const unreadCount = unreadGeneralCount + unreadMessageCount;
+
+  // Global sound policy unblock
   useEffect(() => {
-    if (!socket) return;
-
-    const handleNewNotification = (notification) => {
-     // console.log("📩 Nueva notificación:", notification);
-
-      setNotifications((prev) => {
-        if (prev.some((n) => n._id === notification._id)) return prev;
-        return [notification, ...prev];
-      });
-
-      setUnreadCount((prev) =>
-        Math.max(prev + (notification.isRead ? 0 : 1), 0)
-      );
-
-      if (sonidoHabilitado && audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((err) =>
-          console.error("🔇 Error reproduciendo sonido:", err)
-        );
+    const unblockAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().then(() => {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }).catch(() => { });
       }
+      window.removeEventListener('click', unblockAudio);
+      window.removeEventListener('touchstart', unblockAudio);
     };
-
-    socket.on("newNotification", handleNewNotification);
-
+    window.addEventListener('click', unblockAudio);
+    window.addEventListener('touchstart', unblockAudio);
     return () => {
-      socket.off("newNotification", handleNewNotification);
+      window.removeEventListener('click', unblockAudio);
+      window.removeEventListener('touchstart', unblockAudio);
     };
-  }, [socket, sonidoHabilitado]);
+  }, []);
 
+  // Sync settings to localStorage
   useEffect(() => {
     localStorage.setItem("soundEnabled", sonidoHabilitado);
     localStorage.setItem("soundFile", archivoSonido);
   }, [sonidoHabilitado, archivoSonido]);
 
+  // Request browser notification permission
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Initial fetch
   useEffect(() => {
     if (!user?._id || !token) return;
 
@@ -74,81 +95,89 @@ export const NotificationProvider = ({ children }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setNotifications(res.data);
-        setUnreadCount(res.data.filter((n) => !n.isRead).length);
       } catch (error) {
-       // console.error("❌ Error fetching notifications:", error);
         setError("Error al cargar notificaciones");
         setTimeout(() => setError(null), 3000);
       }
     };
+    fetchNotifications();
+  }, [user?._id, token]);
 
-    const fetchUnreadCount = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_BACKEND}/notifications/unread-count`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setUnreadCount(res.data.unreadCount);
-      } catch (error) {
-       // console.error("❌ Error fetching unread count:", error);
+  // Socket listeners
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (notification) => {
+      setNotifications((prev) => {
+        if (prev.some((n) => n._id === notification._id)) return prev;
+        return [notification, ...prev];
+      });
+
+      playNotificationSound();
+
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(notification.sender?.name || 'BromiChat', {
+          body: notification.message,
+          icon: getFullImageUrl(notification.sender?.profilePicture) || '/logo192.png',
+        });
       }
+
+      showNotification({
+        title: notification.sender?.name || 'BromiChat',
+        message: notification.message,
+        type: notification.type,
+        senderAvatar: notification.sender?.profilePicture,
+        link: notification.link || (notification.type === 'message' ? '/messages' : '/notifications')
+      }, 3500);
     };
 
-    fetchNotifications();
-    fetchUnreadCount();
-  }, [user?._id, token]);
+    socket.on("newNotification", handleNewNotification);
+
+    socket.on("notificationsMarkedAsRead", ({ conversationId, notificationId, all }) => {
+      setNotifications((prev) => prev.map((n) => {
+        if (all) return { ...n, isRead: true };
+        if (notificationId && n._id === notificationId) return { ...n, isRead: true };
+        if (conversationId && n.conversationId === conversationId) return { ...n, isRead: true };
+        return n;
+      }));
+    });
+    return () => {
+      socket.off("newNotification", handleNewNotification);
+      socket.off("notificationsMarkedAsRead");
+    };
+  }, [socket, playNotificationSound, showNotification]);
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(
-        `${process.env.REACT_APP_API_BACKEND}/notifications/${id}/read`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setNotifications((prev) =>
-        prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(prev - 1, 0));
+      setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, isRead: true } : n)));
+      await axios.put(`${process.env.REACT_APP_API_BACKEND}/notifications/${id}/read`, {}, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error) {
-     // console.error("❌ Error marking notification as read:", error);
-      setError("Error al marcar la notificación como leída");
-      setTimeout(() => setError(null), 3000);
+      setError("Error al marcar como leída");
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      await axios.put(
-        `${process.env.REACT_APP_API_BACKEND}/notifications/mark-all-read`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
+      await axios.put(`${process.env.REACT_APP_API_BACKEND}/notifications/mark-all-read`, {}, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error) {
-     // console.error("❌ Error marking all notifications as read:", error);
-      setError("Error al marcar todas las notificaciones como leídas");
-      setTimeout(() => setError(null), 3000);
+      setError("Error al marcar todo");
     }
+  };
+
+  const markConversationAsRead = async (conversationId) => {
+    try {
+      setNotifications((prev) => prev.map((n) => n.conversationId === conversationId ? { ...n, isRead: true } : n));
+      await axios.put(`${process.env.REACT_APP_API_BACKEND}/notifications/conversation/${conversationId}/read`, {}, { headers: { Authorization: `Bearer ${token}` } });
+    } catch (error) { }
   };
 
   const deleteNotification = async (id) => {
     try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_BACKEND}/notifications/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       setNotifications((prev) => prev.filter((n) => n._id !== id));
-      setUnreadCount((prev) => {
-        const wasUnread = notifications.find(
-          (n) => n._id === id && !n.isRead
-        );
-        return wasUnread ? Math.max(prev - 1, 0) : prev;
-      });
+      await axios.delete(`${process.env.REACT_APP_API_BACKEND}/notifications/${id}`, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error) {
-     // console.error("❌ Error deleting notification:", error);
-      setError("Error al eliminar la notificación");
-      setTimeout(() => setError(null), 3000);
+      setError("Error al eliminar");
     }
   };
 
@@ -156,15 +185,21 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider
       value={{
         notifications,
+        generalNotifications,
+        messageNotifications,
         unreadCount,
+        unreadGeneralCount,
+        unreadMessageCount,
         markAsRead,
         markAllAsRead,
+        markConversationAsRead,
         deleteNotification,
         sonidoHabilitado,
         habilitarSonido,
         deshabilitarSonido,
         archivoSonido,
         setArchivoSonido,
+        playNotificationSound,
         error,
       }}
     >

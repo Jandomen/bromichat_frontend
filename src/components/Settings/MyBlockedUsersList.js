@@ -82,7 +82,7 @@ const MyBlockedUsersList = ({ onUnblockUser }) => {
                 onClick={() => navigate(`/user/${user._id}`)}
               >
                 <img
-                  src={getFullImageUrl(user.profilePicture || defaultProfile)}
+                  src={getFullImageUrl(user.profilePicture)}
                   alt={user.username}
                   className="w-10 h-10 rounded-full object-cover mr-3"
                 />

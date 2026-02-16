@@ -7,6 +7,7 @@ export const SocketContext = createContext({ socket: null });
 export const SocketProvider = ({ children }) => {
   const { token, user } = useContext(AuthContext);
   const [socket, setSocket] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   useEffect(() => {
     if (!token || !user?._id) {
@@ -14,12 +15,11 @@ export const SocketProvider = ({ children }) => {
         socket.disconnect();
         setSocket(null);
       }
-      console.warn('Token or userId not available, socket not initialized');
       return;
     }
 
     const s = io(process.env.REACT_APP_API_BACKEND, {
-      transports: ['websocket'],
+      transports: ['polling', 'websocket'],
       auth: { token },
       query: { userId: user._id },
       withCredentials: true,
@@ -29,24 +29,46 @@ export const SocketProvider = ({ children }) => {
     });
 
     s.on('connect', () => {
-      console.log('Connected to socket server:', s.id);
+      // console.log('Connected to socket server:', s.id);
+      if (user?._id) {
+        s.emit('join', user._id);
+        s.emit('getInitialOnlineUsers');
+      }
     });
 
-    s.on('connect_error', (err) => {
-      console.error('Socket connection error:', err.message);
+    s.on('initialOnlineUsers', (userIds) => {
+      setOnlineUsers(new Set(userIds));
     });
 
-    s.on('disconnect', (reason) => {
-      console.warn('Disconnected from socket server:', reason);
+    s.on('userStatusChanged', ({ userId, status }) => {
+      setOnlineUsers((prev) => {
+        const next = new Set(prev);
+        if (status === 'online') next.add(userId);
+        else next.delete(userId);
+        return next;
+      });
     });
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && s.connected && user?._id) {
+        s.emit('join', user._id);
+        s.emit('getInitialOnlineUsers');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     setSocket(s);
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       s.disconnect();
       setSocket(null);
     };
   }, [token, user?._id]);
 
-  return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={{ socket, onlineUsers }}>
+      {children}
+    </SocketContext.Provider>
+  );
 };

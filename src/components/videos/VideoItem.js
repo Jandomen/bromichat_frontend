@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { deleteVideo } from "../../services/videoService";
+import { useUI } from "../../context/UIContext";
 
 const getFullVideoUrl = (path) => {
   if (!path) return "";
@@ -7,22 +8,29 @@ const getFullVideoUrl = (path) => {
 };
 
 const VideoItem = ({ video, authUser, fetchVideos }) => {
+  const { showConfirm, showToast } = useUI();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleDelete = async () => {
-    if (!window.confirm("¿Seguro que quieres eliminar este video?")) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await deleteVideo(video.publicId);
-      fetchVideos();
-    } catch (err) {
-      setError("No se pudo eliminar el video.");
-     // console.error("Error al eliminar video", err);
-    } finally {
-      setLoading(false);
-    }
+    showConfirm(
+      "Eliminar video",
+      "¿Seguro que quieres eliminar este video?",
+      async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          await deleteVideo(video.publicId);
+          showToast("Video eliminado", "success");
+          fetchVideos();
+        } catch (err) {
+          setError("No se pudo eliminar el video.");
+          showToast("No se pudo eliminar el video.", "error");
+        } finally {
+          setLoading(false);
+        }
+      }
+    );
   };
 
   return (
@@ -42,9 +50,8 @@ const VideoItem = ({ video, authUser, fetchVideos }) => {
         <button
           onClick={handleDelete}
           disabled={loading}
-          className={`absolute top-2 right-2 px-2 py-1 rounded text-white ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
-          }`}
+          className={`absolute top-2 right-2 px-2 py-1 rounded text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+            }`}
         >
           {loading ? "Eliminando..." : "Eliminar"}
         </button>

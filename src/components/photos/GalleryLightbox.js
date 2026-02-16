@@ -1,8 +1,10 @@
 import React from 'react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
+import { useUI } from '../../context/UIContext';
 
 const GalleryLightbox = ({ photo, onClose, authUser, onDelete, onUpdateDescription }) => {
+  const { showConfirm, showToast } = useUI();
   if (!photo) return null;
 
   const isOwner = authUser?._id === photo.user?._id;
@@ -46,9 +48,19 @@ const GalleryLightbox = ({ photo, onClose, authUser, onDelete, onUpdateDescripti
             <button
               className="ml-2 text-white bg-red-600 px-2 py-1 rounded hover:bg-red-700"
               onClick={() => {
-                if (window.confirm('¿Seguro que quieres eliminar esta foto?')) {
-                  onDelete(photo._id);
-                }
+                showConfirm(
+                  'Eliminar foto',
+                  '¿Seguro que quieres eliminar esta foto?',
+                  async () => {
+                    try {
+                      await onDelete(photo._id);
+                      showToast('Foto eliminada', 'success');
+                      onClose();
+                    } catch (error) {
+                      showToast('Error al eliminar foto', 'error');
+                    }
+                  }
+                );
               }}
             >
               Eliminar

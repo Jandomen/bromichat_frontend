@@ -7,14 +7,12 @@ const UserButton = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/user'); 
+    navigate('/user');
   };
 
   return (
-    <button
-      onClick={handleClick}
-    >
-      <FontAwesomeIcon icon={faUsers} /> 
+    <button onClick={handleClick} className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95 text-gray-300 hover:text-white">
+      <FontAwesomeIcon icon={faUsers} className="text-xl" />
     </button>
   );
 };

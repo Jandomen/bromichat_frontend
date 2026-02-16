@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { getFullImageUrl } from '../../utils/getProfilePicture';
 
 const UserGallery = ({ photos = [], scrollToTop }) => {
-  const [selectedMedia, setSelectedMedia] = useState(null);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedMediaIndex === null) return;
+      if (e.key === 'Escape') setSelectedMediaIndex(null);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedMediaIndex((prev) => (prev + 1) % validPhotos.length);
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedMediaIndex((prev) => (prev - 1 + validPhotos.length) % validPhotos.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedMediaIndex, photos]);
 
   if (!Array.isArray(photos)) {
-   // console.warn('UserGallery: photos prop is not an array:', photos);
+    // console.warn('UserGallery: photos prop is not an array:', photos);
     return <p>No hay fotos.</p>;
   }
 
@@ -18,47 +37,78 @@ const UserGallery = ({ photos = [], scrollToTop }) => {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {validPhotos.map((photo, index) => (
-          <div key={photo._id || index} className="relative">
+          <div
+            key={photo._id || index}
+            className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all"
+            onClick={() => setSelectedMediaIndex(index)}
+          >
             <img
-              src={photo.imageUrl || '/default-image.png'}
+              src={getFullImageUrl(photo.imageUrl)}
               alt={photo.description || `Foto ${index + 1}`}
-              className="w-full h-48 object-cover rounded cursor-pointer"
-              onClick={() => setSelectedMedia({ ...photo, type: 'photo' })}
+              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
             />
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
+              <span className="text-white opacity-0 group-hover:opacity-100 font-semibold text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm transition-opacity">
+                Ver Foto
+              </span>
+            </div>
           </div>
         ))}
       </div>
-      <div className="mt-4 text-right">
-        <button
-          onClick={scrollToTop}
-          className="px-4 py-2 rounded text-white font-semibold bg-blue-600 hover:bg-blue-700"
-        >
-          Volver Arriba
-        </button>
-      </div>
 
-      {selectedMedia && (
+      {validPhotos.length > 8 && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={scrollToTop}
+            className="px-6 py-2 rounded-full text-blue-600 font-semibold bg-blue-50 hover:bg-blue-100 transition"
+          >
+            ↑ Volver Arriba
+          </button>
+        </div>
+      )}
+
+      {selectedMediaIndex !== null && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setSelectedMedia(null)}
+          className="fixed inset-0 bg-black/98 backdrop-blur-3xl flex items-center justify-center z-[200] animate-in fade-in duration-300"
+          onClick={() => setSelectedMediaIndex(null)}
         >
+          {/* Close Button */}
+          <button
+            onClick={() => setSelectedMediaIndex(null)}
+            className="absolute top-6 right-6 z-[220] p-4 bg-white/10 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all shadow-2xl active:scale-90"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
           <div
-            className="relative bg-white p-4 rounded max-w-3xl w-full"
+            className="relative w-screen h-screen flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={selectedMedia.imageUrl || '/default-image.png'}
-              alt={selectedMedia.description || 'Foto'}
-              className="w-full rounded mb-2 max-h-[80vh] object-contain"
+              src={getFullImageUrl(validPhotos[selectedMediaIndex].imageUrl)}
+              alt={validPhotos[selectedMediaIndex].description || 'Foto'}
+              className="max-w-full max-h-screen object-contain shadow-2xl transition-transform duration-500"
             />
-            <p className="mb-2">{selectedMedia.description || 'Sin descripción'}</p>
+            {validPhotos[selectedMediaIndex].description && (
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md text-white px-8 py-4 rounded-3xl border border-white/10 text-sm font-medium max-w-[80%] text-center shadow-2xl">
+                {validPhotos[selectedMediaIndex].description}
+              </div>
+            )}
+
+            {/* Nav Arrows (Desktop) */}
             <button
-              className="absolute top-2 right-2 text-white text-2xl font-bold"
-              onClick={() => setSelectedMedia(null)}
+              className="hidden md:block absolute left-4 p-4 text-white/20 hover:text-white transition-colors"
+              onClick={() => setSelectedMediaIndex((prev) => (prev - 1 + validPhotos.length) % validPhotos.length)}
             >
-              ×
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button
+              className="hidden md:block absolute right-4 p-4 text-white/20 hover:text-white transition-colors"
+              onClick={() => setSelectedMediaIndex((prev) => (prev + 1) % validPhotos.length)}
+            >
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>
@@ -66,5 +116,6 @@ const UserGallery = ({ photos = [], scrollToTop }) => {
     </>
   );
 };
+
 
 export default UserGallery;

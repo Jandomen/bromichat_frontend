@@ -10,8 +10,8 @@ const GaleryButton = () => {
     };
 
     return (
-        <button onClick={handleGalleryClick} className="gallery-link">
-            <FontAwesomeIcon icon={faImages} /> 
+        <button onClick={handleGalleryClick} className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95 text-gray-300 hover:text-white">
+            <FontAwesomeIcon icon={faImages} className="text-xl" />
         </button>
     );
 };

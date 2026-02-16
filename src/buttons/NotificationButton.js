@@ -5,19 +5,25 @@ import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { NotificationContext } from '../context/NotificationContext';
 
 const NotificationButton = () => {
-  const { unreadCount } = useContext(NotificationContext);
+  const { unreadGeneralCount } = useContext(NotificationContext);
   const navigate = useNavigate();
 
   return (
     <button
       onClick={() => navigate('/notifications')}
-      className="gallery-link relative"
-      aria-label={`Notificaciones (${unreadCount} sin leer)`}
+      className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95"
+      aria-label={`Notificaciones (${unreadGeneralCount} sin leer)`}
     >
-      <FontAwesomeIcon icon={faBell} />
-      {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5">
-          {unreadCount}
+      <FontAwesomeIcon
+        icon={faBell}
+        className={`text-xl transition-colors duration-300 ${unreadGeneralCount > 0
+          ? 'text-white animate-swing'
+          : 'text-gray-300'
+          }`}
+      />
+      {unreadGeneralCount > 0 && (
+        <span className="absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-md ring-2 ring-red-900/50 z-20 animate-pulse">
+          {unreadGeneralCount > 9 ? '9+' : unreadGeneralCount}
         </span>
       )}
     </button>

@@ -22,11 +22,11 @@ const GroupEdit = () => {
         const res = await api.get(`/group/${groupId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-       // console.log("Group fetched for edit:", JSON.stringify(res.data.group, null, 2));
+        // console.log("Group fetched for edit:", JSON.stringify(res.data.group, null, 2));
         setGroup(res.data.group);
         setName(res.data.group.name);
       } catch (err) {
-       // console.error("Error fetching group for edit:", err);
+        // console.error("Error fetching group for edit:", err);
         setNotification({ type: "error", message: "Error al cargar detalles del grupo" });
         setTimeout(() => navigate("/groups"), 2000);
       }
@@ -50,33 +50,33 @@ const GroupEdit = () => {
         { name },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-     // console.log("Group updated:", res.data);
+      // console.log("Group updated:", res.data);
       setNotification({ type: "success", message: "Grupo actualizado con éxito" });
       setTimeout(() => navigate(`/groups/${groupId}`), 2000);
     } catch (err) {
-     // console.error("Error updating group:", err);
+      // console.error("Error updating group:", err);
       setNotification({ type: "error", message: "Error al actualizar el grupo" });
     }
   };
 
   const handleChangeGroupImage = async (file) => {
     if (!file) {
-     // console.warn("No file selected for group image");
+      // console.warn("No file selected for group image");
       setNotification({ type: "error", message: "Selecciona una imagen" });
       return;
     }
     const formData = new FormData();
     formData.append("groupImage", file);
     try {
-     // console.log("Uploading group image for group:", groupId);
+      // console.log("Uploading group image for group:", groupId);
       const res = await api.put(`/group/${groupId}/update-image`, formData, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
-     // console.log("Group image updated:", res.data.groupImage);
-      setGroup((prev) => ({ ...prev, groupImage: res.data.groupImage }));
+      // console.log("Group image updated:", res.data.groupImage);
+      setGroup((prev) => ({ ...prev, groupImage: res.data.group.groupImage }));
       setNotification({ type: "success", message: "Imagen de grupo actualizada" });
     } catch (err) {
-     // console.error("Error updating group image:", err);
+      // console.error("Error updating group image:", err);
       setNotification({ type: "error", message: "Error al actualizar la imagen del grupo" });
     }
   };
@@ -89,10 +89,12 @@ const GroupEdit = () => {
     );
   }
 
-  if (!isCreator) {
+  const isMember = group?.members?.some(m => m._id === user?._id);
+
+  if (!isMember) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-lg text-red-600">Solo el creador puede editar este grupo</p>
+        <p className="text-lg text-red-600">No eres miembro de este grupo</p>
       </div>
     );
   }
@@ -106,11 +108,10 @@ const GroupEdit = () => {
 
           {notification && (
             <div
-              className={`p-2 mb-4 rounded ${
-                notification.type === "success"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
+              className={`p-2 mb-4 rounded ${notification.type === "success"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+                }`}
             >
               {notification.message}
             </div>
@@ -123,13 +124,13 @@ const GroupEdit = () => {
                 alt={group.name}
                 className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition"
                 onClick={() => {
-                 // console.log("Image clicked to change group image");
+                  // console.log("Image clicked to change group image");
                   fileInputRef.current?.click();
                 }}
               />
               <button
                 onClick={() => {
-                 // console.log("Change image button clicked");
+                  // console.log("Change image button clicked");
                   fileInputRef.current?.click();
                 }}
                 className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600 transition"
@@ -139,7 +140,7 @@ const GroupEdit = () => {
               </button>
               <button
                 onClick={() => {
-                 // console.log("Explicit change image button clicked");
+                  // console.log("Explicit change image button clicked");
                   fileInputRef.current?.click();
                 }}
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"

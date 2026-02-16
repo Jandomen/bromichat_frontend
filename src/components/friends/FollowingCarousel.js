@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import useAuthAxios from '../../hooks/useAuthAxios';
+import { getFullImageUrl } from '../../utils/getProfilePicture';
+import defaultProfile from '../../assets/default-profile.png';
 
 const FollowingCarousel = () => {
   const [following, setFollowing] = useState([]);
@@ -11,7 +13,7 @@ const FollowingCarousel = () => {
         const res = await authAxios.get('/friend/following/me');
         setFollowing(res.data.following);
       } catch (err) {
-       // console.error('Error al obtener usuarios que sigues:', err);
+        // console.error('Error al obtener usuarios que sigues:', err);
       }
     };
 
@@ -28,9 +30,10 @@ const FollowingCarousel = () => {
           className="flex flex-col items-center border p-2 rounded-lg shadow-sm"
         >
           <img
-            src={user.profilePicture || '/default-avatar.png'}
+            src={getFullImageUrl(user.profilePicture)}
             alt={user.username}
             className="w-16 h-16 rounded-full"
+            onError={(e) => { e.target.src = defaultProfile; }}
           />
           <span className="text-sm mt-2">{user.username}</span>
         </div>

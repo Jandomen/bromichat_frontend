@@ -3,18 +3,16 @@ import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { FaPaperclip } from 'react-icons/fa'; // 👈 Paperclip for file input
 import defaultProfile from '../../assets/default-profile.png';
+import { getFullImageUrl } from '../../utils/getProfilePicture';
+import { useUI } from '../../context/UIContext';
+import { Upload, Trash2 } from 'lucide-react';
 
 const ChangeProfilePicture = () => {
   const { user, token, setUser } = useContext(AuthContext);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const getFullImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `${process.env.REACT_APP_API_BACKEND}${path}`;
-  };
+  const { showToast } = useUI();
 
   useEffect(() => {
     if (user?.profilePicture) {
@@ -29,12 +27,12 @@ const ChangeProfilePicture = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten imágenes');
+      showToast('Solo se permiten imágenes', 'error');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen es demasiado grande. Máximo 2MB.');
+      showToast('La imagen es demasiado grande. Máximo 2MB.', 'error');
       return;
     }
 
@@ -53,7 +51,7 @@ const ChangeProfilePicture = () => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert('Por favor, selecciona una imagen.');
+      showToast('Por favor, selecciona una imagen.', 'warning');
       return;
     }
 
@@ -74,9 +72,10 @@ const ChangeProfilePicture = () => {
       );
 
       updateUserState(response.data.user);
-      alert('Foto de perfil actualizada');
+      showToast('Foto de perfil actualizada', 'success');
+      setSelectedFile(null);
     } catch (err) {
-      alert('Hubo un error al actualizar la foto de perfil');
+      showToast('Hubo un error al actualizar la foto de perfil', 'error');
     } finally {
       setLoading(false);
     }
@@ -91,68 +90,80 @@ const ChangeProfilePicture = () => {
         }
       );
 
-      updateUserState(response.data.user);
       setPreview(null);
       setSelectedFile(null);
-      alert('Foto de perfil eliminada');
+      showToast('Foto de perfil eliminada', 'success');
     } catch (err) {
-      alert('No se pudo eliminar la foto de perfil');
+      showToast('No se pudo eliminar la foto de perfil', 'error');
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-fit mx-auto text-center">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Actualizar Foto de Perfil</h2>
-
-      {/* Image preview */}
-      <div className="relative w-32 h-32 mx-auto mb-4 group">
-        <img
-          src={preview || defaultProfile}
-          alt="Vista previa"
-          className="w-full h-full object-cover rounded-full border border-gray-300"
-        />
-        {selectedFile && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            {selectedFile.name}
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row items-center gap-8">
+        {/* Image preview */}
+        <div className="relative group mx-auto sm:mx-0">
+          <div className="w-32 h-32 rounded-full p-1 bg-white border-2 border-dashed border-gray-300 group-hover:border-blue-500 transition-colors">
+            <img
+              src={preview || defaultProfile}
+              alt="Vista previa"
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
-        )}
-      </div>
+          {selectedFile && (
+            <div className="absolute -bottom-2 inset-x-0 mx-auto w-fit px-3 py-1 bg-gray-900/80 backdrop-blur text-white text-xs rounded-full truncate max-w-[120px]">
+              {selectedFile.name}
+            </div>
+          )}
+        </div>
 
-      {/* Custom file input */}
-      <div className="relative mb-4">
-        <input
-          type="file"
-          id="file-upload"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-        <label
-          htmlFor="file-upload"
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg cursor-pointer hover:bg-blue-200 transition-colors duration-200 mx-auto"
-        >
-          <FaPaperclip className="text-blue-700" />
-          <span className="font-medium">
-            {selectedFile ? selectedFile.name : 'Seleccionar imagen'}
-          </span>
-        </label>
-      </div>
+        <div className="flex-1 w-full text-center sm:text-left">
+          <div className="flex flex-wrap gap-4 justify-center sm:justify-start items-center">
+            {/* Custom file input */}
+            <div className="relative">
+              <input
+                type="file"
+                id="file-upload"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="file-upload"
+                className="flex items-center gap-2 px-6 py-2.5 bg-blue-50 text-blue-700 font-medium rounded-xl cursor-pointer hover:bg-blue-100 transition-all duration-200 border border-blue-200"
+              >
+                <FaPaperclip className="text-blue-600" />
+                <span>
+                  {selectedFile ? 'Cambiar imagen' : 'Seleccionar archivo'}
+                </span>
+              </label>
+            </div>
 
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={handleUpload}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:bg-blue-400"
-          disabled={loading || !selectedFile}
-        >
-          {loading ? 'Subiendo...' : 'Guardar'}
-        </button>
-        <button
-          onClick={handleDelete}
-          className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
-          disabled={!user?.profilePicture}
-        >
-          Eliminar
-        </button>
+            {selectedFile && (
+              <button
+                onClick={handleUpload}
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Upload className="w-4 h-4" />
+                {loading ? 'Subiendo...' : 'Guardar Foto'}
+              </button>
+            )}
+
+            {user?.profilePicture && (
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white text-red-600 font-medium rounded-xl border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
+              >
+                <Trash2 className="w-4 h-4" />
+                Eliminar
+              </button>
+            )}
+          </div>
+          <p className="mt-4 text-sm text-gray-500">
+            Formatos permitidos: JPG, PNG o GIF. Tamaño máximo 2MB.
+          </p>
+        </div>
       </div>
     </div>
   );

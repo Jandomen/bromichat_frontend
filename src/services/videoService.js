@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = `${process.env.REACT_APP_API_BACKEND}/videos`; 
+const API = `${process.env.REACT_APP_API_BACKEND}/videos`;
 
 export const uploadVideo = (formData, token) =>
   axios.post(`${API}/upload`, formData, {
@@ -10,16 +10,18 @@ export const uploadVideo = (formData, token) =>
     },
   });
 
-export const searchVideosByTitle = (title) =>
-  axios.get(`${API}/search?title=${encodeURIComponent(title)}`);
+export const searchVideosByTitle = (title, token = null) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return axios.get(`${API}/search?title=${encodeURIComponent(title)}`, { headers });
+};
 
 export const deleteVideo = (videoId, token) =>
- axios.delete(`${process.env.REACT_APP_API_BACKEND}/videos/delete`, {
-  headers: { Authorization: `Bearer ${token}` },
-  data: { videoId },
-});
+  axios.delete(`${process.env.REACT_APP_API_BACKEND}/videos/delete`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { videoId },
+  });
 
-  
+
 
 export const getVideoById = (videoId, token = null) => {
   const headers = token ? { Authorization: `Bearer ${token}` } : {};

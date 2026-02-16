@@ -10,8 +10,8 @@ const SettingsButton = () => {
     };
 
     return (
-        <button onClick={handleSettingsClick} className="settings-link">
-            <FontAwesomeIcon icon={faCog} /> 
+        <button onClick={handleSettingsClick} className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-all active:scale-95 text-gray-300 hover:text-white">
+            <FontAwesomeIcon icon={faCog} className="text-xl" />
         </button>
     );
 };

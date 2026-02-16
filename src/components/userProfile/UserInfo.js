@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { SocketContext } from '../../context/SocketContext';
 import api from '../../services/api';
@@ -16,24 +16,33 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ChatIcon from '@mui/icons-material/Chat';
 import BlockIcon from '@mui/icons-material/Block';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import SendMessageButton from '../../buttons/SendMessageButton';
+import { CallContext } from '../../context/CallContext';
+import { Phone, Video as VideoIcon } from 'lucide-react';
+import SosModal from '../UI/SosModal';
+import StoryViewer from '../stories/StoryViewer';
 
 const UserInfo = ({ user }) => {
   const { token, user: currentUser, setUser: setCurrentUser } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
+  const { callUser } = useContext(CallContext);
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
   const [activeTab, setActiveTab] = useState('friends');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isSosModalOpen, setIsSosModalOpen] = useState(false);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
 
   useEffect(() => {
-   // console.log('Depuración - Current User:', currentUser);
-   // console.log('Depuración - User prop:', user);
+    // console.log('Depuración - Current User:', currentUser);
+    // console.log('Depuración - User prop:', user);
     const fetchUserData = async () => {
       if (!id || !token || !currentUser) {
         setError('ID de usuario, token o usuario actual no disponible');
-       // console.log('Depuración - Error en fetchUserData: Falta id, token o currentUser', { id, token, currentUser });
+        // console.log('Depuración - Error en fetchUserData: Falta id, token o currentUser', { id, token, currentUser });
         return;
       }
       setLoading(true);
@@ -42,7 +51,7 @@ const UserInfo = ({ user }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userDataFromApi = res.data;
-       // console.log('Depuración - Datos del usuario desde API:', userDataFromApi);
+        // console.log('Depuración - Datos del usuario desde API:', userDataFromApi);
         setUserData({
           ...userDataFromApi,
           isFriend: userDataFromApi.isFriend || false,
@@ -57,10 +66,10 @@ const UserInfo = ({ user }) => {
       } catch (err) {
         setError(
           err.response?.data?.message ||
-            err.response?.data?.error ||
-            'Error al cargar el usuario'
+          err.response?.data?.error ||
+          'Error al cargar el usuario'
         );
-       // console.error('Depuración - Error en fetchUserData:', err);
+        // console.error('Depuración - Error en fetchUserData:', err);
         setLoading(false);
       }
     };
@@ -78,7 +87,7 @@ const UserInfo = ({ user }) => {
         following: user.following || [],
         profilePicture: user.profilePicture || null,
       });
-     // console.log('Depuración - userData inicializado desde prop user:', user);
+      // console.log('Depuración - userData inicializado desde prop user:', user);
     }
   }, [id, token, user, currentUser]);
 
@@ -86,7 +95,7 @@ const UserInfo = ({ user }) => {
     if (!socket || !userData || !currentUser) return;
 
     socket.on('friendAdded', ({ friendId, friends, isFriend }) => {
-     // console.log('Depuración - Evento friendAdded:', { friendId, friends, isFriend });
+      // console.log('Depuración - Evento friendAdded:', { friendId, friends, isFriend });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, friends }));
         setCurrentUser((prev) => ({ ...prev, friends }));
@@ -100,7 +109,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('friendRemoved', ({ friendId, friends, isFriend }) => {
-     // console.log('Depuración - Evento friendRemoved:', { friendId, friends, isFriend });
+      // console.log('Depuración - Evento friendRemoved:', { friendId, friends, isFriend });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, friends }));
         setCurrentUser((prev) => ({ ...prev, friends }));
@@ -114,7 +123,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('followed', ({ targetId, following, isFollowing }) => {
-     // console.log('Depuración - Evento followed:', { targetId, following, isFollowing });
+      // console.log('Depuración - Evento followed:', { targetId, following, isFollowing });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, following }));
         setCurrentUser((prev) => ({ ...prev, following }));
@@ -128,7 +137,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('newFollower', ({ followerId, followers }) => {
-     // console.log('Depuración - Evento newFollower:', { followerId, followers });
+      // console.log('Depuración - Evento newFollower:', { followerId, followers });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, followers }));
         setCurrentUser((prev) => ({ ...prev, followers }));
@@ -141,7 +150,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('unfollowed', ({ targetId, following, isFollowing }) => {
-     // console.log('Depuración - Evento unfollowed:', { targetId, following, isFollowing });
+      // console.log('Depuración - Evento unfollowed:', { targetId, following, isFollowing });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, following }));
         setCurrentUser((prev) => ({ ...prev, following }));
@@ -155,7 +164,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('followerRemoved', ({ followerId, followers }) => {
-     // console.log('Depuración - Evento followerRemoved:', { followerId, followers });
+      // console.log('Depuración - Evento followerRemoved:', { followerId, followers });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, followers }));
         setCurrentUser((prev) => ({ ...prev, followers }));
@@ -168,7 +177,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('userBlocked', ({ targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing }) => {
-     // console.log('Depuración - Evento userBlocked:', { targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing });
+      // console.log('Depuración - Evento userBlocked:', { targetId, blockedUsers, friends, following, isBlocked, isFriend, isFollowing });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, blockedUsers, friends, following }));
         setCurrentUser((prev) => ({ ...prev, blockedUsers, friends, following }));
@@ -183,7 +192,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('blockedByUser', ({ blockerId, friends, followers }) => {
-     // console.log('Depuración - Evento blockedByUser:', { blockerId, friends, followers });
+      // console.log('Depuración - Evento blockedByUser:', { blockerId, friends, followers });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, friends, followers }));
         setCurrentUser((prev) => ({ ...prev, friends, followers }));
@@ -199,7 +208,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('userUnblocked', ({ targetId, blockedUsers, isBlocked }) => {
-     // console.log('Depuración - Evento userUnblocked:', { targetId, blockedUsers, isBlocked });
+      // console.log('Depuración - Evento userUnblocked:', { targetId, blockedUsers, isBlocked });
       if (userData._id === currentUser._id) {
         setUserData((prev) => ({ ...prev, blockedUsers }));
         setCurrentUser((prev) => ({ ...prev, blockedUsers }));
@@ -212,7 +221,7 @@ const UserInfo = ({ user }) => {
     });
 
     socket.on('unblockedByUser', ({ blockerId }) => {
-     // console.log('Depuración - Evento unblockedByUser:', { blockerId });
+      // console.log('Depuración - Evento unblockedByUser:', { blockerId });
       if (userData._id === currentUser._id) {
         // No se necesita actualizar el estado
       } else if (userData._id === blockerId) {
@@ -234,75 +243,25 @@ const UserInfo = ({ user }) => {
     };
   }, [socket, userData, currentUser, setCurrentUser]);
 
-  const handleStartChat = async (otherUserId) => {
-    if (!token) {
-      setError('Debes iniciar sesión para enviar mensajes.');
-      return;
-    }
-    if (otherUserId === currentUser?._id) {
-      setError('No puedes iniciar un chat contigo mismo.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const resConversations = await api.get('/conversation', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const existingConversation = resConversations.data.find((conv) => {
-        if (conv.isGroup) return false;
-        const participants = conv.participants.map((p) => p._id);
-        return (
-          participants.includes(currentUser._id) &&
-          participants.includes(otherUserId)
-        );
-      });
-
-      if (existingConversation) {
-        navigate(`/chat/${existingConversation._id}`);
-        return;
-      }
-
-      const payload = {
-        participantIds: [currentUser._id, otherUserId].sort(),
-        isGroup: false,
-      };
-      const res = await api.post('/conversation/create', payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const convoId = res.data?._id;
-      if (!convoId) {
-        throw new Error('No se pudo obtener el ID de la conversación');
-      }
-
-      navigate(`/chat/${convoId}`);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        'No se pudo iniciar la conversación';
-      setError(errorMessage);
-     // console.error('Error al iniciar chat:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddFriend = async (friendId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({ ...prev, isFriend: true }));
+    setCurrentUser(prev => ({
+      ...prev,
+      friends: [...(prev.friends || []), { _id: friendId }]
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando agregar amigo:', friendId);
     try {
       const res = await api.put(
         `/friend/add/${friendId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-     // console.log('Depuración - Respuesta de /friend/add:', res.data);
       setUserData((prev) => ({
         ...prev,
         friends: res.data.user?.friends || prev.friends,
@@ -317,27 +276,34 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo agregar amigo';
-     // console.error('Depuración - Error en handleAddFriend:', err.response?.data);
+
       if (err.response?.status === 400 && errorMessage === 'Ya son amigos') {
-       // console.log('Depuración - Corrigiendo isFriend a true por error 400');
         setUserData((prev) => ({ ...prev, isFriend: true }));
       } else {
         setError(errorMessage);
+        // Rollback
+        setUserData(previousUserData);
+        setCurrentUser(previousCurrentUser);
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleRemoveFriend = async (friendId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({ ...prev, isFriend: false }));
+    setCurrentUser(prev => ({
+      ...prev,
+      friends: (prev.friends || []).filter(f => (f._id || f) !== friendId)
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando eliminar amigo:', friendId);
     try {
       const res = await api.delete(`/friend/remove/${friendId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-     // console.log('Depuración - Respuesta de /friend/remove:', res.data);
       setUserData((prev) => ({
         ...prev,
         friends: res.data.user?.friends || prev.friends,
@@ -353,23 +319,30 @@ const UserInfo = ({ user }) => {
         err.response?.data?.error ||
         'No se pudo eliminar amigo';
       setError(errorMessage);
-     // console.error('Depuración - Error en handleRemoveFriend:', err);
-    } finally {
-      setLoading(false);
+      // Rollback
+      setUserData(previousUserData);
+      setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleFollow = async (userId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({ ...prev, isFollowing: true }));
+    setCurrentUser(prev => ({
+      ...prev,
+      following: [...(prev.following || []), { _id: userId }]
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando seguir usuario:', userId);
     try {
       const res = await api.put(
         `/friend/follow/${userId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-     // console.log('Depuración - Respuesta de /friend/follow:', res.data);
       setUserData((prev) => ({
         ...prev,
         followers: res.data.targetUser?.followers || prev.followers,
@@ -384,27 +357,34 @@ const UserInfo = ({ user }) => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         'No se pudo seguir al usuario';
-     // console.error('Depuración - Error en handleFollow:', err.response?.data);
+
       if (err.response?.status === 400 && errorMessage === 'Ya sigues a este usuario') {
-       // console.log('Depuración - Corrigiendo isFollowing a true por error 400');
         setUserData((prev) => ({ ...prev, isFollowing: true }));
       } else {
         setError(errorMessage);
+        // Rollback
+        setUserData(previousUserData);
+        setCurrentUser(previousCurrentUser);
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleUnfollow = async (userId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({ ...prev, isFollowing: false }));
+    setCurrentUser(prev => ({
+      ...prev,
+      following: (prev.following || []).filter(f => (f._id || f) !== userId)
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando dejar de seguir:', userId);
     try {
       const res = await api.delete(`/friend/unfollow/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-     // console.log('Depuración - Respuesta de /friend/unfollow:', res.data);
       setUserData((prev) => ({
         ...prev,
         followers: res.data.targetUser?.followers || prev.followers,
@@ -420,23 +400,35 @@ const UserInfo = ({ user }) => {
         err.response?.data?.error ||
         'No se pudo dejar de seguir al usuario';
       setError(errorMessage);
-     // console.error('Depuración - Error en handleUnfollow:', err);
-    } finally {
-      setLoading(false);
+      // Rollback
+      setUserData(previousUserData);
+      setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleBlockUser = async (userId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({
+      ...prev,
+      isBlocked: true,
+      isFriend: false,
+      isFollowing: false
+    }));
+    setCurrentUser(prev => ({
+      ...prev,
+      blockedUsers: [...(prev.blockedUsers || []), { _id: userId }]
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando bloquear usuario:', userId);
     try {
       const res = await api.put(
         `/friend/block/${userId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-     // console.log('Depuración - Respuesta de /friend/block:', res.data);
       setUserData((prev) => ({
         ...prev,
         blockedUsers: res.data.user?.blockedUsers || prev.blockedUsers,
@@ -458,21 +450,28 @@ const UserInfo = ({ user }) => {
         err.response?.data?.error ||
         'No se pudo bloquear al usuario';
       setError(errorMessage);
-     // console.error('Depuración - Error en handleBlockUser:', err);
-    } finally {
-      setLoading(false);
+      // Rollback
+      setUserData(previousUserData);
+      setCurrentUser(previousCurrentUser);
     }
   };
 
   const handleUnblockUser = async (userId) => {
-    setLoading(true);
+    // Optimistic Update
+    const previousUserData = { ...userData };
+    const previousCurrentUser = { ...currentUser };
+
+    setUserData(prev => ({ ...prev, isBlocked: false }));
+    setCurrentUser(prev => ({
+      ...prev,
+      blockedUsers: (prev.blockedUsers || []).filter(b => (b._id || b) !== userId)
+    }));
+
     setError(null);
-   // console.log('Depuración - Intentando desbloquear usuario:', userId);
     try {
       const res = await api.delete(`/friend/unblock/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-     // console.log('Depuración - Respuesta de /friend/unblock:', res.data);
       setUserData((prev) => ({
         ...prev,
         blockedUsers: res.data.user?.blockedUsers || prev.blockedUsers,
@@ -488,9 +487,9 @@ const UserInfo = ({ user }) => {
         err.response?.data?.error ||
         'No se pudo desbloquear al usuario';
       setError(errorMessage);
-     // console.error('Depuración - Error en handleUnblockUser:', err);
-    } finally {
-      setLoading(false);
+      // Rollback
+      setUserData(previousUserData);
+      setCurrentUser(previousCurrentUser);
     }
   };
 
@@ -511,180 +510,295 @@ const UserInfo = ({ user }) => {
     );
   }
 
-  console.log('Depuración - Renderizando userData:', {
-    userId: userData._id,
-    username: userData.username,
-    profilePicture: userData.profilePicture,
-    profilePictureUrl: getFullImageUrl(userData.profilePicture),
-  });
+  // Cover Photo Logic
+  const handleCoverPhotoChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("coverPhoto", file);
+
+    try {
+      const res = await api.put("/user/cover-picture", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setUserData((prev) => ({
+        ...prev,
+        coverPhoto: res.data.user.coverPhoto,
+      }));
+
+      // Update current user if it's their profile
+      if (currentUser._id === userData._id) {
+        setCurrentUser(prev => ({ ...prev, coverPhoto: res.data.user.coverPhoto }));
+      }
+
+    } catch (err) {
+      console.error("Error upgrading cover photo:", err);
+      setError("Error al actualizar la foto de portada");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, p: 3, bgcolor: 'white', borderRadius: 2, boxShadow: 1, maxWidth: '1000px', mx: 'auto' }}>
-      <img
-        src={getFullImageUrl(userData.profilePicture)}
-        alt={`${userData.username || 'Usuario'}'s profile`}
-        style={{ width: 128, height: 128, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e0e0' }}
-        onError={(e) => {
-          console.error('Error loading profile picture:', {
-            attemptedUrl: e.target.src,
-            userId: userData._id,
-            username: userData.username,
-          });
-          e.target.src = defaultProfile;
-        }}
-      />
-      <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
-        {error && (
-          <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
+    <div className="relative">
+      {/* Cover Image - Modern height and subtle overlay */}
+      <div className="h-64 md:h-80 w-full relative group overflow-hidden">
+        <img
+          src={userData.coverPhoto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"}
+          alt="Cover"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
+          onClick={() => setSelectedImage(userData.coverPhoto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80")}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+
+        {/* Change Cover Button (Only for owner) */}
+        {userData._id === currentUser._id && (
+          <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            <input
+              type="file"
+              id="cover-upload"
+              accept="image/*"
+              className="hidden"
+              onChange={handleCoverPhotoChange}
+            />
+            <label
+              htmlFor="cover-upload"
+              className="cursor-pointer flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/30 transition-all font-bold text-xs uppercase tracking-widest"
+            >
+              <span>📷</span>
+              <span>Cambiar Portada</span>
+            </label>
+          </div>
         )}
-        <Typography variant="h5" fontWeight="bold" color="text.primary">
-          {userData.name || 'Sin nombre'} {userData.lastName || ''}
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          @{userData.username || 'Usuario'}
-        </Typography>
-        <Typography variant="body1" color="text.primary" sx={{ mt: 1 }}>
-          {userData.bio || <i>Sin biografía disponible</i>}
-        </Typography>
-        <Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Email:</strong> {userData.email || 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Teléfono:</strong> {userData.phone || 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Fecha de nacimiento:</strong>{' '}
-            {userData.birthdate ? new Date(userData.birthdate).toLocaleDateString() : 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Miembro desde:</strong>{' '}
-            {userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Amigos:</strong>{' '}
-            {Array.isArray(userData.friends) ? userData.friends.length : 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Seguidores:</strong>{' '}
-            {Array.isArray(userData.followers) ? userData.followers.length : 'No disponible'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Siguiendo:</strong>{' '}
-            {Array.isArray(userData.following) ? userData.following.length : 'No disponible'}
-          </Typography>
-        </Box>
-        {userData._id !== currentUser._id && (
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mt: 2 }}>
-            {!userData.isBlocked && (
+      </div>
+
+      {/* Profile Info Area */}
+      <div className="px-8 pb-8 relative">
+        <div className="flex flex-col md:flex-row-reverse items-center md:items-end -mt-20 md:-mt-24 mb-6 gap-8 text-center md:text-left">
+
+          {/* Profile Picture - Modern shadow and border */}
+          <div className="relative group">
+            <div className={`w-40 h-40 md:w-48 md:h-48 rounded-3xl p-1.5 transition-all duration-500 hover:rotate-2 shadow-2xl ${userData?.hasStories
+              ? userData.allStoriesViewed
+                ? 'bg-gray-300 shadow-gray-200/20 p-[3px]'
+                : 'bg-gradient-to-tr from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/20 p-2'
+              : 'bg-white shadow-black/10 p-2'
+              }`}>
+              <div
+                className="w-full h-full rounded-2xl overflow-hidden relative block group cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userData?.hasStories) {
+                    setShowStoryViewer(true);
+                  } else {
+                    setSelectedImage(getFullImageUrl(userData.profilePicture));
+                  }
+                }}
+              >
+                <img
+                  src={getFullImageUrl(userData.profilePicture)}
+                  alt={userData.username}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  onError={(e) => e.target.src = defaultProfile}
+                />
+
+                {/* Online Status Indicator */}
+                <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
+
+                {/* Story Badge */}
+                {userData?.hasStories && !userData.allStoriesViewed && (
+                  <div className="absolute top-2 right-2 bg-yellow-500 text-[8px] font-black text-white px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg animate-pulse">
+                    Historia
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Name & Bio - Modern typography */}
+          <div className="flex-1 md:pb-4">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+              <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight flex items-center gap-4">
+                <span className="bg-yellow-400/20 px-4 py-1 rounded-2xl backdrop-blur-sm border border-yellow-400/10 inline-block">
+                  {userData.name} {userData.lastName}
+                </span>
+
+                {userData._id !== currentUser?._id && !userData.isBlocked && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => callUser(userData._id, `${userData.name} ${userData.lastName}`, getFullImageUrl(userData.profilePicture), "video")}
+                      className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-2xl shadow-lg shadow-green-500/20 transition-all hover:scale-110 active:scale-95 group relative"
+                      title="Llamada de Video"
+                    >
+                      <VideoIcon size={20} />
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                    </button>
+                    <button
+                      onClick={() => callUser(userData._id, `${userData.name} ${userData.lastName}`, getFullImageUrl(userData.profilePicture), "audio")}
+                      className="p-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-110 active:scale-95"
+                      title="Llamada de Voz"
+                    >
+                      <Phone size={20} />
+                    </button>
+                  </div>
+                )}
+              </h1>
+              <span className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-black uppercase tracking-widest self-center md:self-auto">
+                @{userData.username}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap justify-center md:justify-start items-center gap-6 text-sm">
+              <Link to={`/user/${userData._id}/friends`} className="flex items-center gap-2 group decoration-none">
+                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.friends?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Amigos</span>
+              </Link>
+              <Link to={`/user/${userData._id}/followers`} className="flex items-center gap-2 group decoration-none">
+                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.followers?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Seguidores</span>
+              </Link>
+              <Link to={`/user/${userData._id}/following`} className="flex items-center gap-2 group decoration-none">
+                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.following?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Siguiendo</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Action Buttons - Moved to the far left in reverse layout */}
+          <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center md:justify-start md:pb-6">
+            {userData._id !== currentUser._id && (
               <>
-                {userData.isFriend ? (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<PersonRemoveIcon />}
-                    onClick={() => handleRemoveFriend(userData._id)}
-                    disabled={loading}
-                    aria-label={`Eliminar amigo ${userData.username || 'Usuario'}`}
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Eliminar amigo'}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<PersonAddIcon />}
-                    onClick={() => handleAddFriend(userData._id)}
-                    disabled={loading}
-                    aria-label={`Agregar amigo ${userData.username || 'Usuario'}`}
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Agregar amigo'}
-                  </Button>
+                {!userData.isBlocked && (
+                  <>
+                    {/* Friend Action */}
+                    {userData.isFriend ? (
+                      <button
+                        onClick={() => handleRemoveFriend(userData._id)}
+                        disabled={loading}
+                        className="px-6 py-3 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all group"
+                      >
+                        <PersonRemoveIcon className="w-4 h-4 transition-transform group-hover:scale-110" /> Eliminar Amigo
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleAddFriend(userData._id)}
+                        disabled={loading}
+                        className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-primary-500/30 group"
+                      >
+                        <PersonAddIcon className="w-4 h-4 transition-transform group-hover:scale-125" /> Añadir Amigo
+                      </button>
+                    )}
+
+                    {/* Follow/Unfollow with pill style */}
+                    <button
+                      onClick={() => userData.isFollowing ? handleUnfollow(userData._id) : handleFollow(userData._id)}
+                      disabled={loading}
+                      className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${userData.isFollowing
+                        ? 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                        : 'bg-primary-50 text-primary-600 hover:bg-primary-100'
+                        }`}
+                    >
+                      {userData.isFollowing ? <VisibilityOffIcon className="w-4 h-4" /> : <VisibilityIcon className="w-4 h-4" />}
+                      {userData.isFollowing ? 'Dejar de seguir' : 'Seguir'}
+                    </button>
+
+                    <SendMessageButton recipientId={userData._id} variant="pill" />
+                  </>
                 )}
-                {userData.isFollowing ? (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<VisibilityOffIcon />}
-                    onClick={() => handleUnfollow(userData._id)}
-                    disabled={loading}
-                    aria-label={`Dejar de seguir a ${userData.username || 'Usuario'}`}
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Dejar de seguir'}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<VisibilityIcon />}
-                    onClick={() => handleFollow(userData._id)}
-                    disabled={loading}
-                    aria-label={`Seguir a ${userData.username || 'Usuario'}`}
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Seguir'}
-                  </Button>
-                )}
-                <Button
-                  variant="contained"
-                  color="info"
-                  startIcon={<ChatIcon />}
-                  onClick={() => handleStartChat(userData._id)}
+
+                <button
+                  onClick={() => userData.isBlocked ? handleUnblockUser(userData._id) : handleBlockUser(userData._id)}
                   disabled={loading}
-                  aria-label={`Enviar mensaje a ${userData.username || 'Usuario'}`}
+                  className={`p-3 rounded-2xl transition-all ${userData.isBlocked ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    }`}
+                  title={userData.isBlocked ? "Desbloquear" : "Bloquear"}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Mensaje'}
-                </Button>
+                  {userData.isBlocked ? <LockOpenIcon className="w-5 h-5" /> : <BlockIcon className="w-5 h-5" />}
+                </button>
               </>
             )}
-            <Button
-              variant="contained"
-              color={userData.isBlocked ? 'secondary' : 'error'}
-              startIcon={userData.isBlocked ? <LockOpenIcon /> : <BlockIcon />}
-              onClick={() =>
-                userData.isBlocked ? handleUnblockUser(userData._id) : handleBlockUser(userData._id)
-              }
-              disabled={loading}
-              aria-label={
-                userData.isBlocked
-                  ? `Desbloquear a ${userData.username || 'Usuario'}`
-                  : `Bloquear a ${userData.username || 'Usuario'}`
-              }
-            >
-              {loading ? <CircularProgress size={24} /> : userData.isBlocked ? 'Desbloquear' : 'Bloquear'}
-            </Button>
-          </Box>
-        )}
-        <Box sx={{ mt: 3 }}>
-          <Tabs
-            value={activeTab}
-            onChange={(e, newValue) => setActiveTab(newValue)}
-            variant="fullWidth"
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
+
+            {/* Edit Profile - Premium gray button */}
+            {userData._id === currentUser?._id && (
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="px-8 py-3 bg-gray-900 hover:bg-black text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-black/10"
+                >
+                  ✏️ Editar Mi Perfil
+                </button>
+
+                {currentUser?.sosSettings?.isEnabled && (
+                  <button
+                    onClick={() => setIsSosModalOpen(true)}
+                    className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-red-500/40 animate-pulse"
+                  >
+                    🆘 SOS
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Image Viewer Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-fade-in p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button
+            className="absolute top-6 right-6 text-white bg-white/10 p-3 rounded-full hover:bg-white/20 transition-all z-[110]"
+            onClick={() => setSelectedImage(null)}
           >
-            <Tab
-              label={userData._id === currentUser._id ? 'Mis Amigos' : 'Amigos'}
-              value="friends"
-            />
-            <Tab
-              label={userData._id === currentUser._id ? 'Mis Seguidores' : 'Seguidores'}
-              value="followers"
-            />
-            <Tab
-              label={userData._id === currentUser._id ? 'Mis Seguidos' : 'Siguiendo'}
-              value="following"
-            />
-          </Tabs>
-          <Box sx={{ mt: 2 }}>
-            {activeTab === 'friends' && <MyFriendsList users={userData.friends || []} />}
-            {activeTab === 'followers' && <MyFollowersList users={userData.followers || []} />}
-            {activeTab === 'following' && <MyFollowingList users={userData.following || []} />}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <img
+            src={selectedImage}
+            alt="Full view"
+            className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
+      <SosModal
+        isOpen={isSosModalOpen}
+        onClose={() => setIsSosModalOpen(false)}
+        onConfirm={() => {/* Actual API call for SOS */ }}
+        contacts={currentUser?.sosSettings?.emergencyContacts}
+        message={currentUser?.sosSettings?.message}
+      />
+
+      {showStoryViewer && userData?.stories && (
+        <StoryViewer
+          storyGroups={[{
+            user: {
+              _id: userData._id,
+              username: userData.username,
+              profilePicture: userData.profilePicture
+            },
+            stories: userData.stories
+          }]}
+          initialGroupIndex={0}
+          onClose={() => setShowStoryViewer(false)}
+          currentUserId={currentUser?._id}
+        />
+      )}
+    </div>
   );
 };
+
 
 export default UserInfo;

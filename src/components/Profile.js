@@ -15,13 +15,13 @@ const Profile = () => {
       <Header />
 
       <main className="flex-grow">
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto px-4 pt-4">
           <CurrentUserInfo />
         </div>
 
         <UserSearch />
 
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto px-4 pb-4">
           <CreatePost onPostCreated={() => setRefresh(!refresh)} />
           <PostList refresh={refresh} />
         </div>

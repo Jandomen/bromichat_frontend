@@ -32,7 +32,7 @@ const Friends = () => {
         err.response?.data?.error ||
         'No se pudo eliminar amigo';
       setError(errorMessage);
-     // console.error('Error al eliminar amigo:', err);
+      // console.error('Error al eliminar amigo:', err);
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ const Friends = () => {
         <div className="p-4 max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold mb-4 text-gray-900">Mis Amigos</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
-          <MyFriendsList onRemoveFriend={handleRemoveFriend} />
+          <MyFriendsList onRemoveFriend={handleRemoveFriend} onlineUsers={onlineUsers} />
         </div>
       </main>
 
