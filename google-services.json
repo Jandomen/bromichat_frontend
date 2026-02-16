@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676002459960",
+    "project_id": "bromichat-4264c",
+    "storage_bucket": "bromichat-4264c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676002459960:android:2753072e412362b98e51cd",
+        "android_client_info": {
+          "package_name": "com.bromichat.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK1qb33qk_jSR_Bdf7oGx74gN4NkrfgoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

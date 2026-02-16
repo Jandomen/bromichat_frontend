@@ -60,8 +60,7 @@ const ForgotPassword = () => {
                     <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[9px] mt-2 mb-6">Restablecer Acceso</p>
 
                     <p className="text-sm text-gray-400 leading-relaxed max-w-[280px] mx-auto font-medium">
-                        <span className="text-red-500 font-black block mb-2">SISTEMA EN PROCESO</span>
-                        Actualmente la recuperación por correo no está disponible. Si perdiste tus credenciales, por favor <span className="text-red-500">crea una cuenta nueva</span>.
+                        Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
                     </p>
                 </div>
 
@@ -86,11 +85,10 @@ const ForgotPassword = () => {
 
                     <button
                         type="submit"
-                        disabled={true}
-                        className="w-full py-4 px-6 flex items-center justify-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-gray-800 cursor-not-allowed rounded-2xl shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500/20"
+                        className="w-full py-4 px-6 flex items-center justify-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-red-600 hover:bg-red-500 rounded-2xl shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20"
                     >
-                        <Sparkles className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-500">Temporalmente Deshabilitado</span>
+                        <Sparkles className="w-4 h-4" />
+                        Enviar Enlace
                     </button>
                 </form>
 

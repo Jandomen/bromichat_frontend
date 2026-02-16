@@ -62,7 +62,11 @@ const Login = () => {
         showToast('Error: respuesta del servidor inválida', 'error');
       }
     } catch (error) {
-      showToast(error.response?.data?.error || 'Error al iniciar sesión', 'error');
+      if (error.response?.status === 401 && error.response?.data?.notVerified) {
+        showToast('⚠️ Tu correo no ha sido verificado. Por favor, revisa tu bandeja de entrada.', 'error');
+      } else {
+        showToast(error.response?.data?.message || error.response?.data?.error || 'Error al iniciar sesión', 'error');
+      }
     }
   };
 

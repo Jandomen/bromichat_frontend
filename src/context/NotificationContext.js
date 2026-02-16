@@ -4,6 +4,7 @@ import { SocketContext } from "./SocketContext";
 import { AuthContext } from "./AuthContext";
 import { useUI } from "./UIContext";
 import { getFullImageUrl } from '../utils/getProfilePicture';
+import { requestForToken } from "../firebase";
 
 export const NotificationContext = createContext();
 
@@ -77,12 +78,12 @@ export const NotificationProvider = ({ children }) => {
     localStorage.setItem("soundFile", archivoSonido);
   }, [sonidoHabilitado, archivoSonido]);
 
-  // Request browser notification permission
+  // Request browser notification permission and FCM token
   useEffect(() => {
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
+    if (user?._id && token) {
+      requestForToken(user._id, token);
     }
-  }, []);
+  }, [user?._id, token]);
 
   // Initial fetch
   useEffect(() => {

@@ -45,7 +45,7 @@ const Register = () => {
       );
 
       if (response.data) {
-        showToast('¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.', 'success');
+        showToast('¡Registro exitoso! Por favor, verifica tu correo electrónico para activar tu cuenta.', 'success');
         navigate('/login');
       } else {
         showToast('Error: respuesta del servidor inválida', 'error');
