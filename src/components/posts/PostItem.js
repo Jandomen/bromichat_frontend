@@ -211,7 +211,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     return (
         <article
             onClick={handlePostClick}
-            className={`relative bg-white rounded-[4rem] shadow-[0_40px_120px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-700 animate-fade-in mb-16 group/post overflow-hidden ${!isDetail ? 'cursor-pointer hover:shadow-[0_50px_150px_rgba(0,0,0,0.12)]' : ''}`}
+            className={`relative bg-white rounded-3xl shadow-[0_15px_45px_rgba(0,0,0,0.05)] border border-gray-100 transition-all duration-700 animate-fade-in mb-12 group/post overflow-hidden ${!isDetail ? 'cursor-pointer hover:shadow-[0_25px_60px_rgba(0,0,0,0.1)]' : ''}`}
         >
             {/* Upper Section (The Post) */}
             <div className="bg-white">
@@ -219,11 +219,12 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                 <div className="p-8 sm:p-12 flex items-center justify-between">
                     <div className="flex items-center gap-5">
                         <Link to={`/user/${post.user?._id}`} className="relative group/avatar shrink-0">
-                            <div className="p-1 bg-gradient-to-tr from-primary-200 to-white rounded-[2.5rem] transform transition-all duration-700 group-hover/avatar:scale-105 shadow-md">
+                            <div className="p-0.5 bg-gray-100 rounded-2xl transform transition-all duration-700 group-hover/avatar:scale-105">
                                 <img
                                     src={post.user?.profilePicture ? getFullImageUrl(post.user.profilePicture) : defaultProfile}
                                     alt={post.user?.username}
-                                    className="w-16 h-16 rounded-[2.2rem] object-cover border-4 border-white"
+                                    className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm"
+                                    loading="lazy"
                                     onError={(e) => (e.target.src = defaultProfile)}
                                 />
                             </div>
@@ -306,8 +307,8 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                 onCancel={() => setEditingPostId(null)}
                             />
                         ) : (
-                            <div className="relative pl-8 border-l-4 border-primary-500/20 py-2 group-hover/post:border-primary-500/40 transition-colors">
-                                <p className={`text-slate-900 whitespace-pre-wrap font-bold tracking-tight leading-[1.35] transition-all duration-500 ${post.media?.length === 0 ? 'text-2xl sm:text-5xl' : 'text-xl sm:text-2xl'
+                            <div className="relative pl-6 border-l-4 border-primary-500/20 py-2 group-hover/post:border-primary-500/40 transition-colors">
+                                <p className={`text-slate-900 whitespace-pre-wrap font-bold tracking-tight leading-[1.3] transition-all duration-500 ${post.media?.length === 0 ? 'text-lg sm:text-3xl' : 'text-base sm:text-lg'
                                     }`}>
                                     {post.content}
                                 </p>
@@ -334,6 +335,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                                 src={getFullImageUrl(file.url)}
                                                 alt="Contenido"
                                                 className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-700"
+                                                loading="lazy"
                                                 onClick={() => setSelectedMedia(file)}
                                                 onError={(e) => (e.target.src = defaultProfile)}
                                             />
@@ -461,8 +463,8 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                 </div>
 
                 {/* Comments Section (Distinct Surface) */}
-                <div className="px-8 sm:px-12 pb-12">
-                    <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-xl overflow-hidden p-6 sm:p-10">
+                <div className="px-6 sm:px-12 pb-10">
+                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-5 sm:p-10">
                         {/* Separator Title */}
                         <div className="flex items-center gap-6 mb-12">
                             <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] whitespace-nowrap">COMENTARIOS RECIENTES</span>
@@ -602,4 +604,4 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     );
 };
 
-export default PostItem;
+export default React.memo(PostItem);

@@ -19,9 +19,15 @@ import tImg from '../assets/t-removebg-preview.png';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useContext(AuthContext);
+  const { login, user: currentUser } = useContext(AuthContext);
   const { showToast } = useUI();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (currentUser) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, navigate]);
 
   const logoImages = [bImg, rImg, oImg, mImg, iImg, cImg, hImg, aImg, tImg];
 

@@ -45,7 +45,7 @@ const MobileNav = ({ onPlusClick }) => {
     return (
         <>
             {/* Main Nav Bar */}
-            <div className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md z-[100] bg-red-600/15 backdrop-blur-2xl border border-red-500/20 px-6 py-2 flex justify-between items-center shadow-[0_25px_60px_-15px_rgba(220,38,38,0.3)] rounded-[3rem] ring-1 ring-red-950/5 transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-90 pointer-events-none'}`}>
+            <div className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md z-[100] bg-white/10 backdrop-blur-xl border border-white/10 px-6 py-2 flex justify-between items-center shadow-[0_15px_40px_-5px_rgba(0,0,0,0.3)] rounded-[2.5rem] ring-1 ring-white/5 transition-[transform,opacity] duration-700 ${isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-90 pointer-events-none'}`}>
                 <Link to="/dashboard" className={`p-2 flex flex-col items-center gap-1 transition-all active:scale-90 ${isActive('/dashboard') ? 'text-red-600' : 'text-gray-500'}`}>
                     <div className={`p-1.5 rounded-2xl transition-all duration-300 ${isActive('/dashboard')
                         ? 'bg-red-500/20 ring-2 ring-red-400/80 shadow-[0_0_15px_rgba(220,38,38,0.5)]'
@@ -110,13 +110,13 @@ const MobileNav = ({ onPlusClick }) => {
                     <span className="text-[8px] font-black uppercase tracking-tighter">Chat</span>
                 </Link>
 
-                <Link to={`/user/${user?._id}`} className={`p-2 flex flex-col items-center gap-1 transition-all active:scale-90 ${isActive(`/user/${user?._id}`) ? 'text-red-600' : 'text-gray-500'}`}>
-                    <div className={`p-0.5 rounded-2xl transition-all duration-300 ${isActive(`/user/${user?._id}`)
+                <Link to="/profile" className={`p-2 flex flex-col items-center gap-1 transition-all active:scale-90 ${isActive('/profile') ? 'text-red-600' : 'text-gray-500'}`}>
+                    <div className={`p-0.5 rounded-2xl transition-all duration-300 ${isActive('/profile')
                         ? 'ring-2 ring-red-400 ring-offset-2 ring-offset-red-950/20 shadow-[0_0_20px_rgba(220,38,38,0.6)]'
                         : 'grayscale opacity-70 border border-transparent hover:border-red-500/30'}`}>
                         <img
                             src={user?.profilePicture ? getFullImageUrl(user.profilePicture) : defaultProfile}
-                            className={`w-6 h-6 rounded-lg object-cover ${isActive(`/user/${user?._id}`) ? '' : 'grayscale opacity-70'}`}
+                            className={`w-6 h-6 rounded-lg object-cover ${isActive('/profile') ? '' : 'grayscale opacity-70'}`}
                             alt="Yo"
                             onError={e => e.target.src = defaultProfile}
                         />

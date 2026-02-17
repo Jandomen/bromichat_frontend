@@ -9,8 +9,19 @@ import h from "../assets/h-removebg-preview.png";
 import a from "../assets/a-removebg-preview.png";
 import t from "../assets/t-removebg-preview.png";
 
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 const Home = () => {
   const letters = [b, r, o, m, i, c, h, a, t];
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-red-900 to-black text-center p-8 relative overflow-hidden">

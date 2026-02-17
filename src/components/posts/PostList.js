@@ -9,7 +9,7 @@ const PostList = () => {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_BACKEND}/posts`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_BACKEND}/posts/me/posts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts(res.data || []);
@@ -22,7 +22,7 @@ const PostList = () => {
     if (token) fetchPosts();
   }, [token, fetchPosts]);
 
-  const handleUpdatePost = (updatedPost, deletedId) => {
+  const handleUpdatePost = useCallback((updatedPost, deletedId) => {
     if (deletedId) {
       setPosts(prev => prev.filter(p => p._id !== deletedId));
     } else if (updatedPost) {
@@ -30,7 +30,7 @@ const PostList = () => {
     } else {
       fetchPosts();
     }
-  };
+  }, [fetchPosts]);
 
   return (
     <div className="max-w-2xl mx-auto py-8">
@@ -40,15 +40,13 @@ const PostList = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          {posts
-            .filter((post) => post.user?._id === user?._id)
-            .map((post) => (
-              <PostItem
-                key={post._id}
-                post={post}
-                onUpdate={handleUpdatePost}
-              />
-            ))
+          {posts.map((post) => (
+            <PostItem
+              key={post._id}
+              post={post}
+              onUpdate={handleUpdatePost}
+            />
+          ))
           }
         </div>
       )}

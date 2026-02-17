@@ -140,11 +140,12 @@ const Dashboard = () => {
           <section className="lg:hidden block space-y-4">
             <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
-                <Link to={`/user/${user?._id}`} className="shrink-0">
+                <Link to="/profile" className="shrink-0">
                   <img
                     src={getFullImageUrl(user?.profilePicture)}
                     className="w-12 h-12 rounded-xl object-cover border-2 border-primary-100"
                     alt="Me"
+                    loading="lazy"
                     onError={(e) => e.target.src = defaultProfile}
                   />
                 </Link>
