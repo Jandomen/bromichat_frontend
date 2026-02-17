@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Header from './Header';
@@ -10,24 +10,34 @@ import defaultProfile from '../assets/default-profile.png';
 import { getFullImageUrl } from '../utils/getProfilePicture';
 import StoriesBar from './stories/StoriesBar';
 import SosModal from './UI/SosModal';
-
-import { useRef } from 'react';
-
+import api from '../services/api';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [refresh, setRefresh] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
+  const [appSettings, setAppSettings] = useState({ adsEnabled: false, welcomeMessage: '' });
   const createPostRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get('/settings/public');
+        setAppSettings(res.data);
+      } catch (err) {
+        console.error('Error fetching public settings');
+      }
+    };
+    fetchSettings();
   }, []);
 
   const scrollToTop = () => {
@@ -50,13 +60,12 @@ const Dashboard = () => {
 
       <main className="flex-grow pt-4 sm:pt-8 pb-24 lg:pb-12 px-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 animate-fade-in">
 
-        {/* Left Sidebar - Personal Card & Tools (Hidden on Mobile, Visible on Tablet+) */}
+        {/* Left Sidebar - Personal Card & Tools */}
         <div className="hidden md:block lg:col-span-3 space-y-6">
           <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden sticky top-28 transition-all hover:shadow-2xl hover:shadow-primary-100/20">
-            {/* Minimalist Profile Header */}
             <div className="h-24 bg-gradient-to-br from-primary-600 to-primary-800 relative">
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <Link to={`/ user / ${user?._id} `} className="p-1.5 bg-white rounded-2xl shadow-lg block hover:scale-105 transition-transform">
+                <Link to={`/user/${user?._id}`} className="p-1.5 bg-white rounded-2xl shadow-lg block hover:scale-105 transition-transform">
                   <img
                     src={getFullImageUrl(user?.profilePicture)}
                     className="w-20 h-20 rounded-xl object-cover"
@@ -76,7 +85,7 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500 mt-1">@{user?.username?.toLowerCase()}</p>
 
               <Link
-                to={`/ user / ${user?._id} `}
+                to={`/user/${user?._id}`}
                 className="mt-6 block w-full py-2.5 rounded-xl bg-primary-50 text-primary-600 font-semibold text-sm hover:bg-primary-600 hover:text-white transition-all duration-300"
               >
                 Ver Mi Perfil
@@ -111,7 +120,7 @@ const Dashboard = () => {
               </div>
 
               {user?.sosSettings?.isEnabled && (
-                <div className="px-3 pb-4">
+                <div className="px-3 pt-4">
                   <button
                     onClick={() => setIsSosModalOpen(true)}
                     className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-[2rem] bg-red-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-red-500/40 hover:bg-red-700 transition-all animate-pulse"
@@ -127,12 +136,11 @@ const Dashboard = () => {
 
         {/* Center - Feed */}
         <div className="lg:col-span-6 space-y-6 sm:space-y-8">
-
-          {/* Mobile/Tablet Profile & Quick Links (Hidden on Desktop) */}
+          {/* Mobile/Tablet Profile & Quick Links */}
           <section className="lg:hidden block space-y-4">
             <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
               <div className="flex items-center gap-3">
-                <Link to={`/ user / ${user?._id} `} className="shrink-0">
+                <Link to={`/user/${user?._id}`} className="shrink-0">
                   <img
                     src={getFullImageUrl(user?.profilePicture)}
                     className="w-12 h-12 rounded-xl object-cover border-2 border-primary-100"
@@ -176,41 +184,49 @@ const Dashboard = () => {
             )}
           </section>
 
-          <section className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <section className="animate-slide-up">
             <StoriesBar />
           </section>
 
-          <section ref={createPostRef} className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <section ref={createPostRef} className="animate-slide-up">
             <CreatePost onPostCreated={() => setRefresh(!refresh)} />
           </section>
 
-          <section className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
+          <section className="animate-slide-up">
             <FriendsPosts key={refresh} />
           </section>
         </div>
 
-        {/* Right Sidebar - Dynamic Content (Hidden on Mobile) */}
+        {/* Right Sidebar - Dynamic Content */}
         <div className="hidden lg:block lg:col-span-3 space-y-8">
           <div className="bg-white p-6 rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-50 sticky top-28">
-            <h3 className="text-xs font-black text-gray-400 mb-6 uppercase tracking-[0.2em]">Actividad Destacada</h3>
+            <h3 className="text-xs font-black text-gray-400 mb-6 uppercase tracking-[0.2em]">Canal Corporativo</h3>
 
             <div className="space-y-6">
-              <div className="relative overflow-hidden rounded-2xl group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-900/90 mix-blend-multiply transition-opacity group-hover:opacity-80"></div>
-                <div className="bg-primary-600 h-32 flex items-center justify-center relative p-4 text-center">
-                  <p className="text-white font-bold text-sm leading-tight">Desbloquea Funciones Premium y Apoya a la Comunidad</p>
+              <div className={`relative overflow-hidden rounded-2xl group cursor-pointer transition-all duration-500 ${appSettings.adsEnabled ? 'h-40' : 'h-32'}`}>
+                <div className={`absolute inset-0 bg-gradient-to-br transition-opacity group-hover:opacity-80 ${appSettings.adsEnabled ? 'from-red-600/90 to-red-900/90' : 'from-primary-600/90 to-primary-900/90'} mix-blend-multiply`}></div>
+                <div className={`h-full flex items-center justify-center relative p-6 text-center transition-all ${appSettings.adsEnabled ? 'bg-red-600' : 'bg-primary-600'}`}>
+                  <p className="text-white font-black text-[10px] uppercase tracking-widest leading-relaxed">
+                    {appSettings.adsEnabled
+                      ? "✨ Espacio Publicitario Activo - Contacta a Ventas"
+                      : "Desbloquea Funciones Premium y Apoya a la Comunidad"}
+                  </p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                <p className="text-[10px] font-bold text-primary-500 uppercase mb-2">¿Sabías que?</p>
-                <p className="text-xs text-gray-600 leading-relaxed">¡Ahora puedes compartir fotos y documentos de alta calidad directamente en tu feed!</p>
+              <div className={`p-5 rounded-[2rem] border transition-all duration-500 ${appSettings.adsEnabled ? 'bg-red-50 border-red-100' : 'bg-gray-50 border-gray-100'}`}>
+                <p className={`text-[10px] font-black uppercase mb-2 tracking-widest ${appSettings.adsEnabled ? 'text-red-500' : 'text-primary-500'}`}>
+                  {appSettings.adsEnabled ? 'ANUNCIO BROMICHAT' : '¿Sabías que?'}
+                </p>
+                <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                  {appSettings.welcomeMessage || '¡Ahora puedes compartir fotos y documentos de alta calidad directamente en tu feed!'}
+                </p>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-x-4 gap-y-2 justify-center">
-              {[{ l: 'Privacidad' }, { l: 'Acerca de' }, { l: 'Contacto' }, { l: 'Ayuda' }].map(item => (
-                <span key={item.l} className="text-[10px] font-semibold text-gray-400 hover:text-primary-500 transition-colors uppercase tracking-widest cursor-pointer">{item.l}</span>
+              {['Privacidad', 'Acerca de', 'Contacto', 'Ayuda'].map(l => (
+                <span key={l} className="text-[10px] font-semibold text-gray-400 hover:text-primary-500 transition-colors uppercase tracking-widest cursor-pointer">{l}</span>
               ))}
             </div>
           </div>
@@ -220,7 +236,6 @@ const Dashboard = () => {
 
       <Footer />
 
-      {/* Desktop Scroll Top Only (to avoid overlap with mobile nav) */}
       <div className="hidden lg:block">
         {showScrollTop && (
           <button
@@ -235,13 +250,11 @@ const Dashboard = () => {
       <SosModal
         isOpen={isSosModalOpen}
         onClose={() => setIsSosModalOpen(false)}
-        onConfirm={() => {/* Actual API call for SOS */ }}
         contacts={user?.sosSettings?.emergencyContacts}
         message={user?.sosSettings?.message}
       />
     </div>
   );
 };
-
 
 export default Dashboard;

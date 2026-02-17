@@ -30,7 +30,10 @@ import PostDetail from "./components/posts/PostDetail";
 import SavedPosts from "./components/posts/SavedPosts";
 import NotFound from "./components/NotFound";
 import SearchUsers from "./pages/SearchUsers";
+import AdminDashboard from "./components/AdminDashboard";
+import AdminLogin from "./components/AdminLogin";
 import ProtectedRoute from "./middlewares/ProtectedRoute";
+import AdminRoute from "./middlewares/AdminRoute";
 import ToastContainer from "./components/UI/ToastContainer";
 import ConfirmModal from "./components/UI/ConfirmModal";
 import CallModal from "./components/calls/CallModal";
@@ -75,6 +78,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/admin-auth-portal-secret" element={<AdminLogin />} />
 
         {/* Protected Routes */}
         <Route
@@ -302,6 +306,14 @@ export default function App() {
             <ProtectedRoute>
               <PostDetail />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
           }
         />
 
