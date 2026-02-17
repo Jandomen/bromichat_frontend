@@ -5,7 +5,7 @@ import PostItem from './PostItem';
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
-  const { token, user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   const fetchPosts = useCallback(async () => {
     try {
