@@ -27,9 +27,11 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('user', JSON.stringify(userWithToken));
         } catch (err) {
           // console.error('Error al cargar currentUser:', err);
-          setUser(null);
-          setToken(null);
-          localStorage.removeItem('user');
+          if (err.response?.status === 401) {
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem('user');
+          }
         }
       }
       setLoadingUser(false);

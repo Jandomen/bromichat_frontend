@@ -20,7 +20,7 @@ export const requestForToken = async (userId, token) => {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
             const fcmToken = await getToken(messaging, {
-                vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
+                vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY?.trim()
             });
 
             if (fcmToken) {

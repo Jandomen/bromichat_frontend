@@ -15,7 +15,7 @@ const BiometricSettings = () => {
             const options = optionsRes.data;
 
             // 2. Start WebAuthn registration
-            const attestationResponse = await startRegistration(options);
+            const attestationResponse = await startRegistration({ optionsJSON: options });
 
             // 3. Verify response on server
             const verifyRes = await api.post('/webauthn/register-verify', attestationResponse);

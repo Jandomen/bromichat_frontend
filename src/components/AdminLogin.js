@@ -31,7 +31,7 @@ const AdminLogin = () => {
         try {
             const optionsRes = await api.post('/webauthn/login-challenge', { email });
             const options = optionsRes.data;
-            const asseResp = await startAuthentication(options);
+            const asseResp = await startAuthentication({ optionsJSON: options });
             const verifyRes = await api.post('/webauthn/login-verify', asseResp);
             const { token, user } = verifyRes.data;
 
