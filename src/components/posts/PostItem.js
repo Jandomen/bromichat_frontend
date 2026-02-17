@@ -380,60 +380,60 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
             <div className="relative bg-slate-50/50 border-t border-slate-100">
                 <div className="p-8 sm:p-12">
                     {/* Stats */}
-                    <div className="flex flex-wrap items-center justify-between gap-6 mb-10 px-4">
-                        <div className="flex items-center gap-6">
-                            <div className="flex -space-x-4 cursor-pointer" onClick={() => setIsReactionsModalOpen(true)}>
+                    <div className="flex items-center justify-between gap-2 mb-8 px-2 sm:px-4">
+                        <div className="flex items-center gap-2 sm:gap-6">
+                            <div className="flex -space-x-3 sm:-space-x-4 cursor-pointer" onClick={() => setIsReactionsModalOpen(true)}>
                                 {post.reactions?.slice(0, 3).map((r, i) => (
-                                    <div key={i} className="bg-white rounded-[1.25rem] w-12 h-12 flex items-center justify-center shadow-2xl border border-slate-50 z-[3] hover:z-[10] transition-all hover:-translate-y-2">
-                                        <span className="text-2xl transform active:scale-150 transition-transform">
+                                    <div key={i} className="bg-white rounded-xl sm:rounded-[1.25rem] w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center shadow-lg border border-slate-50 z-[3] hover:z-[10] transition-all">
+                                        <span className="text-sm sm:text-2xl">
                                             {REACTION_TYPES.find(rt => rt.type === r.type)?.emoji || '👍'}
                                         </span>
                                     </div>
                                 ))}
                                 {post.reactions?.length > 3 && (
-                                    <div className="bg-slate-900 rounded-[1.25rem] w-12 h-12 flex items-center justify-center text-white text-[10px] font-black z-[1] shadow-2xl border-2 border-white">
+                                    <div className="bg-slate-900 rounded-xl sm:rounded-[1.25rem] w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center text-white text-[8px] sm:text-[10px] font-black z-[1] shadow-lg border-2 border-white">
                                         +{post.reactions.length - 3}
                                     </div>
                                 )}
                             </div>
                             <span
-                                className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] cursor-pointer hover:text-primary-600 transition-colors"
+                                className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest sm:tracking-[0.3em] cursor-pointer hover:text-primary-600 transition-colors"
                                 onClick={() => setIsReactionsModalOpen(true)}
                             >
-                                {post.reactions?.length || 0} Vibras de Energía
+                                {post.reactions?.length || 0} <span className="hidden sm:inline">Vibras de Energía</span>
                             </span>
                         </div>
-                        <div className="px-6 py-2.5 bg-white border border-slate-100 rounded-full shadow-sm flex items-center gap-3">
-                            <span className="text-lg">💬</span>
-                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                                {post.comments?.length || 0} Conversaciones
+                        <div className="px-3 py-1.5 sm:px-6 sm:py-2.5 bg-white border border-slate-100 rounded-full shadow-sm flex items-center gap-2 sm:gap-3">
+                            <span className="text-sm sm:text-lg">💬</span>
+                            <span className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest sm:tracking-[0.3em]">
+                                {post.comments?.length || 0} <span className="hidden sm:inline">Conversaciones</span>
                             </span>
                         </div>
                     </div>
 
                     {/* Actions Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-3 gap-3 sm:gap-6">
                         <div className="relative group/react w-full">
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleReact(post._id, currentReactionData ? currentReactionData.type : 'like');
                                 }}
-                                className={`flex items-center justify-center gap-4 w-full py-5 rounded-[2rem] transition-all font-black text-[10px] uppercase tracking-[0.2em] shadow-sm hover:shadow-2xl hover:-translate-y-1 border focus:outline-none ${currentReactionData
-                                    ? 'bg-primary-600 text-white border-primary-500 shadow-primary-500/20'
-                                    : 'bg-white text-slate-400 border-slate-100 hover:text-primary-600 hover:border-primary-100'
+                                className={`flex items-center justify-center gap-2 sm:gap-4 w-full py-3 sm:py-5 rounded-2xl sm:rounded-[2rem] transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] shadow-sm hover:shadow-2xl border focus:outline-none ${currentReactionData
+                                    ? 'bg-primary-600 text-white border-primary-500'
+                                    : 'bg-white text-slate-400 border-slate-100 hover:text-primary-600'
                                     }`}
                             >
                                 {currentReactionData ? (
-                                    <span className="flex items-center gap-3">
-                                        <span className="text-2xl animate-bounce-short">{currentReactionData.emoji}</span>
-                                        <span>{currentReactionData.label}</span>
+                                    <span className="flex items-center gap-2">
+                                        <span className="text-lg sm:text-2xl animate-bounce-short">{currentReactionData.emoji}</span>
+                                        <span className="hidden sm:inline">{currentReactionData.label}</span>
                                     </span>
                                 ) : (
-                                    <>
-                                        <FaThumbsUp size={16} className="text-slate-200 group-hover/react:text-primary-400 transition-colors" />
-                                        <span>Reaccionar</span>
-                                    </>
+                                    <div className="flex items-center gap-2">
+                                        <FaThumbsUp size={14} className="text-slate-200" />
+                                        <span className="hidden sm:inline">Reaccionar</span>
+                                    </div>
                                 )}
                             </button>
                             <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-100 transform translate-y-4 group-hover/react:translate-y-0 z-40">
@@ -446,18 +446,18 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
 
                         <button
                             onClick={() => document.getElementById(`comment-input-${post._id}`).focus()}
-                            className="flex items-center justify-center gap-4 py-5 bg-white hover:bg-slate-50 rounded-[2rem] border border-slate-100 transition-all font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm hover:shadow-2xl hover:-translate-y-1 group/comment-btn"
+                            className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-5 bg-white hover:bg-slate-50 rounded-2xl sm:rounded-[2rem] border border-slate-100 transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm group/comment-btn"
                         >
-                            <FaRegComment size={16} className="text-slate-200 group-hover/comment-btn:text-primary-400 transition-colors" />
-                            <span>Conversar</span>
+                            <FaRegComment size={14} className="text-slate-200" />
+                            <span className="hidden sm:inline">Conversar</span>
                         </button>
 
                         <button
                             onClick={() => setIsShareModalOpen(true)}
-                            className="flex items-center justify-center gap-4 py-5 bg-white hover:bg-slate-50 rounded-[2rem] border border-slate-100 transition-all font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm hover:shadow-2xl hover:-translate-y-1 group/share"
+                            className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-5 bg-white hover:bg-slate-50 rounded-2xl sm:rounded-[2rem] border border-slate-100 transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm group/share"
                         >
-                            <FaShare size={16} className="text-slate-200 transition-transform group-hover/share:translate-x-1 group-hover/share:text-primary-400" />
-                            <span>Compartir</span>
+                            <FaShare size={14} className="text-slate-200" />
+                            <span className="hidden sm:inline">Compartir</span>
                         </button>
                     </div>
                 </div>
