@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Trash2, Eye, Download } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Trash2, Eye, MoreHorizontal, Heart, Smile, Send } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import api from '../../services/api';
 import { useUI } from '../../context/UIContext';
@@ -15,16 +15,17 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
     const [progress, setProgress] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [showViewers, setShowViewers] = useState(false);
+    const [isUIVisible, setIsUIVisible] = useState(true); // Toggle for UI "calm" mode
 
+    const videoRef = useRef(null);
     const touchStart = useRef(null);
-    const touchEnd = useRef(null);
-    const touchStartY = useRef(null);
+    const longPressTimer = useRef(null);
 
     // Safety: derive but don't return early yet
     const currentGroup = storyGroups[currentGroupIndex];
     const currentStory = currentGroup ? currentGroup.stories[currentStoryIndex] : null;
 
-    const handleNext = React.useCallback(() => {
+    const handleNext = useCallback(() => {
         if (!currentGroup) return;
         if (currentStoryIndex < currentGroup.stories.length - 1) {
             setCurrentStoryIndex(prev => prev + 1);
@@ -38,7 +39,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
         }
     }, [currentStoryIndex, currentGroupIndex, storyGroups, currentGroup, onClose]);
 
-    const handlePrev = React.useCallback(() => {
+    const handlePrev = useCallback(() => {
         if (currentStoryIndex > 0) {
             setCurrentStoryIndex(prev => prev - 1);
             setProgress(0);
@@ -49,7 +50,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
         }
     }, [currentStoryIndex, currentGroupIndex, storyGroups]);
 
-    const handleDelete = React.useCallback(async () => {
+    const handleDelete = useCallback(async () => {
         if (!currentStory) return;
         showConfirm(
             'Eliminar historia',
@@ -69,7 +70,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
         );
     }, [currentStory, showConfirm, showToast, onClose]);
 
-    const handleVideoEnded = React.useCallback(() => {
+    const handleVideoEnded = useCallback(() => {
         handleNext();
     }, [handleNext]);
 
@@ -123,6 +124,10 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
             if (e.key === 'ArrowRight') handleNext();
             if (e.key === 'ArrowLeft') handlePrev();
             if (e.key === 'Escape') onClose();
+            if (e.key === ' ') { // Space to toggle UI/Pause
+                setIsPaused(prev => !prev);
+                setIsUIVisible(prev => !prev);
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
@@ -130,291 +135,239 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
     }, [handleNext, handlePrev, onClose]);
 
 
+    // --- Gesture & Interaction Logic ---
 
-    // Minimum swipe distance (in px)
-    const minSwipeDistance = 50;
+    const handleTouchStart = (e) => {
+        touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 
-    const onTouchStart = (e) => {
-        touchEnd.current = null;
-        touchStart.current = e.targetTouches[0].clientX;
-        setIsPaused(true);
+        // Long press detection
+        longPressTimer.current = setTimeout(() => {
+            setIsPaused(true);
+            setIsUIVisible(false); // Hide UI on long press
+        }, 300);
     };
 
-    const onTouchMove = (e) => {
-        touchEnd.current = e.targetTouches[0].clientX;
-    };
+    const handleTouchEnd = (e) => {
+        clearTimeout(longPressTimer.current);
+        const touchEnd = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        const diffX = touchStart.current ? touchEnd.x - touchStart.current.x : 0;
+        const diffY = touchStart.current ? touchEnd.y - touchStart.current.y : 0;
 
-    const onTouchEnd = () => {
+        // Resume if we were paused by long press
         setIsPaused(false);
-        if (!touchStart.current || !touchEnd.current) return;
-        const distance = touchStart.current - touchEnd.current;
-        const isLeftSwipe = distance > minSwipeDistance;
-        const isRightSwipe = distance < -minSwipeDistance;
 
-        if (isLeftSwipe) {
-            handleNext();
-        } else if (isRightSwipe) {
-            handlePrev();
+        // If it was a swipe down, close
+        if (diffY > 100 && Math.abs(diffX) < 50) {
+            onClose();
+            return;
+        }
+
+        // Tap detection (minimal movement)
+        if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+            const width = window.innerWidth;
+            const x = touchEnd.x;
+
+            if (x < width * 0.3) {
+                // Left 30%: Previous
+                handlePrev();
+            } else if (x > width * 0.7) {
+                // Right 30%: Next
+                handleNext();
+            } else {
+                // Center 40%: Toggle UI
+                setIsUIVisible(prev => !prev);
+            }
         }
     };
 
-    // Close on swipe down (separate touch tracker for Y)
-
-    const onTouchStartY = (e) => {
-        touchStartY.current = e.targetTouches[0].clientY;
-        setIsPaused(true);
-    };
-
-    const onTouchEndY = (e) => {
-        setIsPaused(false);
-        const distY = e.changedTouches[0].clientY - touchStartY.current;
-        if (distY > 100) onClose(); // Swipe down to close
-    };
-
-    // If invalid, return null now (all hooks have been called unconditionally)
     if (!currentGroup || !currentStory) {
         return null;
     }
 
+    const isOwner = currentGroup.user._id?.toString() === currentUserId?.toString();
+
     return (
         <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden">
-            {/* Background Backdrop for Close */}
-            <div className="absolute inset-0 bg-black/90 cursor-default" onClick={onClose} />
 
-            {/* Close Button - Optimized for touch */}
-            <button
-                onClick={onClose}
-                className="absolute top-6 right-4 text-white z-[210] p-3 hover:bg-white/10 rounded-full bg-black/20 backdrop-blur-sm"
-                aria-label="Cerrar"
-            >
-                <X size={28} />
-            </button>
-
-            {/* Main Content Area */}
+            {/* Media Layer */}
             <div
-                className="relative w-full max-w-md h-full md:h-[90vh] md:rounded-xl overflow-hidden bg-black border border-gray-800 flex flex-col pt-16 md:pt-0 shadow-2xl z-[205]"
-                onMouseDown={() => setIsPaused(true)}
-                onMouseUp={() => setIsPaused(false)}
-                onTouchStart={(e) => { onTouchStart(e); onTouchStartY(e); }}
-                onTouchMove={onTouchMove}
-                onTouchEnd={(e) => { onTouchEnd(); onTouchEndY(e); }}
+                className="absolute inset-0 z-0 flex items-center justify-center bg-black"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={(e) => handleTouchStart({ touches: [{ clientX: e.clientX, clientY: e.clientY }] })}
+                onMouseUp={(e) => handleTouchEnd({ changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] })}
             >
+                {currentStory.type === 'text' ? (
+                    <div
+                        className="w-full h-full flex items-center justify-center p-8 text-center"
+                        style={{ backgroundColor: currentStory.backgroundColor || '#000' }}
+                    >
+                        <p className="text-white font-bold text-3xl md:text-5xl drop-shadow-lg break-words whitespace-pre-wrap select-none">
+                            {currentStory.content}
+                        </p>
+                    </div>
+                ) : currentStory.type === 'video' ? (
+                    <video
+                        ref={videoRef}
+                        src={getFullImageUrl(currentStory.mediaUrl)}
+                        className="w-full h-full object-contain"
+                        autoPlay
+                        playsInline
+                        onEnded={handleVideoEnded}
+                        onTimeUpdate={(e) => {
+                            if (e.target.duration) {
+                                setProgress((e.target.currentTime / e.target.duration) * 100);
+                            }
+                        }}
+                    />
+                ) : (
+                    <img
+                        src={getFullImageUrl(currentStory.mediaUrl)}
+                        alt="story"
+                        className="w-full h-full object-contain select-none"
+                    />
+                )}
+            </div>
 
-                {/* Top Shadow Gradient for Visibility */}
-                <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
+            {/* UI Overlay Layer (Header & Footer) */}
+            <div className={`absolute inset-0 z-50 flex flex-col justify-between pointer-events-none transition-opacity duration-300 ${isUIVisible ? 'opacity-100' : 'opacity-0'}`}>
 
-                {/* Progress Bars */}
-                <div className="absolute top-4 md:top-3 left-0 right-0 z-20 flex gap-1.5 p-3">
-                    {currentGroup.stories.map((s, idx) => (
-                        <div key={s._id} className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden shadow-sm">
-                            <div
-                                className="h-full bg-white transition-all duration-100 ease-linear shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                                style={{
-                                    width: idx === currentStoryIndex ? `${progress}%` :
-                                        idx < currentStoryIndex ? '100%' : '0%'
-                                }}
-                            />
-                        </div>
-                    ))}
-                </div>
+                {/* --- HEADER --- */}
+                <div className="pt-4 px-3 bg-gradient-to-b from-black/60 to-transparent pb-10 pointer-events-auto">
+                    {/* Progress Bars */}
+                    <div className="flex gap-1.5 mb-3">
+                        {currentGroup.stories.map((s, idx) => (
+                            <div key={s._id} className="h-0.5 flex-1 bg-white/30 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-white transition-all duration-100 ease-linear shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                                    style={{
+                                        width: idx === currentStoryIndex ? `${progress}%` :
+                                            idx < currentStoryIndex ? '100%' : '0%'
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
 
-                {/* Header User Info */}
-                <div className="absolute top-10 md:top-8 left-0 right-0 z-20 px-4 flex items-center justify-between">
-                    <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3.5 hover:opacity-90 transition-all active:scale-95 group">
-                        <div className="relative">
+                    {/* User Info & Controls */}
+                    <div className="flex items-center justify-between">
+                        <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3 group">
                             <img
                                 src={getFullImageUrl(currentGroup.user.profilePicture)}
-                                alt="user"
-                                className="w-11 h-11 rounded-full border-2 border-white/80 object-cover shadow-lg group-hover:border-white"
+                                alt={currentGroup.user.username}
+                                className="w-10 h-10 rounded-full border border-white/20 object-cover shadow-md"
                                 onError={(e) => (e.target.src = defaultProfile)}
                             />
-                            <div className="absolute inset-0 rounded-full shadow-inner pointer-events-none" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-white font-bold text-[15px] leading-none drop-shadow-lg tracking-tight">
-                                {currentGroup.user.username}
-                            </span>
-                            <span className="text-white/80 text-[11px] font-medium mt-1 drop-shadow-md flex items-center gap-1.5">
-                                <span className="w-1 h-1 bg-white/50 rounded-full" />
-                                {new Date(currentStory.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                        </div>
-                    </Link>
-
-                    {/* Controls (Owner) */}
-                    {(currentGroup.user._id?.toString() === currentUserId?.toString()) && (
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsPaused(true);
-                                    setShowViewers(true);
-                                }}
-                                className="text-white px-5 py-2.5 bg-gradient-to-r from-indigo-600/80 to-purple-600/80 hover:from-indigo-600 hover:to-purple-600 transition-all border border-white/30 rounded-2xl flex items-center gap-2.5 backdrop-blur-xl active:scale-95 shadow-lg shadow-indigo-900/20 group"
-                            >
-                                <Eye size={18} className="drop-shadow-sm group-hover:scale-110 transition-transform" />
-                                <div className="flex flex-col items-start leading-none">
-                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-70">Vistas</span>
-                                    <span className="text-sm font-black drop-shadow-sm mt-0.5">{currentStory.views?.length || 0}</span>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-white font-bold text-sm tracking-tight drop-shadow-md">
+                                        {currentGroup.user.username}
+                                    </span>
+                                    <span className="text-white/60 text-xs font-medium">
+                                        {new Date(currentStory.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
                                 </div>
-                            </button>
-
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    const link = document.createElement('a');
-                                    link.href = getFullImageUrl(currentStory.mediaUrl);
-                                    link.download = `story-${currentStory._id}.jpg`;
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    showToast('Iniciando descarga...', 'success');
-                                }}
-                                className="text-white/90 hover:text-white hover:bg-white/20 transition-all p-2.5 bg-white/10 rounded-full backdrop-blur-md border border-white/20 active:scale-95"
-                                title="Descargar contenido"
-                            >
-                                <Download size={20} />
-                            </button>
-
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleDelete(); }}
-                                className="text-white/90 hover:text-red-500 hover:bg-red-500/10 transition-all p-2.5 bg-white/10 rounded-full backdrop-blur-md border border-white/20 active:scale-95"
-                                title="Eliminar historia"
-                            >
-                                <Trash2 size={20} />
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Download button for non-owners too (optional, but requested to know "what to do with them") */}
-                    {currentGroup.user._id !== currentUserId && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const link = document.createElement('a');
-                                link.href = getFullImageUrl(currentStory.mediaUrl);
-                                link.download = `story-${currentStory._id}.jpg`;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                showToast('Iniciando descarga...', 'success');
-                            }}
-                            className="text-white/90 hover:text-white hover:bg-white/20 transition-all p-2.5 bg-white/10 rounded-full backdrop-blur-md border border-white/20 active:scale-95"
-                            title="Descargar contenido"
-                        >
-                            <Download size={20} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Viewers List Modal */}
-                {showViewers && (
-                    <div className="absolute inset-0 z-[60] bg-gray-950 flex flex-col animate-slideUp">
-                        <div className="p-5 pt-14 md:pt-5 flex items-center justify-between border-b border-white/5 sticky top-0 bg-gray-950/90 backdrop-blur-xl z-10">
-                            <div>
-                                <h3 className="text-white font-black text-xl uppercase tracking-tight">Espectadores</h3>
-                                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">{currentStory.views?.length || 0} personas han visto esto</p>
                             </div>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setShowViewers(false); setIsPaused(false); }}
-                                className="text-white/50 hover:text-white p-3 bg-white/5 rounded-2xl transition-all active:scale-90 border border-white/5"
-                            >
-                                <X size={24} />
+                        </Link>
+
+                        <div className="flex items-center gap-4">
+                            {/* Options Menu (Placeholder for now, acts as close or more) */}
+                            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-white p-2">
+                                <X size={26} className="drop-shadow-md" />
                             </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 custom-scrollbar">
-                            {(!currentStory.views || currentStory.views.filter(v => v.user).length === 0) ? (
-                                <p className="text-gray-500 text-center py-8 font-medium">Nadie ha visto esto aún.</p>
-                            ) : (
-                                currentStory.views.filter(v => v.user).map((view, idx) => (
-                                    <Link
-                                        key={idx}
-                                        to={`/user/${view.user?._id}`}
-                                        className="flex items-center gap-3 hover:bg-white/5 p-2 rounded-xl transition-colors group"
-                                        onClick={onClose}
-                                    >
-                                        <div className="relative group/view-avatar">
-                                            <div className="p-0.5 bg-gradient-to-tr from-blue-500/50 to-purple-500/50 rounded-full">
-                                                <img
-                                                    src={getFullImageUrl(view.user?.profilePicture)}
-                                                    alt={view.user?.username || 'User'}
-                                                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-900 group-hover/view-avatar:border-white transition-all shadow-md"
-                                                    onError={(e) => (e.target.src = defaultProfile)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-white font-semibold group-hover:text-blue-400 transition-colors">
-                                                {view.user?.username || 'Usuario desconocido'}
-                                            </p>
-                                            <p className="text-gray-500 text-xs mt-0.5">
-                                                {new Date(view.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </p>
-                                        </div>
-                                        <div className="text-gray-600">
-                                            < ChevronRight size={16} />
-                                        </div>
-                                    </Link>
-                                ))
-                            )}
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* Media */}
-                <div className="w-full h-full flex items-center justify-center bg-black">
-                    {currentStory.type === 'text' ? (
-                        <div
-                            className="w-full h-full flex items-center justify-center p-8 text-center"
-                            style={{ backgroundColor: currentStory.backgroundColor || '#000' }}
-                        >
-                            <p className="text-white font-bold text-3xl md:text-4xl drop-shadow-lg break-words whitespace-pre-wrap">
-                                {currentStory.content}
-                            </p>
+                {/* --- FOOTER --- */}
+                <div className="pb-6 pt-12 px-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-auto">
+                    {isOwner ? (
+                        /* Owner Controls */
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setShowViewers(true); setIsPaused(true); }}
+                                className="flex items-center gap-2 text-white font-bold text-sm bg-white/10 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-transform"
+                            >
+                                <Eye size={18} />
+                                <span>{currentStory.views?.length || 0} vistas</span>
+                            </button>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+                                    className="p-3 bg-red-600/80 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
+                                <button className="p-3 bg-white/10 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
+                                    <MoreHorizontal size={20} />
+                                </button>
+                            </div>
                         </div>
-                    ) : currentStory.type === 'video' ? (
-                        <video
-                            src={getFullImageUrl(currentStory.mediaUrl)}
-                            className="max-h-full max-w-full object-contain"
-                            autoPlay
-                            playsInline
-                            onEnded={handleVideoEnded}
-                            onTimeUpdate={(e) => {
-                                if (e.target.duration) {
-                                    setProgress((e.target.currentTime / e.target.duration) * 100);
-                                }
-                            }}
-                        />
                     ) : (
-                        <img
-                            src={getFullImageUrl(currentStory.mediaUrl)}
-                            alt="story"
-                            className="max-h-full max-w-full object-contain"
-                        />
+                        /* Viewer Controls (Facebook Style) */
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 relative">
+                                <input
+                                    type="text"
+                                    placeholder="Enviar mensaje..."
+                                    className="w-full bg-transparent border border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:border-white/60 backdrop-blur-sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                    onFocus={() => setIsPaused(true)}
+                                    onBlur={() => setIsPaused(false)}
+                                />
+                                <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white">
+                                    <Send size={18} />
+                                </button>
+                            </div>
+
+                            {/* Quick Reactions */}
+                            <button className="text-red-500 hover:scale-110 transition-transform active:scale-90">
+                                <Heart size={32} fill="currentColor" strokeWidth={0} />
+                            </button>
+                            <button className="text-yellow-400 hover:scale-110 transition-transform active:scale-90">
+                                <Smile size={32} />
+                            </button>
+                        </div>
                     )}
                 </div>
-
-                {/* Navigation Hotspots */}
-                <div className="absolute inset-0 z-[15] flex mt-20">
-                    <div className="w-1/3 h-full" onClick={(e) => { e.stopPropagation(); handlePrev(); }}></div>
-                    <div className="w-2/3 h-full" onClick={(e) => { e.stopPropagation(); handleNext(); }}></div>
-                </div>
-
-                {/* Arrow Helpers (Desktop) */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white z-50 hidden md:block"
-                >
-                    <ChevronLeft size={40} />
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white z-50 hidden md:block"
-                >
-                    <ChevronRight size={40} />
-                </button>
-
             </div>
+
+            {/* Viewers Sheet (Owner Only) */}
+            {showViewers && (
+                <div className="absolute inset-x-0 bottom-0 top-[30%] z-[60] bg-zinc-900 rounded-t-3xl flex flex-col animate-slideUp border-t border-white/10">
+                    <div className="p-4 border-b border-white/5 flex items-center justify-between">
+                        <h3 className="text-white font-bold text-lg">Espectadores</h3>
+                        <button onClick={() => setShowViewers(false)} className="p-2 bg-white/10 rounded-full text-white">
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                        {(!currentStory.views || currentStory.views.filter(v => v.user).length === 0) ? (
+                            <p className="text-gray-500 text-center py-8 font-medium">Nadie ha visto esto aún.</p>
+                        ) : (
+                            currentStory.views.filter(v => v.user).map((view, idx) => (
+                                <Link
+                                    key={idx}
+                                    to={`/user/${view.user?._id}`}
+                                    className="flex items-center gap-3 hover:bg-white/5 p-3 rounded-xl transition-colors mb-2"
+                                >
+                                    <img
+                                        src={getFullImageUrl(view.user?.profilePicture)}
+                                        alt={view.user?.username}
+                                        className="w-10 h-10 rounded-full object-cover"
+                                        onError={(e) => (e.target.src = defaultProfile)}
+                                    />
+                                    <div className="flex-1">
+                                        <p className="text-white font-semibold text-sm">{view.user?.username}</p>
+                                        <p className="text-gray-500 text-xs">{new Date(view.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </div>
+                                </Link>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
