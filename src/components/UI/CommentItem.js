@@ -101,126 +101,121 @@ const CommentItem = ({
     return (
         <div
             ref={commentRef}
-            className={`group/comment w-full flex flex-col transition-all duration-700 ${highlightedCommentId === comment._id ? 'bg-primary-50/50 rounded-[2.5rem] p-4 ring-2 ring-primary-500/20 shadow-2xl' : ''} ${isReply ? 'ml-4 sm:ml-16 mt-6 border-l-2 border-slate-100 pl-4 sm:pl-10' : 'mb-8'}`}
+            className={`group/comment w-full flex flex-col transition-all duration-300 ${highlightedCommentId === comment._id ? 'bg-primary-50 px-2 py-1 rounded-lg' : ''} ${isReply ? 'ml-10 mt-2' : 'mb-3'}`}
         >
-            <div className="flex gap-4 sm:gap-6 w-full items-start">
+            <div className="flex gap-2 w-full items-start">
                 {/* Avatar */}
-                <div className="relative shrink-0">
-                    <div className="p-0.5 bg-white rounded-[1.25rem] shadow-sm transform transition-transform group-hover/comment:scale-110 duration-500">
-                        <img
-                            src={getFullImageUrl(comment.user?.profilePicture)}
-                            className={`${isReply ? 'w-10 h-10' : 'w-12 h-12'} rounded-[1rem] object-cover border-2 border-white`}
-                            alt=""
-                            onError={e => e.target.src = defaultProfile}
-                        />
-                    </div>
+                <div className="relative shrink-0 mt-1">
+                    <img
+                        src={getFullImageUrl(comment.user?.profilePicture)}
+                        className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover border border-gray-100`}
+                        alt=""
+                        onError={e => e.target.src = defaultProfile}
+                    />
                 </div>
 
                 {/* Content Bubble Area */}
-                <div className="flex-1 min-w-0 w-full">
-                    <div className={`relative group/bubble transition-all duration-500 ${isReply ? 'bg-slate-50/50' : 'bg-white shadow-sm'} rounded-[2rem] rounded-tl-none border border-slate-100 hover:border-primary-100 hover:bg-white p-4 sm:p-6`}>
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                                <span className="text-[11px] font-black text-slate-900 tracking-tighter uppercase">@{comment.user?.username}</span>
-                                {comment.isEdited && <span className="text-[9px] font-bold text-slate-300 italic lowercase">(editado)</span>}
+                <div className="flex-1 min-w-0">
+                    <div className="flex flex-col items-start max-w-full">
+                        <div className={`relative px-3 py-2 rounded-2xl ${isReply ? 'bg-gray-100/50' : 'bg-gray-100'} text-gray-800`}>
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <span className="text-[13px] font-bold text-gray-900 leading-none">
+                                    {comment.user?.username}
+                                </span>
+                                {comment.isEdited && <span className="text-[10px] text-gray-400 italic">(editado)</span>}
                             </div>
-                            <span className="text-[9px] text-slate-300 font-bold uppercase tracking-[0.2em] tabular-nums">
-                                {new Date(comment.createdAt).toLocaleDateString()}
-                            </span>
+
+                            {isEditing ? (
+                                <div className="space-y-2 mt-2 min-w-[200px]">
+                                    <textarea
+                                        autoFocus
+                                        value={editText}
+                                        onChange={e => setEditText(e.target.value)}
+                                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-primary-500/30 transition-all resize-none shadow-sm"
+                                        rows="2"
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                        <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[11px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">Cancelar</button>
+                                        <button onClick={handleUpdate} className="px-4 py-1 bg-primary-600 text-white rounded-md text-[11px] font-bold hover:brightness-110 active:scale-95 transition-all">Guardar</button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-[14px] leading-tight text-gray-800 break-words">{comment.comment}</p>
+                            )}
                         </div>
 
-                        {isEditing ? (
-                            <div className="space-y-4 mt-2">
-                                <textarea
-                                    autoFocus
-                                    value={editText}
-                                    onChange={e => setEditText(e.target.value)}
-                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm text-slate-800 focus:outline-none focus:border-primary-500/30 focus:bg-white transition-all resize-none font-medium shadow-inner"
-                                    rows="2"
-                                />
-                                <div className="flex justify-end gap-3">
-                                    <button onClick={() => setIsEditing(false)} className="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Cancelar</button>
-                                    <button onClick={handleUpdate} className="px-8 py-2 bg-primary-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 shadow-lg shadow-primary-500/20 active:scale-95 transition-all">Guardar</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="text-sm leading-relaxed text-slate-700 font-semibold break-words tracking-tight">{comment.comment}</p>
-                        )}
-                    </div>
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-4 mt-1 ml-2">
+                            <span className="text-[11px] text-gray-500 font-medium whitespace-nowrap">
+                                {new Date(comment.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                            </span>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-6 mt-4 px-2">
-                        <button
-                            onClick={() => {
-                                setIsReplying(!isReplying);
-                                if (!isReplying) setReplyText(`@${comment.user?.username} `);
-                            }}
-                            className={`text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 px-4 py-2 rounded-full ${isReplying ? 'text-white bg-slate-900 shadow-xl' : 'text-slate-400 hover:text-primary-600 bg-slate-50 hover:bg-white'}`}
-                        >
-                            {isReplying ? (
-                                <>✕ Cancelar</>
-                            ) : (
-                                <>Responder</>
-                            )}
-                        </button>
-
-                        {children.length > 0 && (
                             <button
-                                onClick={() => setShowReplies(!showReplies)}
-                                className="text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all text-primary-600/70 hover:text-primary-600 bg-primary-50/30 hover:bg-primary-50 px-4 py-2 rounded-full border border-primary-100/30"
+                                onClick={() => {
+                                    setIsReplying(!isReplying);
+                                    if (!isReplying) setReplyText(`@${comment.user?.username} `);
+                                }}
+                                className={`text-[12px] font-bold transition-all ${isReplying ? 'text-primary-600' : 'text-gray-500 hover:underline'}`}
                             >
-                                {showReplies ? (
-                                    <>Ocultar <span className="opacity-50">▲</span></>
-                                ) : (
-                                    <>Ver respuestas ({children.length}) <span className="opacity-50">▼</span></>
-                                )}
+                                Responder
                             </button>
-                        )}
 
-                        {isOwner && !isEditing && (
-                            <div className="flex items-center gap-5 opacity-0 group-hover/comment:opacity-100 transition-opacity ml-auto">
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 hover:text-slate-600 transition-colors"
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    onClick={() => onDelete(comment._id)}
-                                    className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 hover:text-red-500 transition-colors"
-                                >
-                                    Borrar
-                                </button>
-                            </div>
-                        )}
+                            {isOwner && !isEditing && (
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="text-[12px] font-bold text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(comment._id)}
+                                        className="text-[12px] font-bold text-gray-400 hover:text-red-500 transition-colors"
+                                    >
+                                        Borrar
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Reply Input Form */}
                     {isReplying && (
                         <form
                             onSubmit={handleSubmitReply}
-                            className="mt-6 flex gap-4 animate-in fade-in slide-in-from-top-4 duration-500 w-full"
+                            className="mt-3 flex gap-2 animate-in fade-in slide-in-from-top-1 duration-200 w-full"
                         >
                             <input
                                 autoFocus
                                 type="text"
                                 value={replyText}
                                 onChange={e => setReplyText(e.target.value)}
-                                className="flex-1 bg-white border-2 border-slate-100 rounded-[1.75rem] px-6 py-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-primary-500/30 focus:ring-[12px] focus:ring-primary-50/50 transition-all placeholder:text-slate-200"
-                                placeholder={`Responde a @${comment.user?.username}...`}
+                                className="flex-1 bg-gray-100 rounded-full px-4 py-1.5 text-xs font-medium text-gray-900 focus:outline-none focus:bg-gray-200 transition-all"
+                                placeholder={`Responde a ${comment.user?.username}...`}
                             />
                             <button
                                 type="submit"
-                                className="p-5 bg-slate-900 rounded-[1.5rem] text-white hover:bg-primary-600 active:scale-90 transition-all shadow-xl shadow-slate-900/10"
+                                className="px-4 bg-primary-600 rounded-full text-white text-xs font-bold hover:bg-primary-700 active:scale-90 transition-all p-1.5"
                             >
-                                <FaPaperPlane size={14} />
+                                <FaPaperPlane size={10} />
                             </button>
                         </form>
                     )}
 
+                    {/* Show Replies Button */}
+                    {children.length > 0 && !showReplies && (
+                        <button
+                            onClick={() => setShowReplies(true)}
+                            className="mt-2 text-[13px] font-bold text-gray-500 hover:underline flex items-center gap-2"
+                        >
+                            <div className="w-6 h-[1px] bg-gray-300"></div>
+                            Ver {children.length} {children.length === 1 ? 'respuesta' : 'respuestas'}
+                        </button>
+                    )}
+
                     {/* Nested Replies */}
                     {showReplies && children.length > 0 && (
-                        <div className="space-y-2 w-full animate-in fade-in duration-700">
+                        <div className="space-y-1 w-full animate-in fade-in duration-300">
                             {children.map(child => (
                                 <CommentItem
                                     key={child._id}
@@ -234,6 +229,14 @@ const CommentItem = ({
                                     isReply={true}
                                 />
                             ))}
+                            {showReplies && (
+                                <button
+                                    onClick={() => setShowReplies(false)}
+                                    className="text-[12px] font-bold text-gray-500 hover:underline mt-1"
+                                >
+                                    Ocultar respuestas
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>

@@ -211,42 +211,40 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     return (
         <article
             onClick={handlePostClick}
-            className={`relative bg-white rounded-3xl shadow-[0_15px_45px_rgba(0,0,0,0.05)] border border-gray-100 transition-all duration-700 animate-fade-in mb-12 group/post overflow-hidden ${!isDetail ? 'cursor-pointer hover:shadow-[0_25px_60px_rgba(0,0,0,0.1)]' : ''}`}
+            className={`relative bg-white rounded-xl shadow-sm border border-gray-200 transition-all duration-300 animate-fade-in mb-4 group/post overflow-hidden ${!isDetail ? 'cursor-pointer hover:bg-gray-50/50' : ''}`}
         >
             {/* Upper Section (The Post) */}
             <div className="bg-white">
                 {/* Post Header */}
-                <div className="p-8 sm:p-12 flex items-center justify-between">
-                    <div className="flex items-center gap-5">
+                <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
                         <Link to={`/user/${post.user?._id}`} className="relative group/avatar shrink-0">
-                            <div className="p-0.5 bg-gray-100 rounded-2xl transform transition-all duration-700 group-hover/avatar:scale-105">
-                                <img
-                                    src={post.user?.profilePicture ? getFullImageUrl(post.user.profilePicture) : defaultProfile}
-                                    alt={post.user?.username}
-                                    className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm"
-                                    loading="lazy"
-                                    onError={(e) => (e.target.src = defaultProfile)}
-                                />
-                            </div>
+                            <img
+                                src={post.user?.profilePicture ? getFullImageUrl(post.user.profilePicture) : defaultProfile}
+                                alt={post.user?.username}
+                                className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm"
+                                loading="lazy"
+                                onError={(e) => (e.target.src = defaultProfile)}
+                            />
                         </Link>
                         <div>
-                            <div className="flex items-center gap-3">
-                                <Link to={`/user/${post.user?._id}`} className="text-2xl font-black text-slate-900 hover:text-primary-600 transition-colors tracking-tighter">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                                <Link to={`/user/${post.user?._id}`} className="text-[15px] font-bold text-gray-900 hover:underline transition-colors leading-tight">
                                     {post.user?.username || 'Usuario'}
                                 </Link>
                                 {post.sharedFrom && (
-                                    <span className="flex items-center gap-2 text-[9px] font-black text-primary-600 uppercase tracking-[0.25em] bg-primary-50 px-4 py-1.5 rounded-full border border-primary-100">
-                                        <FaShare size={9} className="transform -scale-x-100" />
+                                    <span className="flex items-center gap-1 text-[10px] font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md border border-primary-100">
+                                        <FaShare size={8} className="transform -scale-x-100" />
                                         REPOST
                                     </span>
                                 )}
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest whitespace-nowrap tabular-nums">
-                                    {new Date(post.createdAt).toLocaleDateString()}
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[11px] text-gray-500 font-medium">
+                                    {new Date(post.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
                                 </span>
-                                <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest whitespace-nowrap tabular-nums">
+                                <span className="w-0.5 h-0.5 bg-gray-300 rounded-full"></span>
+                                <span className="text-[11px] text-gray-500 font-medium">
                                     {new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>
@@ -254,31 +252,31 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                     </div>
 
                     <div className="relative group/options">
-                        <button className="w-12 h-12 flex items-center justify-center hover:bg-slate-50 rounded-2xl text-slate-300 transition-all hover:text-primary-600 border border-transparent hover:border-slate-100">
-                            <FaEllipsisH size={18} />
+                        <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full text-gray-400 transition-all hover:text-gray-600">
+                            <FaEllipsisH size={14} />
                         </button>
-                        <div className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-2xl border border-gray-100 rounded-[2.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.15)] opacity-0 invisible group-hover/options:opacity-100 group-hover/options:visible transition-all duration-500 z-50 p-2 transform translate-y-4 group-hover/options:translate-y-0 scale-95 group-hover/options:scale-100 shadow-xl">
+                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 invisible group-hover/options:opacity-100 group-hover/options:visible transition-all duration-200 z-50 p-1 transform translate-y-2 group-hover/options:translate-y-0">
                             {post.user?._id === user?._id && (
                                 <>
                                     <button
-                                        className="w-full text-left px-6 py-4 hover:bg-primary-50 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest text-slate-700 flex items-center gap-4 transition-colors"
+                                        className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-md text-[13px] font-medium text-gray-700 flex items-center gap-3 transition-colors"
                                         onClick={() => setEditingPostId(post._id)}
                                     >
-                                        <span className="text-xl">✍️</span> Editar Historia
+                                        <span className="text-base">✍️</span> Editar
                                     </button>
                                     <button
-                                        className="w-full text-left px-6 py-4 hover:bg-red-50 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest text-red-600 flex items-center gap-4 transition-colors"
+                                        className="w-full text-left px-4 py-2 hover:bg-red-50 rounded-md text-[13px] font-medium text-red-600 flex items-center gap-3 transition-colors"
                                         onClick={() => handleDeletePost(post._id)}
                                     >
-                                        <span className="text-xl">🗑️</span> Eliminar
+                                        <span className="text-base">🗑️</span> Eliminar
                                     </button>
                                 </>
                             )}
                             <button
                                 onClick={handleSavePost}
-                                className={`w-full text-left px-6 py-4 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest flex items-center gap-4 transition-all ${isSaved ? 'bg-primary-50 text-primary-600' : 'hover:bg-slate-50 text-slate-700'}`}
+                                className={`w-full text-left px-4 py-2 rounded-md text-[13px] font-medium flex items-center gap-3 transition-all ${isSaved ? 'text-primary-600' : 'hover:bg-gray-50 text-gray-700'}`}
                             >
-                                <span className={`text-xl transition-transform ${isSaved ? 'scale-110' : ''}`}>{isSaved ? '🔖' : '🔖'}</span>
+                                <span className="text-base">{isSaved ? '🔖' : '🔖'}</span>
                                 {isSaved ? 'Guardado' : 'Guardar'}
                             </button>
                         </div>
@@ -286,7 +284,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                 </div>
 
                 {/* Post Body Section */}
-                <div className="px-8 sm:px-12 pb-10">
+                <div className="px-4 pb-3">
                     <div className="relative">
                         {editingPostId === post._id ? (
                             <EditPostForm
@@ -307,8 +305,8 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                 onCancel={() => setEditingPostId(null)}
                             />
                         ) : (
-                            <div className="relative pl-6 border-l-4 border-primary-500/20 py-2 group-hover/post:border-primary-500/40 transition-colors">
-                                <p className={`text-slate-900 whitespace-pre-wrap font-bold tracking-tight leading-[1.3] transition-all duration-500 ${post.media?.length === 0 ? 'text-lg sm:text-3xl' : 'text-base sm:text-lg'
+                            <div className="py-1">
+                                <p className={`text-gray-800 whitespace-pre-wrap font-normal leading-normal tracking-normal transition-all duration-500 ${post.media?.length === 0 && post.content?.length < 80 ? 'text-xl font-medium' : 'text-[15px]'
                                     }`}>
                                     {post.content}
                                 </p>
@@ -319,171 +317,151 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
 
                 {/* Media Section */}
                 {post.media?.length > 0 && (
-                    <div className="px-8 sm:px-12 pb-12">
-                        <div className="rounded-[3.5rem] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.12)] border border-gray-100 bg-slate-50 overflow-hidden transform group-hover/post:scale-[1.01] transition-transform duration-1000">
-                            <Swiper
-                                modules={[Navigation, Pagination, Keyboard]}
-                                navigation
-                                pagination={{ clickable: true, dynamicBullets: true }}
-                                keyboard={{ enabled: true }}
-                                className="w-full aspect-square sm:aspect-video"
-                            >
-                                {post.media.map((file, idx) => (
-                                    <SwiperSlide key={idx} className="flex items-center justify-center relative">
-                                        {file.mediaType === 'image' ? (
-                                            <img
+                    <div className="border-y border-gray-100 bg-gray-50">
+                        <Swiper
+                            modules={[Navigation, Pagination, Keyboard]}
+                            navigation
+                            pagination={{ clickable: true, dynamicBullets: true }}
+                            keyboard={{ enabled: true }}
+                            className="w-full"
+                            style={{ aspectRatio: post.media.length === 1 && post.media[0].mediaType === 'image' ? 'auto' : '1/1' }}
+                        >
+                            {post.media.map((file, idx) => (
+                                <SwiperSlide key={idx} className="flex items-center justify-center relative bg-black">
+                                    {file.mediaType === 'image' ? (
+                                        <img
+                                            src={getFullImageUrl(file.url)}
+                                            alt="Contenido"
+                                            className="w-full h-full object-contain max-h-[600px] cursor-pointer"
+                                            loading="lazy"
+                                            onClick={() => setSelectedMedia(file)}
+                                            onError={(e) => (e.target.src = defaultProfile)}
+                                        />
+                                    ) : file.mediaType === 'video' ? (
+                                        <div className="relative w-full aspect-square sm:aspect-video flex items-center justify-center group/video bg-black">
+                                            <video
                                                 src={getFullImageUrl(file.url)}
-                                                alt="Contenido"
-                                                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-700"
-                                                loading="lazy"
-                                                onClick={() => setSelectedMedia(file)}
-                                                onError={(e) => (e.target.src = defaultProfile)}
+                                                className="max-w-full max-h-full"
                                             />
-                                        ) : file.mediaType === 'video' ? (
-                                            <div className="relative w-full h-full group/video">
-                                                <video
-                                                    src={getFullImageUrl(file.url)}
-                                                    className="w-full h-full object-cover bg-black"
-                                                />
-                                                <div
-                                                    className="absolute inset-0 bg-black/20 group-hover/video:bg-black/40 flex items-center justify-center cursor-pointer transition-all"
-                                                    onClick={() => setSelectedMedia(file)}
-                                                >
-                                                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover/video:scale-110 transition-transform">
-                                                        <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                                                    </div>
+                                            <div
+                                                className="absolute inset-0 bg-black/10 group-hover/video:bg-black/30 flex items-center justify-center cursor-pointer transition-all"
+                                                onClick={() => setSelectedMedia(file)}
+                                            >
+                                                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover/video:scale-110 transition-transform">
+                                                    <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                                 </div>
                                             </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center h-full bg-white text-gray-400 p-12 text-center">
-                                                <span className="text-8xl mb-8 transform group-hover:scale-110 transition-transform">📄</span>
-                                                <a
-                                                    href={getFullImageUrl(file.url)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="bg-primary-600 text-white px-10 py-4 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-xs hover:bg-primary-700 transition-all shadow-2xl shadow-primary-500/30 active:scale-95"
-                                                >
-                                                    Ver Documento
-                                                </a>
-                                                <p className="text-[11px] font-black text-slate-300 mt-8 truncate w-full px-20 uppercase tracking-[0.2em]">{file.url.split('/').pop()}</p>
-                                            </div>
-                                        )}
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-64 bg-white text-gray-400 p-8 text-center">
+                                            <span className="text-5xl mb-4">📄</span>
+                                            <a
+                                                href={getFullImageUrl(file.url)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-primary-600 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-primary-700 transition-all shadow-lg active:scale-95"
+                                            >
+                                                Ver Documento
+                                            </a>
+                                            <p className="text-[11px] font-medium text-gray-400 mt-4 truncate w-full px-10">{file.url.split('/').pop()}</p>
+                                        </div>
+                                    )}
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
                     </div>
                 )}
             </div>
 
-            {/* Interaction Stats & Actions (Differentiator Surface) */}
-            <div className="relative bg-slate-50/50 border-t border-slate-100">
-                <div className="p-8 sm:p-12">
+            {/* Interaction Stats & Actions */}
+            <div className="relative bg-white">
+                <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center bg-white">
                     {/* Stats */}
-                    <div className="flex items-center justify-between gap-2 mb-8 px-2 sm:px-4">
-                        <div className="flex items-center gap-2 sm:gap-6">
-                            <div className="flex -space-x-3 sm:-space-x-4 cursor-pointer" onClick={() => setIsReactionsModalOpen(true)}>
-                                {post.reactions?.slice(0, 3).map((r, i) => (
-                                    <div key={i} className="bg-white rounded-xl sm:rounded-[1.25rem] w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center shadow-lg border border-slate-50 z-[3] hover:z-[10] transition-all">
-                                        <span className="text-sm sm:text-2xl">
-                                            {REACTION_TYPES.find(rt => rt.type === r.type)?.emoji || '👍'}
-                                        </span>
-                                    </div>
-                                ))}
-                                {post.reactions?.length > 3 && (
-                                    <div className="bg-slate-900 rounded-xl sm:rounded-[1.25rem] w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center text-white text-[8px] sm:text-[10px] font-black z-[1] shadow-lg border-2 border-white">
-                                        +{post.reactions.length - 3}
-                                    </div>
-                                )}
-                            </div>
-                            <span
-                                className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest sm:tracking-[0.3em] cursor-pointer hover:text-primary-600 transition-colors"
-                                onClick={() => setIsReactionsModalOpen(true)}
-                            >
-                                {post.reactions?.length || 0} <span className="hidden sm:inline">Vibras de Energía</span>
-                            </span>
-                        </div>
-                        <div className="px-3 py-1.5 sm:px-6 sm:py-2.5 bg-white border border-slate-100 rounded-full shadow-sm flex items-center gap-2 sm:gap-3">
-                            <span className="text-sm sm:text-lg">💬</span>
-                            <span className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest sm:tracking-[0.3em]">
-                                {post.comments?.length || 0} <span className="hidden sm:inline">Conversaciones</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Actions Grid */}
-                    <div className="grid grid-cols-3 gap-3 sm:gap-6">
-                        <div className="relative group/react w-full">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReact(post._id, currentReactionData ? currentReactionData.type : 'like');
-                                }}
-                                className={`flex items-center justify-center gap-2 sm:gap-4 w-full py-3 sm:py-5 rounded-2xl sm:rounded-[2rem] transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] shadow-sm hover:shadow-2xl border focus:outline-none ${currentReactionData
-                                    ? 'bg-primary-600 text-white border-primary-500'
-                                    : 'bg-white text-slate-400 border-slate-100 hover:text-primary-600'
-                                    }`}
-                            >
-                                {currentReactionData ? (
-                                    <span className="flex items-center gap-2">
-                                        <span className="text-lg sm:text-2xl animate-bounce-short">{currentReactionData.emoji}</span>
-                                        <span className="hidden sm:inline">{currentReactionData.label}</span>
+                    <div className="flex items-center gap-2">
+                        <div className="flex -space-x-1 cursor-pointer" onClick={() => setIsReactionsModalOpen(true)}>
+                            {post.reactions?.slice(0, 3).map((r, i) => (
+                                <div key={i} className="bg-white rounded-full w-5 h-5 flex items-center justify-center shadow-sm border border-gray-100 z-[3]">
+                                    <span className="text-[10px]">
+                                        {REACTION_TYPES.find(rt => rt.type === r.type)?.emoji || '👍'}
                                     </span>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <FaThumbsUp size={14} className="text-slate-200" />
-                                        <span className="hidden sm:inline">Reaccionar</span>
-                                    </div>
-                                )}
-                            </button>
-                            <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-100 transform translate-y-4 group-hover/react:translate-y-0 z-40">
-                                <ReactionPicker
-                                    onSelect={(type) => handleReact(post._id, type)}
-                                    currentReaction={userReaction?.type}
-                                />
-                            </div>
+                                </div>
+                            ))}
                         </div>
-
-                        <button
-                            onClick={() => document.getElementById(`comment-input-${post._id}`).focus()}
-                            className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-5 bg-white hover:bg-slate-50 rounded-2xl sm:rounded-[2rem] border border-slate-100 transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm group/comment-btn"
+                        <span
+                            className="text-[13px] text-gray-500 hover:underline cursor-pointer font-medium"
+                            onClick={() => setIsReactionsModalOpen(true)}
                         >
-                            <FaRegComment size={14} className="text-slate-200" />
-                            <span className="hidden sm:inline">Conversar</span>
-                        </button>
-
-                        <button
-                            onClick={() => setIsShareModalOpen(true)}
-                            className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-5 bg-white hover:bg-slate-50 rounded-2xl sm:rounded-[2rem] border border-slate-100 transition-all font-black text-[9px] sm:text-[10px] uppercase tracking-widest sm:tracking-[0.2em] text-slate-400 hover:text-primary-600 shadow-sm group/share"
-                        >
-                            <FaShare size={14} className="text-slate-200" />
-                            <span className="hidden sm:inline">Compartir</span>
-                        </button>
+                            {post.reactions?.length || 0}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[13px] text-gray-500 font-medium">
+                            {post.comments?.length || 0} comentarios
+                        </span>
                     </div>
                 </div>
 
-                {/* Comments Section (Distinct Surface) */}
-                <div className="px-6 sm:px-12 pb-10">
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-5 sm:p-10">
-                        {/* Separator Title */}
-                        <div className="flex items-center gap-6 mb-12">
-                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] whitespace-nowrap">COMENTARIOS RECIENTES</span>
-                            <div className="h-px flex-1 bg-slate-100"></div>
-                            <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100">
-                                <span className="text-lg">👇</span>
-                            </div>
+                {/* Actions Grid */}
+                <div className="flex p-1 gap-1">
+                    <div className="relative group/react flex-1">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleReact(post._id, currentReactionData ? currentReactionData.type : 'like');
+                            }}
+                            className={`flex items-center justify-center gap-2 w-full py-2 rounded-md transition-all font-semibold text-[13px] hover:bg-gray-100 focus:outline-none ${currentReactionData
+                                ? 'text-primary-600'
+                                : 'text-gray-600'
+                                }`}
+                        >
+                            {currentReactionData ? (
+                                <span className="flex items-center gap-2">
+                                    <span className="text-lg animate-bounce-short">{currentReactionData.emoji}</span>
+                                    <span>{currentReactionData.label}</span>
+                                </span>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <FaThumbsUp size={16} className="text-gray-400" />
+                                    <span>Me gusta</span>
+                                </div>
+                            )}
+                        </button>
+                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-500 absolute bottom-full left-0 mb-2 z-40 bg-white shadow-2xl rounded-full p-1 border border-gray-100 transform translate-y-2 group-hover/react:translate-y-0">
+                            <ReactionPicker
+                                onSelect={(type) => handleReact(post._id, type)}
+                                currentReaction={userReaction?.type}
+                            />
                         </div>
+                    </div>
 
+                    <button
+                        onClick={() => document.getElementById(`comment-input-${post._id}`).focus()}
+                        className="flex-1 flex items-center justify-center gap-2 py-2 hover:bg-gray-100 rounded-md transition-all font-semibold text-[13px] text-gray-600"
+                    >
+                        <FaRegComment size={16} className="text-gray-400" />
+                        <span>Comentar</span>
+                    </button>
+
+                    <button
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="flex-1 flex items-center justify-center gap-2 py-2 hover:bg-gray-100 rounded-md transition-all font-semibold text-[13px] text-gray-600"
+                    >
+                        <FaShare size={16} className="text-gray-400" />
+                        <span>Compartir</span>
+                    </button>
+                </div>
+
+                {/* Comments Section */}
+                {isDetail && (
+                    <div className="px-4 pb-4 border-t border-gray-100 bg-gray-50/30">
                         {/* List of Comments */}
-                        <div className="max-h-[800px] overflow-y-auto pr-2 sm:pr-8 scrollbar-thin scrollbar-thumb-primary-100/50 hover:scrollbar-thumb-primary-200 scrollbar-track-transparent touch-pan-y scroll-smooth overscroll-contain">
+                        <div className="space-y-4 mt-4">
                             {rootComments.length === 0 ? (
-                                <div className="py-24 text-center">
-                                    <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner text-4xl transform rotate-12">🙊</div>
-                                    <h4 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-tighter">Silencio Absoluto</h4>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sé el primero en romper el hielo</p>
+                                <div className="py-8 text-center">
+                                    <p className="text-sm text-gray-500">No hay comentarios aún.</p>
                                 </div>
                             ) : (
-                                <div className="space-y-8">
+                                <div className="space-y-4">
                                     {rootComments.map(c => (
                                         <CommentItem
                                             key={c._id}
@@ -500,36 +478,32 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                             )}
                         </div>
 
-                        {/* Sticky Input for Comment */}
-                        <form onSubmit={handleComment} className="mt-12 group/form">
-                            <div className="flex items-center gap-5 p-3 bg-slate-50 border-2 border-slate-100 rounded-[2.5rem] focus-within:bg-white focus-within:ring-[15px] focus-within:ring-primary-50 focus-within:border-primary-200 transition-all duration-700 shadow-inner">
-                                <div className="w-14 h-14 rounded-[1.75rem] overflow-hidden flex-shrink-0 border-2 border-white shadow-xl transform transition-transform group-focus-within/form:scale-105">
-                                    <img
-                                        src={user?.profilePicture ? getFullImageUrl(user.profilePicture) : defaultProfile}
-                                        className="w-full h-full object-cover"
-                                        alt="Yo"
-                                        onError={(e) => e.target.src = defaultProfile}
-                                    />
-                                </div>
-                                <div className="flex-1 relative">
-                                    <input
-                                        id={`comment-input-${post._id}`}
-                                        type="text"
-                                        name="comment"
-                                        autoComplete="off"
-                                        placeholder="Escribe una respuesta brillante..."
-                                        className="w-full bg-transparent border-none px-2 py-4 text-sm font-bold text-slate-800 placeholder:text-slate-300 outline-none"
-                                    />
-                                </div>
-                                <button type="submit" className="bg-primary-600 text-white w-14 h-14 rounded-[1.75rem] hover:bg-primary-700 transition-all shadow-2xl shadow-primary-500/40 flex items-center justify-center active:scale-90 group/send">
-                                    <svg className="w-6 h-6 transform transition-transform group-hover/send:rotate-12 group-hover/send:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        {/* Input for Comment */}
+                        <form onSubmit={handleComment} className="mt-4 flex gap-2 items-center">
+                            <img
+                                src={user?.profilePicture ? getFullImageUrl(user.profilePicture) : defaultProfile}
+                                className="w-8 h-8 rounded-full object-cover"
+                                alt="Yo"
+                                onError={(e) => e.target.src = defaultProfile}
+                            />
+                            <div className="flex-1 relative flex items-center bg-gray-100 rounded-full px-4 py-1.5 focus-within:bg-gray-200 transition-colors">
+                                <input
+                                    id={`comment-input-${post._id}`}
+                                    type="text"
+                                    name="comment"
+                                    autoComplete="off"
+                                    placeholder="Escribe un comentario..."
+                                    className="w-full bg-transparent border-none text-[14px] text-gray-800 placeholder:text-gray-500 outline-none"
+                                />
+                                <button type="submit" className="text-primary-600 p-1 hover:bg-primary-50 rounded-full transition-all active:scale-90">
+                                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                     </svg>
                                 </button>
                             </div>
                         </form>
                     </div>
-                </div>
+                )}
             </div>
 
             <ReactionsModal
@@ -548,20 +522,15 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
             {/* Lightbox / Media Viewer */}
             {selectedMedia && (
                 <div
-                    className="fixed inset-0 z-[150] bg-slate-950/98 backdrop-blur-3xl flex flex-col items-center justify-center p-4 sm:p-12 animate-fade-in"
+                    className="fixed inset-0 z-[150] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-fade-in"
                     onClick={() => setSelectedMedia(null)}
                 >
-                    <div className="absolute top-0 left-0 w-full p-6 sm:p-10 flex justify-between items-center z-[160] pointer-events-none">
-                        <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 hidden sm:block">
-                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">Vista de Alta Fidelidad</span>
-                        </div>
-                        <button
-                            className="pointer-events-auto text-white/40 hover:text-white transition-all p-5 hover:bg-white/10 rounded-full group/close border border-white/5 bg-white/5 backdrop-blur-xl"
-                            onClick={() => setSelectedMedia(null)}
-                        >
-                            <svg className="w-8 h-8 transition-transform group-hover/close:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
+                    <button
+                        className="absolute top-4 right-4 text-white/70 hover:text-white p-2 hover:bg-white/10 rounded-full transition-all"
+                        onClick={() => setSelectedMedia(null)}
+                    >
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
 
                     <div className="relative w-full h-full flex items-center justify-center animate-zoom-in" onClick={(e) => e.stopPropagation()}>
                         {selectedMedia.mediaType === 'video' ? (
@@ -569,34 +538,15 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                 src={getFullImageUrl(selectedMedia.url)}
                                 controls
                                 autoPlay
-                                className="max-w-full max-h-full rounded-3xl shadow-[0_0_150px_rgba(0,0,0,0.8)] border border-white/10"
+                                className="max-w-full max-h-[90vh] rounded-lg shadow-2xl"
                             />
                         ) : (
                             <img
                                 src={getFullImageUrl(selectedMedia.url)}
-                                className="max-w-full max-h-full object-contain rounded-3xl shadow-[0_0_150px_rgba(0,0,0,0.8)] border border-white/10"
+                                className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
                                 alt="Full size"
                             />
                         )}
-
-                        {/* Meta Info Overlay (Optional but premium) */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-xl border border-white/10 px-8 py-4 rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-500 flex items-center gap-6">
-                            <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Formato</span>
-                                <span className="text-xs font-bold text-white uppercase tracking-tighter">{selectedMedia.mediaType}</span>
-                            </div>
-                            <div className="w-px h-8 bg-white/10"></div>
-                            <a
-                                href={getFullImageUrl(selectedMedia.url)}
-                                download
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[10px] font-black text-primary-400 hover:text-primary-300 uppercase tracking-widest flex items-center gap-2"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                Descargar Original
-                            </a>
-                        </div>
                     </div>
                 </div>
             )}

@@ -104,19 +104,19 @@ const FriendsPosts = () => {
   if (!posts.length) return <p className="text-center mt-8 text-gray-500">No hay publicaciones recientes. ¡Sigue a más personas!</p>;
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-2xl">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-black text-gray-900 tracking-tight">Tu Feed</h2>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Tu Feed</h2>
         <button
           onClick={() => fetchFriendsPosts(true)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-blue-500"
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-primary-600"
           title="Actualizar"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
         </button>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-4">
         {posts.map((post) => (
           <PostItem
             key={post._id}
@@ -125,7 +125,7 @@ const FriendsPosts = () => {
           />
         ))}
       </div>
-    </main>
+    </div>
   );
 };
 

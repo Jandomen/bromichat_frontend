@@ -61,14 +61,14 @@ const Dashboard = () => {
       <main className="flex-grow pt-4 sm:pt-8 pb-24 lg:pb-12 px-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 animate-fade-in">
 
         {/* Left Sidebar - Personal Card & Tools */}
-        <div className="hidden md:block lg:col-span-3 space-y-6">
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden sticky top-28 transition-all hover:shadow-2xl hover:shadow-primary-100/20">
-            <div className="h-24 bg-gradient-to-br from-primary-600 to-primary-800 relative">
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <Link to={`/user/${user?._id}`} className="p-1.5 bg-white rounded-2xl shadow-lg block hover:scale-105 transition-transform">
+        <div className="hidden md:block lg:col-span-3 space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-28 transition-all hover:bg-gray-50/10">
+            <div className="h-16 bg-gradient-to-br from-primary-600 to-primary-700 relative">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                <Link to={`/user/${user?._id}`} className="p-1 bg-white rounded-full shadow-sm block hover:scale-105 transition-transform">
                   <img
                     src={getFullImageUrl(user?.profilePicture)}
-                    className="w-20 h-20 rounded-xl object-cover"
+                    className="w-16 h-16 rounded-full object-cover"
                     alt="Profile"
                     onError={(e) => e.target.src = defaultProfile}
                   />
@@ -76,57 +76,48 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="pt-12 pb-6 px-6 text-center">
-              <h2 className="text-xl font-bold text-gray-800">
-                <span className="bg-yellow-400/20 px-3 py-1 rounded-xl border border-yellow-400/10 inline-block">
-                  {user?.username || 'Usuario'}
-                </span>
+            <div className="pt-10 pb-4 px-4 text-center">
+              <h2 className="text-base font-bold text-gray-900 leading-tight">
+                {user?.username || 'Usuario'}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">@{user?.username?.toLowerCase()}</p>
+              <p className="text-[11px] text-gray-500 font-medium">@{user?.username?.toLowerCase()}</p>
 
               <Link
                 to={`/user/${user?._id}`}
-                className="mt-6 block w-full py-2.5 rounded-xl bg-primary-50 text-primary-600 font-semibold text-sm hover:bg-primary-600 hover:text-white transition-all duration-300"
+                className="mt-4 block w-full py-1.5 rounded-lg bg-primary-50 text-primary-600 font-bold text-[12px] hover:bg-primary-600 hover:text-white transition-all"
               >
-                Ver Mi Perfil
+                Mi Perfil
               </Link>
             </div>
 
-            <div className="px-3 pb-4 space-y-1">
-              <Link to="/search" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all group text-gray-700">
-                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </div>
-                <span className="font-medium">Descubrir Personas</span>
+            <div className="px-2 pb-3 space-y-0.5">
+              <Link to="/friends" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-700">
+                <span className="text-sm">👥</span>
+                <span className="text-[13px] font-semibold">Amigos</span>
               </Link>
 
-              <Link to="/friends" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all group text-gray-700">
-                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors text-xl leading-none">👥</div>
-                <span className="font-medium">Amigos</span>
+              <Link to="/groups" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-700">
+                <span className="text-sm">🏰</span>
+                <span className="text-[13px] font-semibold">Comunidades</span>
               </Link>
 
-              <Link to="/groups" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all group text-gray-700">
-                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors text-xl leading-none">🏰</div>
-                <span className="font-medium">Comunidades</span>
+              <Link to="/saved" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-700">
+                <span className="text-sm">🔖</span>
+                <span className="text-[13px] font-semibold">Guardados</span>
               </Link>
 
-              <Link to="/saved" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-all group text-gray-700">
-                <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors text-xl leading-none">🔖</div>
-                <span className="font-medium">Guardados</span>
-              </Link>
-
-              <div className="pt-4 mt-4 border-t border-gray-100 px-1">
+              <div className="pt-2 mt-2 border-t border-gray-100 px-1">
                 <LogoutButton />
               </div>
 
               {user?.sosSettings?.isEnabled && (
-                <div className="px-3 pt-4">
+                <div className="px-2 pt-3">
                   <button
                     onClick={() => setIsSosModalOpen(true)}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-[2rem] bg-red-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-red-500/40 hover:bg-red-700 transition-all animate-pulse"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-600 text-white font-bold text-[11px] uppercase tracking-wider shadow-md hover:bg-red-700 transition-all"
                   >
-                    <span className="text-lg">🆘</span>
-                    BOTÓN DE AUXILIO
+                    <span>🆘</span>
+                    AUXILIO
                   </button>
                 </div>
               )}

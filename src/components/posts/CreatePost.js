@@ -141,24 +141,22 @@ const CreatePost = ({ onPostCreated, groupId }) => {
   };
 
   return (
-    <div className="mb-10 max-w-2xl mx-auto group">
+    <div className="mb-6 max-w-2xl mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-[2rem] shadow-xl shadow-gray-200/40 border border-gray-100 transition-all duration-300 focus-within:shadow-2xl focus-within:shadow-primary-100/30 relative overflow-hidden"
+        className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 transition-all duration-300 relative overflow-hidden"
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
         onDragLeave={handleDrag}
         onDrop={handleDrop}
       >
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-2xl bg-gray-100 overflow-hidden ring-2 ring-gray-50 p-0.5">
-              <img
-                src={getFullImageUrl(user?.profilePicture)}
-                alt="Yo"
-                className="w-full h-full object-cover rounded-[14px]"
-              />
-            </div>
+            <img
+              src={getFullImageUrl(user?.profilePicture)}
+              alt="Yo"
+              className="w-10 h-10 rounded-full object-cover border border-gray-100"
+            />
           </div>
 
           <div className="flex-1">
@@ -167,18 +165,18 @@ const CreatePost = ({ onPostCreated, groupId }) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows="2"
-              className="w-full p-2 text-slate-900 placeholder-gray-400 bg-transparent border-none focus:ring-0 resize-none text-lg sm:text-xl font-bold leading-tight tracking-tight selection:bg-primary-100 placeholder:font-medium"
+              className="w-full p-1 text-gray-800 placeholder-gray-400 bg-transparent border-none focus:ring-0 resize-none text-[16px] font-normal leading-normal outline-none"
             />
           </div>
         </div>
 
 
         {mediaFiles.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 px-1">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 px-1">
             {mediaFiles.map((file, idx) => (
               <div
                 key={`${file.name}-${idx}`}
-                className="relative w-full h-24 bg-gray-50 rounded-2xl overflow-hidden group/item border border-gray-100 shadow-sm transition-transform hover:scale-105"
+                className="relative w-full h-20 bg-gray-50 rounded-lg overflow-hidden group/item border border-gray-200 shadow-sm"
               >
                 {file.type.startsWith('image') ? (
                   <img
@@ -194,16 +192,16 @@ const CreatePost = ({ onPostCreated, groupId }) => {
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-[10px] text-gray-500 font-bold">
                     <span className="text-xl mb-1">📄</span>
-                    <span className="truncate max-w-[80%] uppercase tracking-tighter">{file.name}</span>
+                    <span className="truncate max-w-[80%] uppercase tracking-tighter text-[9px]">{file.name}</span>
                   </div>
                 )}
 
                 <button
                   type="button"
                   onClick={() => handleRemoveFile(idx)}
-                  className="absolute top-1.5 right-1.5 bg-black/40 hover:bg-primary-600 text-white rounded-full p-1.5 opacity-0 group-hover/item:opacity-100 transition-all duration-300"
+                  className="absolute top-1 right-1 bg-black/50 hover:bg-primary-600 text-white rounded-full p-1 transition-all"
                 >
-                  <FaTimes size={10} />
+                  <FaTimes size={8} />
                 </button>
               </div>
             ))}
@@ -212,20 +210,20 @@ const CreatePost = ({ onPostCreated, groupId }) => {
 
 
         {dragActive && (
-          <div className="absolute inset-2 rounded-2xl border-2 border-dashed border-primary-400 bg-primary-50/90 text-primary-600 flex flex-col items-center justify-center font-black uppercase tracking-widest text-xs z-20 backdrop-blur-sm animate-pulse-slow">
-            <span className="text-3xl mb-2">✨</span>
+          <div className="absolute inset-2 rounded-lg border-2 border-dashed border-primary-400 bg-primary-50/90 text-primary-600 flex flex-col items-center justify-center font-bold uppercase tracking-widest text-[10px] z-20 backdrop-blur-sm animate-pulse">
+            <span className="text-2xl mb-1">✨</span>
             Suelta los archivos aquí
           </div>
         )}
 
         {error && (
-          <div className="text-primary-600 text-xs font-bold uppercase tracking-widest px-4 mt-4 animate-bounce">
+          <div className="text-primary-600 text-[11px] font-bold px-4 mt-3">
             ⚠️ {error}
           </div>
         )}
 
-        <div className="border-t border-gray-50 mt-5 pt-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="border-t border-gray-100 mt-4 pt-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <input
               type="file"
               id="file-upload"
@@ -237,26 +235,25 @@ const CreatePost = ({ onPostCreated, groupId }) => {
             />
             <label
               htmlFor="file-upload"
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer ${mediaFiles.length > 0
-                ? 'text-primary-600 bg-primary-50 hover:bg-primary-100'
-                : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${mediaFiles.length > 0
+                ? 'text-primary-600 bg-primary-50'
+                : 'text-gray-500 hover:bg-gray-100'
                 }`}
             >
-              <FaPaperclip />
-              <span>{mediaFiles.length > 0 ? 'Añadir más' : 'Adjuntar Medios'}</span>
+              <FaPaperclip size={12} />
+              <span>{mediaFiles.length > 0 ? 'Añadir más' : 'Media'}</span>
             </label>
           </div>
 
           <button
             type="submit"
             disabled={!content.trim() && mediaFiles.length === 0}
-            className={`px-8 py-2.5 text-xs font-black uppercase tracking-[0.1em] rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-xl active:scale-95 flex items-center gap-2 ${isOnline
-                ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-500/30'
-                : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/30'
+            className={`px-6 py-2 text-[13px] font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95 flex items-center gap-2 ${isOnline
+              ? 'bg-primary-600 text-white hover:bg-primary-700'
+              : 'bg-emerald-500 text-white hover:bg-emerald-600'
               }`}
           >
-            {!isOnline && <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>}
-            {isOnline ? 'Publicar Historia' : 'Guardar en Brumi-Mesh'}
+            {isOnline ? 'Publicar' : 'Guardar offline'}
           </button>
         </div>
 
@@ -264,6 +261,5 @@ const CreatePost = ({ onPostCreated, groupId }) => {
     </div>
   );
 };
-
 
 export default CreatePost;
