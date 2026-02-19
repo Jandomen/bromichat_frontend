@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Trash2, Eye, MoreHorizontal, Heart, Smile, Send } from 'lucide-react';
+import { X, Trash2, Eye, MoreHorizontal } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import api from '../../services/api';
 import { useUI } from '../../context/UIContext';
@@ -305,29 +305,24 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
                             </div>
                         </div>
                     ) : (
-                        /* Viewer Controls (Facebook Style) */
+                        /* Viewer Controls (Simplified - User Info) */
                         <div className="flex items-center gap-3">
-                            <div className="flex-1 relative">
-                                <input
-                                    type="text"
-                                    placeholder="Enviar mensaje..."
-                                    className="w-full bg-transparent border border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:border-white/60 backdrop-blur-sm"
-                                    onClick={(e) => e.stopPropagation()}
-                                    onFocus={() => setIsPaused(true)}
-                                    onBlur={() => setIsPaused(false)}
+                            <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3 group">
+                                <img
+                                    src={getFullImageUrl(currentGroup.user.profilePicture)}
+                                    alt={currentGroup.user.username}
+                                    className="w-12 h-12 rounded-full border-2 border-white/20 object-cover shadow-md"
+                                    onError={(e) => (e.target.src = defaultProfile)}
                                 />
-                                <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white">
-                                    <Send size={18} />
-                                </button>
-                            </div>
-
-                            {/* Quick Reactions */}
-                            <button className="text-red-500 hover:scale-110 transition-transform active:scale-90">
-                                <Heart size={32} fill="currentColor" strokeWidth={0} />
-                            </button>
-                            <button className="text-yellow-400 hover:scale-110 transition-transform active:scale-90">
-                                <Smile size={32} />
-                            </button>
+                                <div className="flex flex-col">
+                                    <span className="text-white font-bold text-lg tracking-tight drop-shadow-md">
+                                        {currentGroup.user.username}
+                                    </span>
+                                    <span className="text-white/60 text-xs font-medium">
+                                        Ver perfil
+                                    </span>
+                                </div>
+                            </Link>
                         </div>
                     )}
                 </div>
