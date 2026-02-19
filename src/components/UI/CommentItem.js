@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Send, Reply, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
 import { useUI } from '../../context/UIContext';

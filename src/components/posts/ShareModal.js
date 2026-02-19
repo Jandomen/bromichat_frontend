@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Send, Share2, Users } from 'lucide-react';
+import { X, Users } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
 

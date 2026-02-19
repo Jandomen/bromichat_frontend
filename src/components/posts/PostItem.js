@@ -13,13 +13,9 @@ import { getFullImageUrl } from '../../utils/getProfilePicture';
 import CommentItem from '../UI/CommentItem';
 import EditPostForm from './EditPostForm';
 import {
-    MessageSquare,
     Share2,
-    ThumbsUp,
     MoreHorizontal,
-    Bookmark,
     Send,
-    X,
     Play,
     Smile,
     Lightbulb,

@@ -3,7 +3,7 @@ import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { useUI } from '../../context/UIContext';
 import { Menu } from '@headlessui/react';
-import { X, Search, Smile, Lightbulb, Users, Heart, MessageSquare, Share2, Trash2, Edit3, MoreVertical, ChevronLeft, ChevronRight, Lock, Globe, Send } from 'lucide-react';
+import { X, Search, Smile, Lightbulb, Users, Trash2, Edit3, MoreVertical, ChevronLeft, ChevronRight, Lock, Globe, Send } from 'lucide-react';
 import { useSwipe } from '../../hooks/useSwipe';
 import CommentItem from '../UI/CommentItem';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
