@@ -53,7 +53,7 @@ const Gallery = () => {
     fetchGlobalFeed();
   }, [fetchGlobalFeed]);
 
-  const handleDelete = async (photoId) => {
+  const handleDelete = React.useCallback(async (photoId) => {
     showConfirm(
       'Eliminar foto',
       '¿Seguro que quieres eliminar esta foto?',
@@ -67,17 +67,16 @@ const Gallery = () => {
         }
       }
     );
-  };
+  }, [token, showConfirm, showToast, fetchUserPhotos]);
 
-  const handleUpdateDescription = async (photoId, description) => {
+  const handleUpdateDescription = React.useCallback(async (photoId, description) => {
     try {
       await photoService.updatePhoto(photoId, { description }, token);
       fetchUserPhotos();
     } catch (err) { }
-  };
+  }, [token, fetchUserPhotos]);
 
-  const handleSearch = async (term) => {
-
+  const handleSearch = React.useCallback(async (term) => {
     if (!token) return;
 
     if (!term) {
@@ -98,7 +97,7 @@ const Gallery = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, view, user?._id, fetchUserPhotos, fetchGlobalFeed]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

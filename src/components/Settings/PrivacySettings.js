@@ -54,7 +54,7 @@ const PrivacySettings = () => {
                     className="w-full border rounded p-2"
                 >
                     <option value="public">Público (Todos)</option>
-                    <option value="friends">Solo Amigos</option>
+                    <option value="friends">Solo Compas</option>
                     <option value="private">Privado (Solo yo)</option>
                 </select>
             </div>
@@ -67,7 +67,7 @@ const PrivacySettings = () => {
                     className="w-full border rounded p-2"
                 >
                     <option value="everyone">Todos</option>
-                    <option value="friends">Solo Amigos</option>
+                    <option value="friends">Solo Compas</option>
                 </select>
             </div>
 

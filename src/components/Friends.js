@@ -14,7 +14,7 @@ const Friends = () => {
 
   const handleRemoveFriend = async (friendId) => {
     if (!token || !currentUser) {
-      setError('Debes iniciar sesión para eliminar amigos.');
+      setError('Debes iniciar sesión para eliminar compas.');
       return;
     }
 
@@ -30,7 +30,7 @@ const Friends = () => {
       const errorMessage =
         err.response?.data?.message ||
         err.response?.data?.error ||
-        'No se pudo eliminar amigo';
+        'No se pudo eliminar compa';
       setError(errorMessage);
       // console.error('Error al eliminar amigo:', err);
     } finally {
@@ -60,7 +60,7 @@ const Friends = () => {
   }, [socket, currentUser, setCurrentUser]);
 
   if (!currentUser) {
-    return <p className="text-red-500 text-center">Debes iniciar sesión para ver tus amigos.</p>;
+    return <p className="text-red-500 text-center">Debes iniciar sesión para ver tus compas.</p>;
   }
 
   return (
@@ -69,7 +69,7 @@ const Friends = () => {
 
       <main className="flex-grow">
         <div className="p-4 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Mis Amigos</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">Mis Compas</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <MyFriendsList onRemoveFriend={handleRemoveFriend} onlineUsers={onlineUsers} />
         </div>

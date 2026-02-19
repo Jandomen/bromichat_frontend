@@ -14,15 +14,7 @@ const PhotoFeed = () => {
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [showX, setShowX] = useState(true);
     const containerRef = useRef(null);
-    const xTimeoutRef = useRef(null);
-
-    const resetXTimeout = () => {
-        setShowX(true);
-        if (xTimeoutRef.current) clearTimeout(xTimeoutRef.current);
-        xTimeoutRef.current = setTimeout(() => setShowX(false), 3000);
-    };
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -50,23 +42,11 @@ const PhotoFeed = () => {
                 });
                 setPhotos(res.data);
             } catch (err) {
-                console.error("Error fetching photo feed", err);
             } finally {
                 setLoading(false);
             }
         };
         if (token) fetchFeed();
-
-        const handleInteraction = () => resetXTimeout();
-        window.addEventListener('mousemove', handleInteraction);
-        window.addEventListener('touchstart', handleInteraction);
-        resetXTimeout();
-
-        return () => {
-            window.removeEventListener('mousemove', handleInteraction);
-            window.removeEventListener('touchstart', handleInteraction);
-            if (xTimeoutRef.current) clearTimeout(xTimeoutRef.current);
-        };
     }, [token]);
 
     if (loading) return (
@@ -83,10 +63,13 @@ const PhotoFeed = () => {
             {/* Close button for Fullscreen */}
             {isFullscreen && (
                 <button
-                    onClick={() => setIsFullscreen(false)}
-                    className={`fixed top-6 right-6 z-[210] p-4 bg-white/10 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-90 ${showX ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsFullscreen(false);
+                    }}
+                    className="fixed top-6 right-6 z-[250] p-4 bg-black/40 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-90 opacity-100"
                 >
-                    <X size={28} />
+                    <X size={28} strokeWidth={3} />
                 </button>
             )}
 

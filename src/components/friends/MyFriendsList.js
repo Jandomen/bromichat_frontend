@@ -8,7 +8,7 @@ const MyFriendsList = ({ users = [], onlineUsers = new Set() }) => {
   if (!Array.isArray(users) || users.length === 0) {
     return (
       <Typography variant="body1" color="text.secondary" textAlign="center">
-        No hay amigos para mostrar.
+        No hay compas para mostrar.
       </Typography>
     );
   }

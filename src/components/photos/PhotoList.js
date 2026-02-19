@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { useUI } from '../../context/UIContext';
@@ -21,15 +21,6 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
 
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [editForm, setEditForm] = useState({ description: '', isPrivate: false, allowFeed: true, category: 'Mundo' });
-  const [showUI, setShowUI] = useState(true);
-  const uiTimeoutRef = useRef(null);
-
-  const resetUITimeout = () => {
-    setShowUI(true);
-    if (uiTimeoutRef.current) clearTimeout(uiTimeoutRef.current);
-    uiTimeoutRef.current = setTimeout(() => setShowUI(false), 3000);
-  };
-
   useEffect(() => {
     if (initialPhotoId && photos.length > 0) {
       const index = photos.findIndex(p => p._id === initialPhotoId);
@@ -87,17 +78,9 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
       if (e.key === 'Escape') setLightboxIndex(null);
     };
 
-    const handleInteraction = () => resetUITimeout();
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('mousemove', handleInteraction);
-    window.addEventListener('touchstart', handleInteraction);
-    resetUITimeout();
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('mousemove', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-      if (uiTimeoutRef.current) clearTimeout(uiTimeoutRef.current);
     };
   }, [lightboxIndex, photos, handleNext, handlePrev, token]);
 
@@ -352,23 +335,36 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
       </div>
 
       {lightboxIndex !== null && (
-        <div {...handlers} className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
-          <div className="relative w-screen h-screen bg-black flex flex-col md:flex-row" onClick={e => e.stopPropagation()}>
+        <div {...handlers} className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300">
+          <div className="relative w-screen h-screen bg-black/20 flex flex-col md:flex-row" onClick={() => setLightboxIndex(null)}>
             {/* Close button - high visibility */}
             <button
-              onClick={() => setLightboxIndex(null)}
-              className={`absolute top-6 right-6 z-[220] p-4 bg-white/10 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-90 ${showUI ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex(null);
+              }}
+              className="absolute top-6 right-6 z-[250] p-5 bg-black/60 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-95 group"
             >
-              <X className="w-6 h-6" />
+              <X size={32} strokeWidth={3} />
             </button>
 
-            <div className="flex-grow relative bg-black flex items-center justify-center group/img">
-              <button className="absolute left-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handlePrev}><ChevronLeft size={32} /></button>
-              <button className="absolute right-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handleNext}><ChevronRight size={32} /></button>
-              <img src={photos[lightboxIndex].imageUrl} alt="" className="max-h-full max-w-full object-contain" />
+            <div className="flex-grow relative bg-black/40 flex items-center justify-center group/img" onClick={e => e.stopPropagation()}>
+              <button
+                className="absolute left-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100"
+                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+              >
+                <ChevronLeft size={32} />
+              </button>
+              <button
+                className="absolute right-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100"
+                onClick={(e) => { e.stopPropagation(); handleNext(); }}
+              >
+                <ChevronRight size={32} />
+              </button>
+              <img src={photos[lightboxIndex].imageUrl} alt="" className="max-h-full max-w-full object-contain" onClick={(e) => e.stopPropagation()} />
             </div>
 
-            <div className="w-full md:w-96 bg-zinc-900 flex flex-col border-l border-white/5">
+            <div className="w-full md:w-96 bg-zinc-900 flex flex-col border-l border-white/5" onClick={e => e.stopPropagation()}>
               <div className="p-6 border-b border-white/5">
                 <div className="flex items-center gap-3 mb-4">
                   <img src={getFullImageUrl(currentPhotoDetails?.user?.profilePicture)} className="w-10 h-10 rounded-full object-cover border border-white/10" alt="" onError={e => e.target.src = defaultProfile} />

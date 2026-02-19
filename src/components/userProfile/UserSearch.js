@@ -56,7 +56,7 @@ const UserSearch = () => {
         <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-black mb-2">
           Buscar Usuarios
         </h2>
-        <p className="text-gray-500">Encuentra amigos y conecta con nuevas personas</p>
+        <p className="text-gray-500">Encuentra compas y conecta con nuevas personas</p>
       </div>
 
       <div className="relative mb-6 max-w-2xl mx-auto group">

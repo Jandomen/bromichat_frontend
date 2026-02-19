@@ -16,6 +16,7 @@ import {
     Share2,
     MoreHorizontal,
     Send,
+    X,
     Play,
     Smile,
     Lightbulb,
@@ -344,7 +345,14 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                         {post.sharedFrom.media && post.sharedFrom.media.length > 0 && (
                             <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden border border-gray-100 shadow-sm max-h-[200px]">
                                 {post.sharedFrom.media.slice(0, 4).map((m, i) => (
-                                    <div key={i} className="relative aspect-square">
+                                    <div
+                                        key={i}
+                                        className="relative aspect-square cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedMedia(m);
+                                        }}
+                                    >
                                         {m.mediaType === 'video' ? (
                                             <div className="w-full h-full bg-black flex items-center justify-center">
                                                 <Play size={16} className="text-white opacity-60" />
@@ -396,7 +404,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                             <video
                                                 src={getFullImageUrl(file.url)}
                                                 className="max-w-full max-h-full"
-                                                preload="metadata"
+                                                autoPlay
+                                                muted
+                                                loop
                                                 playsInline
                                             />
                                             <div
@@ -595,10 +605,13 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                     onClick={() => setSelectedMedia(null)}
                 >
                     <button
-                        className="absolute top-4 right-4 text-white/70 hover:text-white p-2 hover:bg-white/10 rounded-full transition-all"
-                        onClick={() => setSelectedMedia(null)}
+                        className="absolute top-6 right-6 text-white bg-black/40 p-4 rounded-full backdrop-blur-md border border-white/20 hover:bg-red-600 transition-all z-[200] flex items-center justify-center shadow-2xl"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMedia(null);
+                        }}
                     >
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        <X size={32} strokeWidth={3} />
                     </button>
 
                     <div className="relative w-full h-full flex items-center justify-center animate-zoom-in" onClick={(e) => e.stopPropagation()}>

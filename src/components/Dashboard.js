@@ -93,7 +93,7 @@ const Dashboard = () => {
             <div className="px-2 pb-3 space-y-0.5">
               <Link to="/friends" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-700">
                 <span className="text-sm">👥</span>
-                <span className="text-[13px] font-semibold">Amigos</span>
+                <span className="text-[13px] font-semibold">Compas</span>
               </Link>
 
               <Link to="/groups" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-700">
@@ -152,7 +152,7 @@ const Dashboard = () => {
 
             <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
               {[
-                { l: 'Amigos', i: '👥', h: '/friends' },
+                { l: 'Compas', i: '👥', h: '/friends' },
                 { l: 'Guardados', i: '🔖', h: '/saved' },
                 { l: 'Comunidades', i: '🏰', h: '/groups' },
                 { l: 'Videos', i: '🎬', h: '/videos' },

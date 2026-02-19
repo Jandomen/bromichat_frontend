@@ -117,7 +117,7 @@ const UserProfile = () => {
   const TABS = [
     { id: 'posts', label: 'Publicaciones' },
     { id: 'about', label: 'Información' },
-    { id: 'friends', label: 'Amigos' },
+    { id: 'friends', label: 'Compas' },
     { id: 'photos', label: 'Fotos' },
     { id: 'videos', label: 'Videos' },
   ];

@@ -597,7 +597,7 @@ const UserInfo = ({ user }) => {
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-6 text-sm">
               <Link to={`/user/${userData._id}/friends`} className="flex items-center gap-2 group decoration-none">
                 <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.friends?.length || 0}</span>
-                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Amigos</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Compas</span>
               </Link>
               <Link to={`/user/${userData._id}/followers`} className="flex items-center gap-2 group decoration-none">
                 <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.followers?.length || 0}</span>
@@ -622,7 +622,7 @@ const UserInfo = ({ user }) => {
                         disabled={loading}
                         className="px-6 py-3 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all group"
                       >
-                        <PersonRemoveIcon className="w-4 h-4 transition-transform group-hover:scale-110" /> Eliminar Amigo
+                        <PersonRemoveIcon className="w-4 h-4 transition-transform group-hover:scale-110" /> Eliminar Compa
                       </button>
                     ) : (
                       <button
@@ -630,7 +630,7 @@ const UserInfo = ({ user }) => {
                         disabled={loading}
                         className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-primary-500/30 group"
                       >
-                        <PersonAddIcon className="w-4 h-4 transition-transform group-hover:scale-125" /> Añadir Amigo
+                        <PersonAddIcon className="w-4 h-4 transition-transform group-hover:scale-125" /> Añadir Compa
                       </button>
                     )}
 

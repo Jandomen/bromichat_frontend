@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Bromichat',
   webDir: 'build',
   server: {
-    url: 'https://bromichat.vercel.app/',
+    url: 'https://bromichat.vercel.app',
     cleartext: true
   },
   plugins: {

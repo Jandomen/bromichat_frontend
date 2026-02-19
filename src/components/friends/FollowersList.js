@@ -64,7 +64,7 @@ const FollowersList = ({ minimal = false }) => {
 
             <div className="flex gap-4 mb-6">
               <Link to={`/user/${userId}/friends`} className="px-6 py-3 rounded-2xl bg-white text-gray-400 hover:text-gray-900 font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-                <FaUserFriends /> Amigos
+                <FaUserFriends /> Compas
               </Link>
               <Link to={`/user/${userId}/followers`} className="px-6 py-3 rounded-2xl bg-purple-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-purple-500/30 flex items-center gap-2">
                 <FaUsers /> Seguidores

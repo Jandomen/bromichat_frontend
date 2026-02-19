@@ -34,7 +34,7 @@ const FriendsList = ({ minimal = false }) => {
         setError(
           err.response?.data?.message ||
           err.response?.data?.error ||
-          'Error al cargar la lista de amigos'
+          'Error al cargar la lista de compas'
         );
         setLoading(false);
       }
@@ -43,7 +43,7 @@ const FriendsList = ({ minimal = false }) => {
     if (token) {
       fetchFriends();
     } else {
-      setError('Debes iniciar sesión para ver la lista de amigos');
+      setError('Debes iniciar sesión para ver la lista de compas');
       setLoading(false);
     }
   }, [userId, token]);
@@ -66,7 +66,7 @@ const FriendsList = ({ minimal = false }) => {
 
             <div className="flex gap-4 mb-6">
               <Link to={`/user/${userId}/friends`} className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/30 flex items-center gap-2">
-                <FaUserFriends /> Amigos
+                <FaUserFriends /> Compas
               </Link>
               <Link to={`/user/${userId}/followers`} className="px-6 py-3 rounded-2xl bg-white text-gray-400 hover:text-gray-900 font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2">
                 <FaUsers /> Seguidores
@@ -111,7 +111,7 @@ const FriendsList = ({ minimal = false }) => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="text-gray-500 font-medium">Buscando en el círculo...</p>
+              <p className="text-gray-500 font-medium">Buscando compas...</p>
             </div>
           ) : error ? (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-2xl">
@@ -155,7 +155,7 @@ const FriendsList = ({ minimal = false }) => {
           ) : (
             <div className="text-center py-20 bg-gray-50/30 rounded-[2rem] border border-dashed border-gray-200">
               <div className="text-5xl mb-4">🙊</div>
-              <p className="text-gray-400 font-medium">No se encontraron amigos en esta lista.</p>
+              <p className="text-gray-400 font-medium">No se encontraron compas en esta lista.</p>
             </div>
           )}
         </div>
