@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
-import { Smile, Lightbulb, Users, X, Send } from 'lucide-react';
+import { Smile, Lightbulb, Users, X, Send, Trash2, Eye } from 'lucide-react';
 import defaultProfile from '../../assets/default-profile.png';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
@@ -98,7 +98,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
     const [commentText, setCommentText] = useState('');
 
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const { showToast } = useUI();
+    const { showToast, showConfirm } = useUI();
     const infoTimeoutRef = useRef(null);
 
     useEffect(() => {
@@ -151,6 +151,18 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
         } catch (err) { console.error(err); }
     };
 
+    const handleDeletePhoto = async () => {
+        showConfirm('Eliminar contenido', '¿Estás seguro de que deseas eliminar este contenido permanentemente?', async () => {
+            try {
+                await api.delete(`/gallery/${photo._id}`);
+                showToast('Contenido eliminado', 'success');
+                window.location.reload(); // Quick way to refresh feed
+            } catch (err) {
+                showToast('Error al eliminar', 'error');
+            }
+        });
+    };
+
     const handleShare = async (shareContent) => {
         try {
             await api.post(`/gallery/${photo._id}/share`, { content: shareContent });
@@ -170,13 +182,25 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
     return (
         <div className="relative h-full w-full flex-shrink-0 snap-start flex items-center justify-center bg-zinc-950 group" onClick={resetInfoTimeout}>
-            {/* The Main Photo */}
-            <img
-                src={photo.imageUrl}
-                alt={photo.description || photo.title}
-                onClick={onToggleFullscreen}
-                className={`h-full w-full transition-all duration-1000 cursor-pointer ${isFullscreen ? 'object-contain' : 'object-contain md:object-cover md:max-w-4xl lg:max-w-5xl group-hover:scale-105'}`}
-            />
+            {/* The Main Media */}
+            {photo.imageUrl?.toLowerCase().includes('.mp4') || photo.mediaType === 'video' ? (
+                <video
+                    src={photo.imageUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onClick={onToggleFullscreen}
+                    className={`h-full w-full transition-all duration-1000 cursor-pointer ${isFullscreen ? 'object-contain' : 'object-contain md:object-cover md:max-w-4xl lg:max-w-5xl group-hover:scale-105'}`}
+                />
+            ) : (
+                <img
+                    src={photo.imageUrl}
+                    alt={photo.description || photo.title}
+                    onClick={onToggleFullscreen}
+                    className={`h-full w-full transition-all duration-1000 cursor-pointer ${isFullscreen ? 'object-contain' : 'object-contain md:object-cover md:max-w-4xl lg:max-w-5xl group-hover:scale-105'}`}
+                />
+            )}
 
             {/* Gradient Overlay for Readability */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
@@ -252,6 +276,14 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
                             <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
 
+                            {/* View Count */}
+                            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/view">
+                                <Eye className="w-4 h-4 text-zinc-400 group-hover/view:text-white transition-colors" />
+                                <span className="text-[10px] font-black text-white">{localPhoto.views || 0}</span>
+                            </div>
+
+                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
+
                             {/* Comment Button */}
                             <button
                                 onClick={() => setShowComments(true)}
@@ -271,6 +303,19 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                 <Users className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />
                                 <span className="text-[10px] font-black text-white uppercase tracking-tighter">Viral</span>
                             </button>
+
+                            {/* Owner Deletion Button */}
+                            {currentUser?._id === photo.user?._id && (
+                                <>
+                                    <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(); }}
+                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-red-500/10 group/delete text-red-500/50 hover:text-red-500"
+                                    >
+                                        <Trash2 className="w-4 h-4 transition-colors" />
+                                    </button>
+                                </>
+                            )}
                         </div>
 
                     </div>

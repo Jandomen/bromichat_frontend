@@ -343,8 +343,14 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                         }}
                                     >
                                         {m.mediaType === 'video' ? (
-                                            <div className="w-full h-full bg-black flex items-center justify-center">
-                                                <Play size={16} className="text-white opacity-60" />
+                                            <div className="w-full h-full bg-gradient-to-br from-indigo-600/20 via-slate-900 to-black flex items-center justify-center relative group-hover:from-indigo-600/30 transition-all duration-500 overflow-hidden">
+                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                                                <div className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-500">
+                                                    <Play size={14} className="text-white fill-white translate-x-0.5" />
+                                                </div>
+                                                <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-indigo-600/80 backdrop-blur-md rounded text-[7px] font-black text-white uppercase tracking-[0.2em] border border-white/10 shadow-xl">
+                                                    REEL
+                                                </div>
                                             </div>
                                         ) : (
                                             <img
@@ -399,11 +405,14 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                                 playsInline
                                             />
                                             <div
-                                                className="absolute inset-0 bg-black/10 group-hover/video:bg-black/30 flex items-center justify-center cursor-pointer transition-all"
+                                                className="absolute inset-0 bg-black/10 group-hover/video:bg-black/40 flex items-center justify-center cursor-pointer transition-all duration-300"
                                                 onClick={() => setSelectedMedia(file)}
                                             >
-                                                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover/video:scale-110 transition-transform">
-                                                    <Play size={32} className="text-white fill-current" />
+                                                <div className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border-2 border-white/30 group-hover/video:scale-110 group-hover/video:border-white transition-all duration-500 shadow-2xl">
+                                                    <Play size={32} className="text-white fill-white translate-x-1" />
+                                                </div>
+                                                <div className="absolute top-4 right-4 px-3 py-1 bg-indigo-600/80 backdrop-blur-md rounded-full text-[10px] font-black text-white uppercase tracking-widest border border-white/20 shadow-lg">
+                                                    Video HD
                                                 </div>
                                             </div>
                                         </div>

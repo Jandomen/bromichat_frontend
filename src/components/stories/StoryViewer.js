@@ -250,10 +250,13 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
                                     setIsPaused(true);
                                     setShowViewers(true);
                                 }}
-                                className="text-white px-4 py-2 bg-white/10 hover:bg-white/20 transition-all border border-white/20 rounded-full flex items-center gap-2 backdrop-blur-md active:scale-95"
+                                className="text-white px-5 py-2.5 bg-gradient-to-r from-indigo-600/80 to-purple-600/80 hover:from-indigo-600 hover:to-purple-600 transition-all border border-white/30 rounded-2xl flex items-center gap-2.5 backdrop-blur-xl active:scale-95 shadow-lg shadow-indigo-900/20 group"
                             >
-                                <Eye size={18} className="drop-shadow-sm" />
-                                <span className="text-sm font-black drop-shadow-sm">{currentStory.views?.length || 0}</span>
+                                <Eye size={18} className="drop-shadow-sm group-hover:scale-110 transition-transform" />
+                                <div className="flex flex-col items-start leading-none">
+                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-70">Vistas</span>
+                                    <span className="text-sm font-black drop-shadow-sm mt-0.5">{currentStory.views?.length || 0}</span>
+                                </div>
                             </button>
 
                             <button
