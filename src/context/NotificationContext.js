@@ -5,6 +5,7 @@ import { AuthContext } from "./AuthContext";
 import { useUI } from "./UIContext";
 import { getFullImageUrl } from '../utils/getProfilePicture';
 import { requestForToken } from "../firebase";
+import { Badge } from '@capawesome/capacitor-badge';
 
 export const NotificationContext = createContext();
 
@@ -77,6 +78,22 @@ export const NotificationProvider = ({ children }) => {
     localStorage.setItem("soundEnabled", sonidoHabilitado);
     localStorage.setItem("soundFile", archivoSonido);
   }, [sonidoHabilitado, archivoSonido]);
+
+  // Update App Icon Badge
+  useEffect(() => {
+    const updateBadge = async () => {
+      try {
+        if (unreadCount > 0) {
+          await Badge.set({ count: unreadCount });
+        } else {
+          await Badge.clear();
+        }
+      } catch (e) {
+        console.warn("Badge logic only works on native devices", e);
+      }
+    };
+    updateBadge();
+  }, [unreadCount]);
 
   // Request browser notification permission and FCM token
   useEffect(() => {
