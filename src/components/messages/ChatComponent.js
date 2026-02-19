@@ -340,7 +340,7 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
       <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/subtle-white-feathers.png')" }}></div>
 
       {recipientInfo.username && recipientInfo.username !== 'User' ? (
-        <div className="flex items-center gap-2 sm:gap-4 px-4 sm:px-6 py-3 bg-white/90 backdrop-blur-md border-b sticky top-0 z-20 shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-4 px-4 sm:px-6 py-3 bg-white/90 backdrop-blur-md border-b sticky top-0 z-20 shadow-sm pt-[env(safe-area-inset-top)]">
           {onBack && (
             <button
               onClick={onBack}
@@ -611,7 +611,7 @@ const ChatComponent = ({ conversationId: propConversationId, isGroup: propIsGrou
         <div ref={endRef} />
       </div>
 
-      <div className="p-4 bg-white border-t z-20">
+      <div className="p-4 bg-white border-t z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <ChatInput onSend={handleSendMessage} conversationId={conversationId} />
       </div>
 

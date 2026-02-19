@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { FaPaperclip, FaTimes } from 'react-icons/fa';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
@@ -8,7 +8,7 @@ import { useOfflineQueue } from '../../hooks/useOfflineQueue';
 const CreatePost = ({ onPostCreated, groupId }) => {
   const [content, setContent] = useState('');
   const [mediaFiles, setMediaFiles] = useState([]);
-  const { token, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const fileInputRef = useRef(null);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
@@ -32,7 +32,52 @@ const CreatePost = ({ onPostCreated, groupId }) => {
     processFiles(files);
   };
 
-  const processFiles = (files) => {
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Max dimensions
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          }, 'image/jpeg', 0.7); // 0.7 quality
+        };
+      };
+    });
+  };
+
+  const processFiles = async (files) => {
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp',
       'video/mp4', 'video/webm', 'video/ogg',
@@ -40,14 +85,15 @@ const CreatePost = ({ onPostCreated, groupId }) => {
     ];
     const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'ogg', 'pdf'];
 
-    const validFiles = files.filter((file) => {
+    const validFiles = [];
+
+    for (const file of files) {
       const fileExt = file.name.split('.').pop().toLowerCase();
-
-
       const isValidType = allowedTypes.includes(file.type) || allowedExtensions.includes(fileExt);
+
       if (!isValidType) {
-        setError(`Archivo "${file.name}" no permitido. Solo imágenes, videos o PDFs.`);
-        return false;
+        setError(`Archivo "${file.name}" no permitido.`);
+        continue;
       }
 
       const maxSize = file.type.startsWith('video') || ['mp4', 'webm', 'ogg'].includes(fileExt)
@@ -55,15 +101,20 @@ const CreatePost = ({ onPostCreated, groupId }) => {
         : maxImagePdfSize;
 
       if (file.size > maxSize) {
-        setError(`Archivo "${file.name}" excede el tamaño máximo permitido (${maxSize / (1024 * 1024)}MB).`);
-        return false;
+        setError(`"${file.name}" es demasiado grande.`);
+        continue;
       }
 
-      return true;
-    });
+      if (file.type.startsWith('image/')) {
+        const compressed = await compressImage(file);
+        validFiles.push(compressed);
+      } else {
+        validFiles.push(file);
+      }
+    }
 
     if (mediaFiles.length + validFiles.length > maxFiles) {
-      setError(`No puedes subir más de ${maxFiles} archivos.`);
+      setError(`Máximo ${maxFiles} archivos.`);
       return;
     }
 
@@ -116,16 +167,15 @@ const CreatePost = ({ onPostCreated, groupId }) => {
     });
 
     const url = groupId
-      ? `${process.env.REACT_APP_API_BACKEND}/communities/${groupId}/posts`
-      : `${process.env.REACT_APP_API_BACKEND}/posts`;
+      ? `/communities/${groupId}/posts`
+      : `/posts`;
 
     try {
-      const res = await axios.post(
+      const res = await api.post(
         url,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
           },
         }

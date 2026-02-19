@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
 import { Smile, Lightbulb, Users, X, Send } from 'lucide-react';
@@ -37,9 +37,7 @@ const PhotoFeed = () => {
     useEffect(() => {
         const fetchFeed = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BACKEND}/gallery/feed`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await api.get('/gallery/feed');
                 setPhotos(res.data);
             } catch (err) {
             } finally {
@@ -58,7 +56,7 @@ const PhotoFeed = () => {
     return (
         <div
             ref={containerRef}
-            className={`flex flex-col overflow-y-scroll snap-y snap-mandatory hide-scrollbar bg-zinc-950 transition-all duration-500 ${isFullscreen ? 'fixed inset-0 h-screen w-screen z-[200] rounded-none' : 'h-[85vh] rounded-2xl shadow-2xl'}`}
+            className={`flex flex-col overflow-y-scroll snap-y snap-mandatory hide-scrollbar bg-zinc-950 transition-all duration-500 ${isFullscreen ? 'fixed inset-0 h-screen w-screen z-[200] rounded-none' : 'h-[85vh] rounded-2xl shadow-2xl mt-[env(safe-area-inset-top)]'}`}
         >
             {/* Close button for Fullscreen */}
             {isFullscreen && (
@@ -67,7 +65,7 @@ const PhotoFeed = () => {
                         e.stopPropagation();
                         setIsFullscreen(false);
                     }}
-                    className="fixed top-6 right-6 z-[250] p-4 bg-black/40 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-90 opacity-100"
+                    className="fixed top-[calc(1.5rem+env(safe-area-inset-top))] right-6 z-[250] p-4 bg-black/40 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all duration-500 shadow-2xl active:scale-90 opacity-100"
                 >
                     <X size={28} strokeWidth={3} />
                 </button>
@@ -116,9 +114,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
     const handleReact = async (type) => {
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/react`, { type }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.post(`/gallery/${photo._id}/react`, { type });
             setLocalPhoto(prev => ({ ...prev, reactions: res.data }));
         } catch (err) { console.error(err); }
     };
@@ -130,13 +126,9 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
         try {
             let res;
             if (commentId) {
-                res = await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/comment/${commentId}/reply`, { comment: text }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                res = await api.post(`/gallery/${photo._id}/comment/${commentId}/reply`, { comment: text });
             } else {
-                res = await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/comment`, { comment: text }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                res = await api.post(`/gallery/${photo._id}/comment`, { comment: text });
                 setCommentText('');
             }
             setLocalPhoto(prev => ({ ...prev, comments: res.data }));
@@ -145,9 +137,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
     const handleEditComment = async (text, commentId) => {
         try {
-            const res = await axios.put(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/comment/${commentId}`, { comment: text }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.put(`/gallery/${photo._id}/comment/${commentId}`, { comment: text });
             setLocalPhoto(prev => ({ ...prev, comments: res.data }));
             showToast('Comentario actualizado', 'success');
         } catch (err) { console.error(err); }
@@ -155,9 +145,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
     const handleDeleteComment = async (commentId) => {
         try {
-            const res = await axios.delete(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/comment/${commentId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.delete(`/gallery/${photo._id}/comment/${commentId}`);
             setLocalPhoto(prev => ({ ...prev, comments: res.data }));
             showToast('Comentario eliminado', 'success');
         } catch (err) { console.error(err); }
@@ -165,9 +153,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
     const handleShare = async (shareContent) => {
         try {
-            await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/share`, { content: shareContent }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.post(`/gallery/${photo._id}/share`, { content: shareContent });
             showToast('¡Foto viralizada en tu muro!', 'success');
         } catch (err) { showToast('Error al viralizar', 'error'); }
     };
@@ -214,19 +200,19 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
 
                             <div className="flex flex-col min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <span className="font-black text-white text-lg tracking-tight truncate">@{photo.user?.username}</span>
-                                    <span className="px-2 py-0.5 bg-indigo-600/20 text-indigo-400 text-[9px] font-black uppercase rounded-md border border-indigo-600/30">Creative</span>
+                                    <span className="font-black text-white text-base tracking-tight truncate">@{photo.user?.username}</span>
+                                    <span className="px-1.5 py-0.5 bg-indigo-600/20 text-indigo-400 text-[8px] font-black uppercase rounded-md border border-indigo-600/30">Creative</span>
                                 </div>
 
-                                <div className="mt-1">
-                                    <p className="text-zinc-300 text-sm leading-relaxed font-medium">
-                                        {showFullDescription ? photo.description : truncateDescription(photo.description)}
-                                        {photo.description?.length > 80 && (
+                                <div className="mt-0.5">
+                                    <p className="text-zinc-300 text-[11px] leading-snug font-medium">
+                                        {showFullDescription ? photo.description : truncateDescription(photo.description, 60)}
+                                        {photo.description?.length > 60 && (
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setShowFullDescription(!showFullDescription); }}
-                                                className="ml-2 text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-widest"
+                                                className="ml-1 text-indigo-400 hover:text-indigo-300 font-bold text-[10px] uppercase tracking-widest"
                                             >
-                                                {showFullDescription ? 'Ver menos' : 'Ver más'}
+                                                {showFullDescription ? 'Menos' : 'Más'}
                                             </button>
                                         )}
                                     </p>
@@ -235,7 +221,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                         </div>
 
                         {/* NEW: Horizontal Interaction Bar */}
-                        <div className="flex items-center justify-center gap-2 sm:gap-4 bg-black/30 p-2 rounded-[1.75rem] border border-white/5 self-center md:self-auto">
+                        <div className="flex items-center justify-center gap-1 sm:gap-2 bg-black/30 p-1.5 rounded-[1.5rem] border border-white/5 self-center md:self-auto">
                             {/* Reaction Button */}
                             <div className="relative group/react">
                                 <button
@@ -248,12 +234,12 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                             handleReact('like');
                                         }
                                     }}
-                                    className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
                                 >
                                     <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
-                                        {currentReactionData ? <span className="text-2xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />}
+                                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />}
                                     </div>
-                                    <span className="text-xs font-black text-white">{localPhoto.reactions?.length || 0}</span>
+                                    <span className="text-[10px] font-black text-white">{localPhoto.reactions?.length || 0}</span>
                                 </button>
                                 <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-1 group-hover/react:translate-y-0 z-[150]">
                                     <ReactionPicker
@@ -264,26 +250,26 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                 </div>
                             </div>
 
-                            <div className="w-[1px] h-8 bg-white/10 mx-1" />
+                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
 
                             {/* Comment Button */}
                             <button
                                 onClick={() => setShowComments(true)}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
                             >
-                                <Lightbulb className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-xs font-black text-white">{localPhoto.comments?.length || 0}</span>
+                                <Lightbulb className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />
+                                <span className="text-[10px] font-black text-white">{localPhoto.comments?.length || 0}</span>
                             </button>
 
-                            <div className="w-[1px] h-8 bg-white/10 mx-1" />
+                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
 
                             {/* Share Button */}
                             <button
                                 onClick={() => setIsShareModalOpen(true)}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
                             >
-                                <Users className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-xs font-black text-white uppercase tracking-tighter">Viralizar</span>
+                                <Users className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-tighter">Viral</span>
                             </button>
                         </div>
 
@@ -301,7 +287,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                         </button>
                     </div>
 
-                    <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                    <div className="flex-grow overflow-y-auto p-4 space-y-4 custom-scrollbar overscroll-contain touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                         {localPhoto.comments?.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full opacity-30">
                                 <Lightbulb size={48} className="text-zinc-500 mb-2" />
@@ -323,7 +309,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                         )}
                     </div>
 
-                    <form onSubmit={handleComment} className="p-4 bg-black/50 border-t border-white/5 flex gap-2">
+                    <form onSubmit={handleComment} className="p-4 bg-black/50 border-t border-white/5 flex gap-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                         <input
                             type="text"
                             value={commentText}

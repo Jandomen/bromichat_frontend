@@ -106,7 +106,7 @@ const FriendsPosts = () => {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Tu Feed</h2>
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Novedades recientes</h2>
         <button
           onClick={() => fetchFriendsPosts(true)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-primary-600"

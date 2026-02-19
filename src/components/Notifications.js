@@ -187,9 +187,9 @@ export default function Notifications() {
                     {notification.message}
                   </div>
                   <div className="text-xs text-gray-400 mt-1 font-medium flex items-center gap-1">
-                    {new Date(notification.createdAt).toLocaleString(undefined, {
-                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}
+                    {new Date(notification.createdAt).toLocaleDateString(undefined, {
+                      day: 'numeric', month: 'short', year: '2-digit'
+                    })} • {new Date(notification.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
 

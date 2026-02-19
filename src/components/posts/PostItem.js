@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -31,7 +31,7 @@ import ShareModal from './ShareModal';
 // El componente CommentItem interno ha sido eliminado para usar el universal de ../UI/CommentItem
 
 const PostItem = ({ post, onUpdate, isDetail = false }) => {
-    const { token, user, setUser } = useContext(AuthContext);
+    const { user, setUser } = useContext(AuthContext);
     const { showToast, showConfirm, setSelectedPostId } = useUI();
     const [editingPostId, setEditingPostId] = useState(null);
     const [isReactionsModalOpen, setIsReactionsModalOpen] = useState(false);
@@ -82,10 +82,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
         if (onUpdate) onUpdate(optimisticPost);
 
         try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_BACKEND}/posts/${postId}/react`,
-                { type },
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await api.post(
+                `/posts/${postId}/react`,
+                { type }
             );
             if (onUpdate) onUpdate(res.data);
         } catch (error) {
@@ -96,10 +95,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
 
     const handleShare = async (postId, shareContent = '') => {
         try {
-            await axios.post(
-                `${process.env.REACT_APP_API_BACKEND}/posts/${postId}/share`,
-                { content: shareContent },
-                { headers: { Authorization: `Bearer ${token}` } }
+            await api.post(
+                `/posts/${postId}/share`,
+                { content: shareContent }
             );
             showToast('¡Publicación compartida!', 'success');
             if (onUpdate) onUpdate();
@@ -114,10 +112,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
         if (!content.trim()) return;
 
         try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_BACKEND}/posts/${post._id}/comment`,
-                { comment: content },
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await api.post(
+                `/posts/${post._id}/comment`,
+                { comment: content }
             );
             if (onUpdate) onUpdate(res.data);
             e.target.reset();
@@ -129,10 +126,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
 
     const handleReplyComment = async (content, parentId) => {
         try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_BACKEND}/posts/${post._id}/comment/${parentId}/reply`,
-                { comment: content },
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await api.post(
+                `/posts/${post._id}/comment/${parentId}/reply`,
+                { comment: content }
             );
             if (onUpdate) onUpdate(res.data);
             showToast('Respuesta enviada', 'success');
@@ -143,10 +139,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
 
     const handleEditComment = async (content, commentId) => {
         try {
-            const res = await axios.put(
-                `${process.env.REACT_APP_API_BACKEND}/posts/${post._id}/comment/${commentId}`,
-                { comment: content },
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await api.put(
+                `/posts/${post._id}/comment/${commentId}`,
+                { comment: content }
             );
             if (onUpdate) onUpdate(res.data);
             showToast('Comentario actualizado', 'success');
@@ -158,9 +153,8 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     const handleDeleteComment = async (commentId) => {
         showConfirm('Eliminar comentario', '¿Deseas eliminar este comentario?', async () => {
             try {
-                const res = await axios.delete(
-                    `${process.env.REACT_APP_API_BACKEND}/posts/${post._id}/comment/${commentId}`,
-                    { headers: { Authorization: `Bearer ${token}` } }
+                const res = await api.delete(
+                    `/posts/${post._id}/comment/${commentId}`
                 );
                 if (onUpdate) onUpdate(res.data.post || res.data);
                 showToast('Comentario eliminado', 'success');
@@ -173,9 +167,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     const handleDeletePost = async (postId) => {
         showConfirm('Eliminar publicación', '¿Eliminar esta publicación permanente?', async () => {
             try {
-                await axios.delete(`${process.env.REACT_APP_API_BACKEND}/posts/${postId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                await api.delete(`/posts/${postId}`);
                 showToast('Publicación eliminada', 'success');
                 if (onUpdate) onUpdate(null, postId);
             } catch (error) {
@@ -191,10 +183,8 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
     const handleSavePost = async (e) => {
         e.stopPropagation();
         try {
-            const res = await axios.post(
-                `${process.env.REACT_APP_API_BACKEND}/users/save/${post._id}`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await api.post(
+                `/users/save/${post._id}`
             );
 
             // Optimistically update user.savedPosts in AuthContext
@@ -301,10 +291,9 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                 initialContent={post.content}
                                 onSave={async (newContent) => {
                                     try {
-                                        const res = await axios.put(
-                                            `${process.env.REACT_APP_API_BACKEND}/posts/${editingPostId}`,
-                                            { content: newContent },
-                                            { headers: { Authorization: `Bearer ${token}` } }
+                                        const res = await api.put(
+                                            `/posts/${editingPostId}`,
+                                            { content: newContent }
                                         );
                                         setEditingPostId(null);
                                         if (onUpdate) onUpdate(res.data);

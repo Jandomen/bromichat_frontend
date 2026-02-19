@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { Send, MoreHorizontal, Edit2, Trash2 } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
 import { useUI } from '../../context/UIContext';
@@ -34,6 +34,7 @@ const CommentItem = ({
     const [replyText, setReplyText] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(comment.comment);
+    const [showMenu, setShowMenu] = useState(false);
 
     const children = useMemo(() => {
         return allComments.filter(c => {
@@ -126,21 +127,21 @@ const CommentItem = ({
                             </div>
 
                             {isEditing ? (
-                                <div className="space-y-2 mt-2 min-w-[200px]">
+                                <div className="space-y-2 mt-2 min-w-[180px]">
                                     <textarea
                                         autoFocus
                                         value={editText}
                                         onChange={e => setEditText(e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-primary-500/30 transition-all resize-none shadow-sm"
+                                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] text-gray-800 focus:outline-none focus:border-primary-500/30 transition-all resize-none shadow-sm"
                                         rows="2"
                                     />
                                     <div className="flex justify-end gap-2">
-                                        <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[11px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">Cancelar</button>
-                                        <button onClick={handleUpdate} className="px-4 py-1 bg-primary-600 text-white rounded-md text-[11px] font-bold hover:brightness-110 active:scale-95 transition-all">Guardar</button>
+                                        <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[10px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">Cancelar</button>
+                                        <button onClick={handleUpdate} className="px-4 py-1 bg-primary-600 text-white rounded-md text-[10px] font-bold hover:brightness-110 active:scale-95 transition-all">Guardar</button>
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-[14px] leading-tight text-gray-800 break-words">{comment.comment}</p>
+                                <p className="text-[12px] leading-snug text-gray-800 break-words">{comment.comment}</p>
                             )}
                         </div>
 
@@ -161,19 +162,36 @@ const CommentItem = ({
                             </button>
 
                             {isOwner && !isEditing && (
-                                <div className="flex items-center gap-3">
+                                <div className="relative">
                                     <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="text-[12px] font-bold text-gray-400 hover:text-gray-600 transition-colors"
+                                        onClick={() => setShowMenu(!showMenu)}
+                                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
                                     >
-                                        Editar
+                                        <MoreHorizontal size={14} />
                                     </button>
-                                    <button
-                                        onClick={() => onDelete(comment._id)}
-                                        className="text-[12px] font-bold text-gray-400 hover:text-red-500 transition-colors"
-                                    >
-                                        Borrar
-                                    </button>
+
+                                    {showMenu && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-50"
+                                                onClick={() => setShowMenu(false)}
+                                            />
+                                            <div className="absolute left-0 bottom-full mb-1 w-28 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-[60] animate-in fade-in zoom-in-95 duration-100 origin-bottom-left">
+                                                <button
+                                                    onClick={() => { setIsEditing(true); setShowMenu(false); }}
+                                                    className="w-full text-left px-3 py-2 text-[10px] font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                >
+                                                    <Edit2 size={12} /> Editar
+                                                </button>
+                                                <button
+                                                    onClick={() => { onDelete(comment._id); setShowMenu(false); }}
+                                                    className="w-full text-left px-3 py-2 text-[10px] font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                >
+                                                    <Trash2 size={12} /> Borrar
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>

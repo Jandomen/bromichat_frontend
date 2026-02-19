@@ -29,7 +29,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-[100] bg-gradient-to-r from-black via-red-900 to-black text-white shadow-2xl border-b border-red-900/30 backdrop-blur-md bg-opacity-95">
+      <header className="fixed top-0 left-0 w-full z-[100] bg-gradient-to-r from-black via-red-900 to-black text-white shadow-2xl border-b border-red-900/30 backdrop-blur-md bg-opacity-95 pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3">
           <div className="flex flex-row justify-between items-center gap-2 sm:gap-4">
 
@@ -76,7 +76,7 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Backdrop & Drawer */}
-        <div className={`lg:hidden fixed inset-0 top-[60px] bg-black/60 backdrop-blur-sm transition-all duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`} onClick={() => setIsMenuOpen(false)}>
+        <div className={`lg:hidden fixed inset-0 top-[calc(60px+env(safe-area-inset-top))] bg-black/60 backdrop-blur-sm transition-all duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`} onClick={() => setIsMenuOpen(false)}>
           <div
             className={`absolute right-0 top-0 h-screen w-2/3 max-w-[280px] bg-zinc-900 shadow-2xl p-6 transition-transform duration-500 ease-out border-l border-white/10 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
             onClick={e => e.stopPropagation()}
@@ -111,7 +111,7 @@ const Header = () => {
         </div>
       </header>
       {/* Reduced spacer height for mobile */}
-      <div className="h-[60px] sm:h-[100px]"></div>
+      <div className="h-[calc(60px+env(safe-area-inset-top))] sm:h-[calc(100px+env(safe-area-inset-top))]"></div>
     </>
   );
 };

@@ -45,7 +45,7 @@ const MobileNav = ({ onPlusClick }) => {
     return (
         <>
             {/* Main Nav Bar */}
-            <div className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md z-[100] bg-white/10 backdrop-blur-xl border border-white/10 px-6 py-2 flex justify-between items-center shadow-[0_15px_40px_-5px_rgba(0,0,0,0.3)] rounded-[2.5rem] ring-1 ring-white/5 transition-[transform,opacity] duration-700 ${isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-90 pointer-events-none'}`}>
+            <div className={`lg:hidden fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-md z-[100] bg-white/10 backdrop-blur-xl border border-white/10 px-6 py-2 flex justify-between items-center shadow-[0_15px_40px_-5px_rgba(0,0,0,0.3)] rounded-[2.5rem] ring-1 ring-white/5 transition-[transform,opacity] duration-700 ${isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-90 pointer-events-none'}`}>
                 <Link to="/dashboard" className={`p-2 flex flex-col items-center gap-1 transition-all active:scale-90 ${isActive('/dashboard') ? 'text-red-600' : 'text-gray-500'}`}>
                     <div className={`p-1.5 rounded-2xl transition-all duration-300 ${isActive('/dashboard')
                         ? 'bg-red-500/20 ring-2 ring-red-400/80 shadow-[0_0_15px_rgba(220,38,38,0.5)]'
@@ -128,7 +128,7 @@ const MobileNav = ({ onPlusClick }) => {
             {/* Floating Toggle Button (visible when nav is hidden) */}
             <button
                 onClick={() => setIsVisible(true)}
-                className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[110] w-14 h-14 bg-red-600/10 backdrop-blur-xl text-red-900 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-90 border border-red-500/20 shadow-lg shadow-red-500/10 select-none ${!isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-50 pointer-events-none'}`}
+                className={`lg:hidden fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[110] w-14 h-14 bg-red-600/10 backdrop-blur-xl text-red-900 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-90 border border-red-500/20 shadow-lg shadow-red-500/10 select-none ${!isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-32 opacity-0 scale-50 pointer-events-none'}`}
             >
                 <span className="text-2xl font-black tracking-tighter">?</span>
             </button>

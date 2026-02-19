@@ -3,6 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BACKEND,
   withCredentials: true,
+  timeout: 60000, // 60 segundos
 });
 
 api.interceptors.request.use(
