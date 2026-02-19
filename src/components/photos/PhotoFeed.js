@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
-import { Smile, Lightbulb, Users, X, Send, Trash2, Eye } from 'lucide-react';
+import { Smile, Lightbulb, Users, X, Send, Trash2, Eye, Plus } from 'lucide-react';
 import defaultProfile from '../../assets/default-profile.png';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
@@ -205,121 +206,119 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
             {/* Gradient Overlay for Readability */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-            {/* NEW: Integrated Social Dashboard (Moving away from TikTok style) */}
-            <div className={`absolute bottom-6 inset-x-4 sm:inset-x-8 transition-all duration-700 transform ${showInfo && !showComments ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
-                <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 p-4 sm:p-6 shadow-2xl">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            {/* NEW: TikTok Style UI (Less Cluttered) */}
+            <div className={`absolute inset-0 z-50 pointer-events-none transition-opacity duration-500 ${showInfo && !showComments ? 'opacity-100' : 'opacity-0'}`}>
 
-                        {/* User & Description Info */}
-                        <div className="flex items-center gap-4 flex-grow">
-                            <div className="relative group/avatar">
-                                <img
-                                    src={getFullImageUrl(photo.user?.profilePicture)}
-                                    className="w-14 h-14 rounded-[1.25rem] border-2 border-indigo-500/50 shadow-lg object-cover transform transition-transform group-hover/avatar:rotate-3"
-                                    alt=""
-                                    onError={e => e.target.src = defaultProfile}
-                                />
-                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-zinc-900 rounded-full" />
-                            </div>
-
-                            <div className="flex flex-col min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-black text-white text-base tracking-tight truncate">@{photo.user?.username}</span>
-                                    <span className="px-1.5 py-0.5 bg-indigo-600/20 text-indigo-400 text-[8px] font-black uppercase rounded-md border border-indigo-600/30">Creative</span>
-                                </div>
-
-                                <div className="mt-0.5">
-                                    <p className="text-zinc-300 text-[11px] leading-snug font-medium">
-                                        {showFullDescription ? photo.description : truncateDescription(photo.description, 60)}
-                                        {photo.description?.length > 60 && (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); setShowFullDescription(!showFullDescription); }}
-                                                className="ml-1 text-indigo-400 hover:text-indigo-300 font-bold text-[10px] uppercase tracking-widest"
-                                            >
-                                                {showFullDescription ? 'Menos' : 'Más'}
-                                            </button>
-                                        )}
-                                    </p>
-                                </div>
-                            </div>
+                {/* Right Side Interaction Bar */}
+                <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 pointer-events-auto">
+                    {/* Profile */}
+                    <div className="relative group/avatar">
+                        <Link to={`/user/${photo.user?._id}`} onClick={(e) => e.stopPropagation()}>
+                            <img
+                                src={getFullImageUrl(photo.user?.profilePicture)}
+                                className="w-12 h-12 rounded-full border-2 border-white shadow-xl object-cover"
+                                alt=""
+                                onError={e => e.target.src = defaultProfile}
+                            />
+                        </Link>
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-zinc-900 shadow-lg">
+                            <Plus size={12} className="text-white" />
                         </div>
+                    </div>
 
-                        {/* NEW: Horizontal Interaction Bar */}
-                        <div className="flex items-center justify-center gap-1 sm:gap-2 bg-black/30 p-1.5 rounded-[1.5rem] border border-white/5 self-center md:self-auto">
-                            {/* Reaction Button */}
-                            <div className="relative group/react">
+                    {/* Like/Reaction */}
+                    <div className="flex flex-col items-center gap-1 group/react relative">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const userReaction = localPhoto.reactions?.find(r => r.user === currentUser?._id);
+                                if (userReaction) {
+                                    handleReact(userReaction.type);
+                                } else {
+                                    handleReact('like');
+                                }
+                            }}
+                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
+                        >
+                            {currentReactionData ? <span className="text-2xl">{currentReactionData.emoji}</span> : <Smile className="w-6 h-6" />}
+                        </button>
+                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.reactions?.length || 0}</span>
+
+                        {/* Reaction Picker on side */}
+                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-300 absolute right-14 top-0">
+                            <ReactionPicker
+                                onSelect={(type) => handleReact(type)}
+                                currentReaction={localPhoto.reactions?.find(r => r.user === currentUser?._id)?.type}
+                                align="right"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Comments */}
+                    <div className="flex flex-col items-center gap-1">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowComments(true); }}
+                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
+                        >
+                            <Lightbulb className="w-6 h-6" />
+                        </button>
+                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.comments?.length || 0}</span>
+                    </div>
+
+                    {/* Views */}
+                    <div className="flex flex-col items-center gap-1">
+                        <div className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg">
+                            <Eye className="w-6 h-6 text-zinc-300" />
+                        </div>
+                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.views || 0}</span>
+                    </div>
+
+                    {/* Share */}
+                    <div className="flex flex-col items-center gap-1">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(true); }}
+                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
+                        >
+                            <Users className="w-6 h-6" />
+                        </button>
+                        <span className="text-[10px] font-bold text-white uppercase tracking-tighter drop-shadow-lg">VIRAL</span>
+                    </div>
+
+                    {/* Delete (Owner) */}
+                    {currentUser?._id === photo.user?._id && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(); }}
+                            className="w-10 h-10 rounded-full bg-red-600/40 backdrop-blur-md flex items-center justify-center text-white border border-red-600/50 active:scale-95 transition-all shadow-lg sm:opacity-50 sm:hover:opacity-100"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Bottom Left Info Panel */}
+                <div className="absolute left-4 bottom-8 right-20 flex flex-col gap-2 pointer-events-auto">
+                    <div className="flex items-center gap-2">
+                        <span className="font-black text-white text-base tracking-tight drop-shadow-lg">
+                            @{photo.user?.username || 'Cargando...'}
+                        </span>
+                        <div className="px-1.5 py-0.5 bg-indigo-600/60 rounded text-[8px] font-black text-white uppercase border border-indigo-400/50">CREATIVO</div>
+                    </div>
+
+                    <div className="max-h-24 overflow-y-auto no-scrollbar">
+                        <p className="text-white text-sm font-medium leading-snug drop-shadow-md">
+                            {showFullDescription ? photo.description : truncateDescription(photo.description, 100)}
+                            {photo.description?.length > 100 && (
                                 <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const userReaction = localPhoto.reactions?.find(r => r.user === currentUser?._id);
-                                        if (userReaction) {
-                                            handleReact(userReaction.type);
-                                        } else {
-                                            handleReact('like');
-                                        }
-                                    }}
-                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                    onClick={(e) => { e.stopPropagation(); setShowFullDescription(!showFullDescription); }}
+                                    className="ml-1 text-zinc-300 font-bold"
                                 >
-                                    <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
-                                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />}
-                                    </div>
-                                    <span className="text-[10px] font-black text-white">{localPhoto.reactions?.length || 0}</span>
+                                    {showFullDescription ? ' [Menos]' : ' [Ver más]'}
                                 </button>
-                                <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-1 group-hover/react:translate-y-0 z-[150]">
-                                    <ReactionPicker
-                                        onSelect={(type) => handleReact(type)}
-                                        currentReaction={localPhoto.reactions?.find(r => r.user === currentUser?._id)?.type}
-                                        align="center"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
-
-                            {/* View Count */}
-                            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/view">
-                                <Eye className="w-4 h-4 text-zinc-400 group-hover/view:text-white transition-colors" />
-                                <span className="text-[10px] font-black text-white">{localPhoto.views || 0}</span>
-                            </div>
-
-                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
-
-                            {/* Comment Button */}
-                            <button
-                                onClick={() => setShowComments(true)}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
-                            >
-                                <Lightbulb className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-[10px] font-black text-white">{localPhoto.comments?.length || 0}</span>
-                            </button>
-
-                            <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
-
-                            {/* Share Button */}
-                            <button
-                                onClick={() => setIsShareModalOpen(true)}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/5 group/btn"
-                            >
-                                <Users className="w-4 h-4 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-[10px] font-black text-white uppercase tracking-tighter">Viral</span>
-                            </button>
-
-                            {/* Owner Deletion Button */}
-                            {currentUser?._id === photo.user?._id && (
-                                <>
-                                    <div className="w-[1px] h-6 bg-white/10 mx-0.5" />
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(); }}
-                                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-red-500/10 group/delete text-red-500/50 hover:text-red-500"
-                                    >
-                                        <Trash2 className="w-4 h-4 transition-colors" />
-                                    </button>
-                                </>
                             )}
-                        </div>
-
+                        </p>
                     </div>
                 </div>
+
             </div>
 
             {/* Comments Drawer (TikTok Style) */}

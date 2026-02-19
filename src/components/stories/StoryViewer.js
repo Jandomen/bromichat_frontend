@@ -177,7 +177,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
     }
 
     return (
-        <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center overflow-hidden">
+        <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden">
             {/* Background Backdrop for Close */}
             <div className="absolute inset-0 bg-black/90 cursor-default" onClick={onClose} />
 
@@ -219,7 +219,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
                 </div>
 
                 {/* Header User Info */}
-                <div className="absolute top-12 md:top-8 left-0 right-0 z-20 px-4 flex items-center justify-between">
+                <div className="absolute top-10 md:top-8 left-0 right-0 z-20 px-4 flex items-center justify-between">
                     <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3.5 hover:opacity-90 transition-all active:scale-95 group">
                         <div className="relative">
                             <img
@@ -242,7 +242,7 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
                     </Link>
 
                     {/* Controls (Owner) */}
-                    {currentGroup.user._id === currentUserId && (
+                    {(currentGroup.user._id?.toString() === currentUserId?.toString()) && (
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={(e) => {
