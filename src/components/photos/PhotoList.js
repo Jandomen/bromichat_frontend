@@ -203,7 +203,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
   if (!photos || photos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-zinc-400 bg-zinc-50 rounded-[3rem] border-2 border-dashed border-zinc-100">
-        <FaGlobe className="mb-4 opacity-10" size={64} />
+        <Globe className="mb-4 opacity-10" size={64} />
         <p className="font-bold uppercase tracking-[0.2em] text-xs text-zinc-500">No hay momentos cautivadores aún</p>
       </div>
     );
@@ -327,19 +327,19 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
             {type !== 'pinterest' && ((typeof photo.user === 'object' ? photo.user._id : photo.user) === currentUser?._id) && (
               <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                 <Menu as="div" className="relative">
-                  <Menu.Button className="p-1.5 bg-black/50 text-white rounded-full backdrop-blur-md"><FaEllipsisV size={10} /></Menu.Button>
+                  <Menu.Button className="p-1.5 bg-black/50 text-white rounded-full backdrop-blur-md"><MoreVertical size={10} /></Menu.Button>
                   <Menu.Items className="absolute right-0 mt-1 w-36 bg-zinc-800 rounded-xl shadow-2xl overflow-hidden border border-white/10 z-[100]">
                     <Menu.Item>
                       {({ active }) => (
                         <button className={`${active ? 'bg-indigo-600' : ''} w-full text-left px-4 py-2 text-[10px] font-bold text-white flex items-center gap-2`} onClick={() => handleEditClick(photo)}>
-                          <FaEdit size={10} /> Editar
+                          <Edit3 size={10} /> Editar
                         </button>
                       )}
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
                         <button className={`${active ? 'bg-red-600' : ''} w-full text-left px-4 py-2 text-[10px] font-bold text-white flex items-center gap-2`} onClick={() => handleDelete(photo._id)}>
-                          <FaTrash size={10} /> Eliminar
+                          <Trash2 size={10} /> Eliminar
                         </button>
                       )}
                     </Menu.Item>
@@ -420,7 +420,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
               <div className="flex-grow overflow-y-auto p-4 sm:p-6 space-y-6 max-h-[50vh] md:max-h-full custom-scrollbar">
                 {currentPhotoDetails?.comments?.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 opacity-20">
-                    <FaComment size={40} className="mb-4 text-white" />
+                    <Lightbulb size={40} className="mb-4 text-white" />
                     <p className="text-[10px] font-black uppercase text-white tracking-widest">No hay comentarios aún</p>
                   </div>
                 ) : (
@@ -467,7 +467,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
           <div className="bg-zinc-900 border border-white/10 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-white/5 flex justify-between items-center">
               <h3 className="text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2">
-                <FaEdit className="text-indigo-500" /> Editar Foto
+                <Edit3 className="text-indigo-500" /> Editar Foto
               </h3>
               <button onClick={() => setEditingPhoto(null)} className="text-zinc-500 hover:text-white transition-colors">&times;</button>
             </div>
