@@ -14,7 +14,7 @@ import ChangeEmail from "./Settings/ChangeEmail";
 import PrivacySettings from "./Settings/PrivacySettings";
 import BiometricSettings from "./Settings/BiometricSettings";
 import StorySettings from "./Settings/StorySettings";
-import SosSettings from "./Settings/SosSettings";
+import PermissionSettings from "./Settings/PermissionSettings"; // Updated Import
 import StoryArchive from "./Settings/StoryArchive";
 import {
   User,
@@ -30,9 +30,9 @@ import {
   Mail,
   Fingerprint,
   History,
-  AlertTriangle,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  Smartphone // Added icon for permissions
 } from "lucide-react";
 
 const Settings = () => {
@@ -115,7 +115,7 @@ const Settings = () => {
   const sections = [
     { id: 'profile', icon: User, label: 'Perfil Público' },
     { id: 'security', icon: Shield, label: 'Seguridad' },
-    { id: 'sos', icon: AlertTriangle, label: 'Emergencia SOS' },
+    { id: 'permissions', icon: Smartphone, label: 'Permisos' }, // Changed to Permissions
     { id: 'notifications', icon: Bell, label: 'Notificaciones' },
     { id: 'stories', icon: History, label: 'Historias' },
     { id: 'archive', icon: History, label: 'Archivo Historias' },
@@ -346,19 +346,19 @@ const Settings = () => {
                   </div>
                 )}
 
-                {/* SOS Section */}
-                {activeTab === 'sos' && (
+                {/* Permissions Section (Replaces SOS) */}
+                {activeTab === 'permissions' && (
                   <div className="p-6 sm:p-8">
                     <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-red-50 text-red-600 rounded-xl">
-                        <AlertTriangle className="w-6 h-6" />
+                      <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <Smartphone className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Configuración SOS</h3>
-                        <p className="text-sm text-gray-500">Gestiona alertas y contactos de emergencia</p>
+                        <h3 className="text-lg font-bold text-gray-900">Permisos de la Aplicación</h3>
+                        <p className="text-sm text-gray-500">Administra el acceso a hardware y servicios</p>
                       </div>
                     </div>
-                    <SosSettings />
+                    <PermissionSettings />
                   </div>
                 )}
 

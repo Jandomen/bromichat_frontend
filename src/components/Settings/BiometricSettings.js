@@ -6,8 +6,26 @@ import { useUI } from '../../context/UIContext';
 const BiometricSettings = () => {
     const [loading, setLoading] = useState(false);
     const { showToast } = useUI();
+    const [isSupported, setIsSupported] = useState(true);
+    const [supportError, setSupportError] = useState('');
+
+    React.useEffect(() => {
+        // Check for WebAuthn support and Secure Context
+        if (!window.isSecureContext) {
+            setIsSupported(false);
+            setSupportError('La biometría requiere HTTPS o localhost.');
+        } else if (!window.PublicKeyCredential) {
+            setIsSupported(false);
+            setSupportError('Tu navegador o dispositivo no soporta biometría.');
+        }
+    }, []);
 
     const handleRegisterBiometrics = async () => {
+        if (!isSupported) {
+            showToast(supportError, 'error');
+            return;
+        }
+
         setLoading(true);
         try {
             // 1. Get registration options from server
@@ -27,7 +45,11 @@ const BiometricSettings = () => {
             }
         } catch (error) {
             console.error('Biometric registration error:', error);
-            showToast(error.response?.data?.error || 'Error al configurar la biometría.', 'error');
+            if (error.name === 'NotAllowedError') {
+                showToast('Cancelado o tiempo de espera agotado. Inténtalo de nuevo.', 'error');
+            } else {
+                showToast(error.response?.data?.error || 'Error al configurar la biometría.', 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -39,14 +61,20 @@ const BiometricSettings = () => {
                 <span className="text-2xl">☝️</span> Seguridad Biométrica
             </h3>
             <p className="text-gray-400 text-sm mb-6">
-                Configura tu huella dactilar o reconocimiento facial para iniciar sesión de forma más rápida y segura sin necesidad de ingresar tu contraseña.
+                Configura tu huella dactilar o reconocimiento facial para iniciar sesión de forma más rápida y segura.
             </p>
+
+            {!isSupported && (
+                <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-xl text-yellow-200 text-xs">
+                    ⚠️ {supportError}
+                </div>
+            )}
 
             <div className="flex flex-col gap-4">
                 <button
                     onClick={handleRegisterBiometrics}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-gradient-to-r from-red-600 to-red-800 rounded-xl font-semibold shadow-lg hover:shadow-red-900/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                    disabled={loading || !isSupported}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-gradient-to-r from-red-600 to-red-800 rounded-xl font-semibold shadow-lg hover:shadow-red-900/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? 'Procesando...' : 'Activar Huella Dactilar'}
                 </button>

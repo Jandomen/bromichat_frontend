@@ -29,24 +29,38 @@ const Login = () => {
     }
   }, [currentUser, navigate]);
 
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('lastLoginEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+  }, []);
+
   const logoImages = [bImg, rImg, oImg, mImg, iImg, cImg, hImg, aImg, tImg];
 
   const handleBiometricLogin = async () => {
     try {
+      // Send email if we have it (helps filter credentials), otherwise rely on Resident Key (Usernameless) flow
       const optionsRes = await api.post('/webauthn/login-challenge', { email });
       const options = optionsRes.data;
+
       const asseResp = await startAuthentication({ optionsJSON: options });
       const verifyRes = await api.post('/webauthn/login-verify', asseResp);
       const { token, user } = verifyRes.data;
 
       if (token && user) {
+        localStorage.setItem('lastLoginEmail', user.email); // Remember email for next time
         login({ token, user });
         showToast('¡Bienvenido de nuevo (Biometría)!', 'success');
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Biometric login error:', error);
-      showToast(error.response?.data?.error || 'Error en la autenticación biométrica.', 'error');
+      if (error.name === 'NotAllowedError') {
+        showToast('Cancelado o tiempo de espera agotado.', 'error');
+      } else {
+        showToast(error.response?.data?.error || 'Error en la autenticación biométrica.', 'error');
+      }
     }
   };
 
@@ -61,6 +75,7 @@ const Login = () => {
       const { token, user } = response.data;
 
       if (token && user) {
+        localStorage.setItem('lastLoginEmail', email); // Remember email
         login({ token, user });
         showToast('¡Bienvenido de nuevo!', 'success');
         navigate('/dashboard');
