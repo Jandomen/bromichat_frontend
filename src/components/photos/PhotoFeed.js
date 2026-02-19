@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
-import { Heart, MessageCircle, Share2, X, Send } from 'lucide-react';
+import { Smile, Lightbulb, Users, X, Send } from 'lucide-react';
 import defaultProfile from '../../assets/default-profile.png';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
@@ -185,8 +185,8 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
             await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${photo._id}/share`, { content: shareContent }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            showToast('¡Foto compartida en tu muro!', 'success');
-        } catch (err) { showToast('Error al compartir', 'error'); }
+            showToast('¡Foto viralizada en tu muro!', 'success');
+        } catch (err) { showToast('Error al viralizar', 'error'); }
     };
 
     const userReaction = localPhoto.reactions?.find(r => r.user === currentUser?._id);
@@ -268,7 +268,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                     className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
                                 >
                                     <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
-                                        {currentReactionData ? <span className="text-2xl drop-shadow-md">{currentReactionData.emoji}</span> : <Heart className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />}
+                                        {currentReactionData ? <span className="text-2xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />}
                                     </div>
                                     <span className="text-xs font-black text-white">{localPhoto.reactions?.length || 0}</span>
                                 </button>
@@ -288,7 +288,7 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                 onClick={() => setShowComments(true)}
                                 className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
                             >
-                                <MessageCircle className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
+                                <Lightbulb className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
                                 <span className="text-xs font-black text-white">{localPhoto.comments?.length || 0}</span>
                             </button>
 
@@ -299,8 +299,8 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                                 onClick={() => setIsShareModalOpen(true)}
                                 className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
                             >
-                                <Share2 className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-xs font-black text-white uppercase tracking-tighter">Share</span>
+                                <Users className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
+                                <span className="text-xs font-black text-white uppercase tracking-tighter">Viralizar</span>
                             </button>
                         </div>
 
@@ -321,8 +321,8 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
                     <div className="flex-grow overflow-y-auto p-4 space-y-4">
                         {localPhoto.comments?.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full opacity-30">
-                                <MessageCircle size={48} className="text-zinc-500 mb-2" />
-                                <p className="text-white text-sm font-medium">No hay comentarios todavía</p>
+                                <Lightbulb size={48} className="text-zinc-500 mb-2" />
+                                <p className="text-white text-sm font-medium">No hay opiniones todavía</p>
                             </div>
                         ) : (
                             localPhoto.comments?.filter(c => !c.parentId).map(c => (

@@ -47,8 +47,11 @@ const Gallery = () => {
 
   useEffect(() => {
     fetchUserPhotos();
+  }, [fetchUserPhotos]);
+
+  useEffect(() => {
     fetchGlobalFeed();
-  }, [fetchUserPhotos, fetchGlobalFeed]);
+  }, [fetchGlobalFeed]);
 
   const handleDelete = async (photoId) => {
     showConfirm(
@@ -106,8 +109,8 @@ const Gallery = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 border-b border-zinc-100 pb-10">
           <div className="space-y-2">
             <h1 className="text-5xl font-black text-zinc-900 tracking-tighter flex items-center gap-4">
-              <span className="text-indigo-600 bg-indigo-50 p-4 rounded-3xl shadow-inner italic">PH</span>
-              Photo Central
+              <span className="text-indigo-600 bg-indigo-50 p-4 rounded-3xl shadow-inner italic">📸</span>
+              Galeria
             </h1>
             <p className="text-zinc-500 font-bold ml-1 uppercase tracking-widest text-xs opacity-60">Descubre los momentos de la comunidad</p>
           </div>
@@ -178,6 +181,7 @@ const Gallery = () => {
                 </h3>
                 <PhotoList
                   photos={photos}
+                  setPhotos={setPhotos}
                   authUser={user}
                   onDelete={handleDelete}
                   onUpdateDescription={handleUpdateDescription}
@@ -205,6 +209,7 @@ const Gallery = () => {
               </div>
               <PhotoList
                 photos={discoverPhotos}
+                setPhotos={setDiscoverPhotos}
                 authUser={user}
                 onDelete={handleDelete}
                 onUpdateDescription={handleUpdateDescription}

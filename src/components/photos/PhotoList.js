@@ -3,13 +3,13 @@ import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { useUI } from '../../context/UIContext';
 import { Menu } from '@headlessui/react';
-import { X, Search } from 'lucide-react';
-import { FaTrash, FaEdit, FaEllipsisV, FaChevronLeft, FaChevronRight, FaLock, FaGlobe, FaHeart, FaComment, FaShare, FaPaperPlane } from 'react-icons/fa';
+import { X, Search, Smile, Lightbulb, Users, Heart, MessageSquare, Share2, Trash2, Edit3, MoreVertical, ChevronLeft, ChevronRight, Lock, Globe, Send } from 'lucide-react';
 import { useSwipe } from '../../hooks/useSwipe';
 import CommentItem from '../UI/CommentItem';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
+import ShareModal from '../posts/ShareModal';
 
 const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) => {
   const { user: currentUser } = useContext(AuthContext);
@@ -17,6 +17,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [currentPhotoDetails, setCurrentPhotoDetails] = useState(null);
   const [commentText, setCommentText] = useState('');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const [editingPhoto, setEditingPhoto] = useState(null);
   const [editForm, setEditForm] = useState({ description: '', isPrivate: false, allowFeed: true, category: 'Mundo' });
@@ -188,16 +189,15 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
     } catch (err) { console.error(err); }
   };
 
-  const handleShare = async () => {
-    if (!currentPhotoDetails) return;
-    const shareContent = prompt('Añade un comentario a tu compartido...');
-    if (shareContent === null) return;
+  const handleShare = async (shareContent) => {
+    if (!currentPhotoDetails || !shareContent) return;
     try {
       await axios.post(`${process.env.REACT_APP_API_BACKEND}/gallery/${currentPhotoDetails._id}/share`, { content: shareContent }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      showToast('¡Foto compartida en tu muro!', 'success');
-    } catch (err) { showToast('Error al compartir', 'error'); }
+      showToast('¡Foto viralizada en tu muro!', 'success');
+      setIsShareModalOpen(false);
+    } catch (err) { showToast('Error al viralizar', 'error'); }
   };
 
   if (!photos || photos.length === 0) {
@@ -239,11 +239,11 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
               <div className="absolute top-4 left-4 flex gap-2 z-10 scale-0 group-hover:scale-100 transition-transform origin-left">
                 {photo.isPrivate ? (
                   <div className="bg-black/60 p-2 rounded-xl backdrop-blur-md border border-white/10">
-                    <FaLock size={12} className="text-red-500" />
+                    <Lock size={12} className="text-red-500" />
                   </div>
                 ) : (
                   <div className="bg-black/60 p-2 rounded-xl backdrop-blur-md border border-white/10">
-                    <FaGlobe size={12} className="text-blue-400" />
+                    <Globe size={12} className="text-blue-400" />
                   </div>
                 )}
                 {photo.category && (
@@ -299,19 +299,19 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                   {((typeof photo.user === 'object' ? photo.user._id : photo.user) === currentUser?._id) && (
                     <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                       <Menu as="div" className="relative">
-                        <Menu.Button className="p-2 text-zinc-300 hover:text-indigo-600 transition-colors"><FaEllipsisV size={14} /></Menu.Button>
+                        <Menu.Button className="p-2 text-zinc-300 hover:text-indigo-600 transition-colors"><MoreVertical size={14} /></Menu.Button>
                         <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl overflow-hidden border border-zinc-100 z-[100] animate-in zoom-in-95 duration-200">
                           <Menu.Item>
                             {({ active }) => (
                               <button className={`${active ? 'bg-indigo-50 text-indigo-600' : 'text-zinc-600'} w-full text-left px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-3`} onClick={() => handleEditClick(photo)}>
-                                <FaEdit size={12} /> Editar
+                                <Edit3 size={12} /> Editar
                               </button>
                             )}
                           </Menu.Item>
                           <Menu.Item>
                             {({ active }) => (
                               <button className={`${active ? 'bg-red-50 text-red-600' : 'text-zinc-600'} w-full text-left px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-3`} onClick={() => handleDelete(photo._id)}>
-                                <FaTrash size={12} /> Eliminar
+                                <Trash2 size={12} /> Eliminar
                               </button>
                             )}
                           </Menu.Item>
@@ -363,8 +363,8 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
             </button>
 
             <div className="flex-grow relative bg-black flex items-center justify-center group/img">
-              <button className="absolute left-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handlePrev}><FaChevronLeft size={32} /></button>
-              <button className="absolute right-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handleNext}><FaChevronRight size={32} /></button>
+              <button className="absolute left-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handlePrev}><ChevronLeft size={32} /></button>
+              <button className="absolute right-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/img:opacity-100" onClick={handleNext}><ChevronRight size={32} /></button>
               <img src={photos[lightboxIndex].imageUrl} alt="" className="max-h-full max-w-full object-contain" />
             </div>
 
@@ -394,7 +394,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                       className="flex flex-col items-center gap-1 group/btn"
                     >
                       <div className={`p-3 rounded-full transition-all ${currentReactionData ? 'bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200' : 'hover:bg-white/5 text-zinc-400'}`}>
-                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <FaHeart size={18} />}
+                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile size={20} />}
                       </div>
                       <span className="text-[10px] font-black text-zinc-500">{currentPhotoDetails?.reactions?.length || 0}</span>
                     </button>
@@ -407,12 +407,12 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                     </div>
                   </div>
                   <button className="flex flex-col items-center gap-1 text-zinc-400 hover:text-indigo-500 transition-colors">
-                    <FaComment size={18} />
-                    <span className="text-[10px] font-black text-zinc-500">{currentPhotoDetails?.comments?.length || 0}</span>
+                    <Lightbulb size={20} />
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Opinar</span>
                   </button>
-                  <button onClick={handleShare} className="flex flex-col items-center gap-1 text-zinc-400 hover:text-green-500 transition-colors">
-                    <FaShare size={18} />
-                    <span className="text-[10px] font-black text-zinc-500">SHARE</span>
+                  <button onClick={() => setIsShareModalOpen(true)} className="flex flex-col items-center gap-1 text-zinc-400 hover:text-green-500 transition-colors">
+                    <Users size={20} />
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Viralizar</span>
                   </button>
                 </div>
               </div>
@@ -441,11 +441,24 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
 
               <form onSubmit={handleComment} className="p-4 bg-black/40 border-t border-white/5 flex gap-2">
                 <input type="text" value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-600/50" />
-                <button type="submit" className="p-2.5 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 transition-colors"><FaPaperPlane size={14} /></button>
+                <button type="submit" className="p-2.5 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                  <Send size={14} />
+                </button>
               </form>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Share Modal */}
+      {currentPhotoDetails && (
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          onShare={handleShare}
+          item={currentPhotoDetails}
+          type="photo"
+        />
       )}
 
       {/* Edit Modal */}

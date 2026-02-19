@@ -4,6 +4,10 @@ const config: CapacitorConfig = {
   appId: 'com.bromichat.app',
   appName: 'Bromichat',
   webDir: 'build',
+  server: {
+    url: 'https://bromichat.vercel.app/',
+    cleartext: true
+  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

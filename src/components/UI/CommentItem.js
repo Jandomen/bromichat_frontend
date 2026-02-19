@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
+import { Send, Reply, Edit2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import defaultProfile from '../../assets/default-profile.png';
 import { useUI } from '../../context/UIContext';
@@ -195,9 +195,9 @@ const CommentItem = ({
                             />
                             <button
                                 type="submit"
-                                className="px-4 bg-primary-600 rounded-full text-white text-xs font-bold hover:bg-primary-700 active:scale-90 transition-all p-1.5"
+                                className="px-4 bg-primary-600 rounded-full text-white text-xs font-bold hover:bg-primary-700 active:scale-90 transition-all p-1.5 flex items-center justify-center text-white"
                             >
-                                <FaPaperPlane size={10} />
+                                <Send size={12} />
                             </button>
                         </form>
                     )}

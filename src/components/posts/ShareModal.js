@@ -34,9 +34,9 @@ const ShareModal = ({ isOpen, onClose, onShare, item, type = 'post' }) => {
                 <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary-50 text-primary-600 rounded-xl">
-                            <Share2 size={20} strokeWidth={2.5} />
+                            <Users size={20} strokeWidth={2.5} />
                         </div>
-                        <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase">Compartir Historia</h3>
+                        <h3 className="text-xl font-black text-gray-900 tracking-tight uppercase">Viralizar Historia</h3>
                     </div>
                     <button
                         onClick={onClose}
@@ -108,8 +108,8 @@ const ShareModal = ({ isOpen, onClose, onShare, item, type = 'post' }) => {
                             type="submit"
                             className="flex-[2] py-4 px-6 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary-200 transition-all active:scale-95 flex items-center justify-center gap-2"
                         >
-                            Compartir ahora
-                            <Send size={14} strokeWidth={3} />
+                            Viralizar ahora
+                            <Users size={14} strokeWidth={3} />
                         </button>
                     </div>
                 </form>
