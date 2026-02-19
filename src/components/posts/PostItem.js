@@ -251,7 +251,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                                 <span className="text-[11px] text-gray-500 font-medium">
-                                    {new Date(post.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                    {new Date(post.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: '2-digit' })}
                                 </span>
                                 <span className="w-0.5 h-0.5 bg-gray-300 rounded-full"></span>
                                 <span className="text-[11px] text-gray-500 font-medium">

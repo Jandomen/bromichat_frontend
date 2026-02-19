@@ -147,7 +147,7 @@ const CommentItem = ({
                         {/* Action Buttons */}
                         <div className="flex items-center gap-4 mt-1 ml-2">
                             <span className="text-[11px] text-gray-500 font-medium whitespace-nowrap">
-                                {new Date(comment.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                {new Date(comment.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: '2-digit' })}
                             </span>
 
                             <button
