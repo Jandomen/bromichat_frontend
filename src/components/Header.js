@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import bImg from '../assets/b-removebg-preview.png';
-import rImg from '../assets/r-removebg-preview.png';
-import oImg from '../assets/o-removebg-preview.png';
-import mImg from '../assets/m-removebg-preview.png';
-import iImg from '../assets/i-removebg-preview.png';
-import cImg from '../assets/c-removebg-preview.png';
-import hImg from '../assets/h-removebg-preview.png';
-import aImg from '../assets/a-removebg-preview.png';
-import tImg from '../assets/t-removebg-preview.png';
 
 import DashBoard from '../buttons/DashboardButton';
 import Profile from '../buttons/ProfileButton';
@@ -25,7 +16,17 @@ import GroupButton from '../buttons/GroupButton';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const logoImages = [bImg, rImg, oImg, mImg, iImg, cImg, hImg, aImg, tImg];
+  const logoImages = [
+    '/assets/logo/b-removebg-preview.png',
+    '/assets/logo/r-removebg-preview.png',
+    '/assets/logo/o-removebg-preview.png',
+    '/assets/logo/m-removebg-preview.png',
+    '/assets/logo/i-removebg-preview.png',
+    '/assets/logo/c-removebg-preview.png',
+    '/assets/logo/h-removebg-preview.png',
+    '/assets/logo/a-removebg-preview.png',
+    '/assets/logo/t-removebg-preview.png'
+  ];
 
   return (
     <>
