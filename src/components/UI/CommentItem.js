@@ -102,14 +102,14 @@ const CommentItem = ({
     return (
         <div
             ref={commentRef}
-            className={`group/comment w-full flex flex-col transition-all duration-300 ${highlightedCommentId === comment._id ? 'bg-primary-50 px-2 py-1 rounded-lg' : ''} ${isReply ? 'ml-10 mt-2' : 'mb-3'}`}
+            className={`group/comment w-full flex flex-col transition-all duration-300 ${highlightedCommentId === comment._id ? 'bg-white/10 px-2 py-1 rounded-xl' : ''} ${isReply ? 'ml-6 sm:ml-10 mt-3' : 'mb-5'}`}
         >
-            <div className="flex gap-2 w-full items-start">
+            <div className="flex gap-3 w-full items-start">
                 {/* Avatar */}
-                <div className="relative shrink-0 mt-1">
+                <div className="relative shrink-0 mt-0.5">
                     <img
                         src={getFullImageUrl(comment.user?.profilePicture)}
-                        className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover border border-gray-100`}
+                        className={`${isReply ? 'w-7 h-7' : 'w-10 h-10'} rounded-2xl object-cover border-2 border-white/10 shadow-lg transition-transform active:scale-95`}
                         alt=""
                         onError={e => e.target.src = defaultProfile}
                     />
@@ -118,30 +118,30 @@ const CommentItem = ({
                 {/* Content Bubble Area */}
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-col items-start max-w-full">
-                        <div className={`relative px-3 py-2 rounded-2xl ${isReply ? 'bg-gray-100/50' : 'bg-gray-100'} text-gray-800`}>
-                            <div className="flex items-center gap-2 mb-0.5">
-                                <span className="text-[13px] font-bold text-gray-900 leading-none">
+                        <div className={`relative px-4 py-3 rounded-[1.5rem] border border-white/5 shadow-xl ${isReply ? 'bg-white/5' : 'bg-white/10'} text-white w-full sm:w-auto`}>
+                            <div className="flex items-center gap-2 mb-1.5">
+                                <span className="text-sm font-black text-white leading-none tracking-tight">
                                     {comment.user?.username}
                                 </span>
-                                {comment.isEdited && <span className="text-[10px] text-gray-400 italic">(editado)</span>}
+                                {comment.isEdited && <span className="text-[10px] text-zinc-500 italic font-medium">(editado)</span>}
                             </div>
 
                             {isEditing ? (
-                                <div className="space-y-2 mt-2 min-w-[180px]">
+                                <div className="space-y-3 mt-2 w-full min-w-[200px]">
                                     <textarea
                                         autoFocus
                                         value={editText}
                                         onChange={e => setEditText(e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] text-gray-800 focus:outline-none focus:border-primary-500/30 transition-all resize-none shadow-sm"
-                                        rows="2"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600/30 transition-all resize-none shadow-inner"
+                                        rows="3"
                                     />
                                     <div className="flex justify-end gap-2">
-                                        <button onClick={() => setIsEditing(false)} className="px-3 py-1 text-[10px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">Cancelar</button>
-                                        <button onClick={handleUpdate} className="px-4 py-1 bg-primary-600 text-white rounded-md text-[10px] font-bold hover:brightness-110 active:scale-95 transition-all">Guardar</button>
+                                        <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors">Cancelar</button>
+                                        <button onClick={handleUpdate} className="px-5 py-2 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700 active:scale-95 transition-all shadow-lg">Guardar</button>
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-[12px] leading-snug text-gray-800 break-words">{comment.comment}</p>
+                                <p className="text-[13px] sm:text-sm leading-relaxed text-zinc-200 font-medium break-words">{comment.comment}</p>
                             )}
                         </div>
 
@@ -224,16 +224,21 @@ const CommentItem = ({
                     {children.length > 0 && !showReplies && (
                         <button
                             onClick={() => setShowReplies(true)}
-                            className="mt-2 text-[13px] font-bold text-gray-500 hover:underline flex items-center gap-2"
+                            className="mt-3 py-2 px-4 bg-white/5 border border-white/10 rounded-full text-xs font-black text-zinc-400 hover:text-white transition-all active:scale-95 flex items-center gap-2 w-fit uppercase tracking-widest shadow-lg"
                         >
-                            <div className="w-6 h-[1px] bg-gray-300"></div>
+                            <div className="w-4 h-4 rounded-full bg-red-600/20 flex items-center justify-center">
+                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+                            </div>
                             Ver {children.length} {children.length === 1 ? 'respuesta' : 'respuestas'}
                         </button>
                     )}
 
-                    {/* Nested Replies */}
+                    {/* Nested Replies with Connection Line */}
                     {showReplies && children.length > 0 && (
-                        <div className="space-y-1 w-full animate-in fade-in duration-300">
+                        <div className="relative mt-3 space-y-2 w-full animate-in fade-in duration-500">
+                            {/* NEW: Connecting vertical line for "tree" feel */}
+                            <div className="absolute left-[-20px] top-0 bottom-8 w-[2px] bg-gradient-to-b from-red-600/40 via-blue-600/20 to-transparent rounded-full ml-[11px] sm:ml-[15px]"></div>
+
                             {children.map(child => (
                                 <CommentItem
                                     key={child._id}
@@ -247,12 +252,14 @@ const CommentItem = ({
                                     isReply={true}
                                 />
                             ))}
+
                             {showReplies && (
                                 <button
                                     onClick={() => setShowReplies(false)}
-                                    className="text-[12px] font-bold text-gray-500 hover:underline mt-1"
+                                    className="ml-6 sm:ml-10 py-2 px-4 text-[10px] font-black text-zinc-500 hover:text-red-500 transition-colors uppercase tracking-widest mt-2 flex items-center gap-2"
                                 >
-                                    Ocultar respuestas
+                                    <div className="w-4 h-[1px] bg-zinc-700"></div>
+                                    Ocultar hilos
                                 </button>
                             )}
                         </div>

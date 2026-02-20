@@ -12,7 +12,8 @@ export const AuthProvider = ({ children }) => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     return storedUser?.token || null;
   });
-  const [loadingUser, setLoadingUser] = useState(true);
+  // Si tenemos token, permitimos carga inmediata (background update)
+  const [loadingUser, setLoadingUser] = useState(!localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchUser = async () => {

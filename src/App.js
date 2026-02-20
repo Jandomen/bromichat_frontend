@@ -317,7 +317,7 @@ export default function App() {
           }
         />
 
-        {/* Fallback Route */}
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
       <MobileNav />

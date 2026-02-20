@@ -152,7 +152,7 @@ const AdminDashboard = () => {
     };
 
     const handleSuspendUser = (userId) => {
-        setSelectedEntity({ ...selectedEntity, targetUserId: userId }); // Store the user ID for suspension
+        setSelectedEntity({ ...selectedEntity, targetUserId: userId });
         setIsSuspensionModalOpen(true);
     };
 

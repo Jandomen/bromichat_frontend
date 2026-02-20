@@ -95,31 +95,33 @@ const UserSearch = () => {
       )}
 
       {results.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 animate-fadeIn">
           {results.map((u) => (
             <div
               key={u._id}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center group relative overflow-hidden"
+              onClick={() => navigate(`/user/${u._id}`)}
+              className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-xl sm:hover:-translate-y-1 transition-all duration-300 flex flex-row sm:flex-col items-center sm:text-center group relative overflow-hidden cursor-pointer"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 pointer-events-none"></div>
 
-              <div className="relative mb-4">
-                <div className="absolute inset-0 bg-blue-100 rounded-full transform rotate-6 scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+              <div className="relative mb-0 sm:mb-4 flex-shrink-0">
+                <div className="absolute inset-0 bg-red-50 rounded-full transform rotate-6 scale-0 group-hover:scale-110 transition-transform duration-300"></div>
                 <img
                   src={getFullImageUrl(u.profilePicture)}
                   alt={`Perfil de ${u.username}`}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md relative z-10 cursor-pointer"
-                  onClick={() => navigate(`/user/${u._id}`)}
+                  className="w-14 h-14 sm:w-24 sm:h-24 rounded-full object-cover border-2 sm:border-4 border-white shadow-md relative z-10"
                   onError={(e) => { e.target.src = defaultProfile; }}
                 />
               </div>
 
-              <h3 className="font-bold text-gray-900 text-lg mb-1">{u.username}</h3>
-              <p className="text-sm text-gray-500 mb-6">{u.name} {u.lastName}</p>
+              <div className="flex-grow min-w-0 sm:w-full ml-4 sm:ml-0">
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">{u.username}</h3>
+                <p className="text-xs sm:text-sm text-gray-500 truncate">{u.name} {u.lastName}</p>
+              </div>
 
-              <div className="flex gap-3 w-full mt-auto">
+              <div className="flex gap-2 sm:gap-3 items-center ml-auto sm:ml-0 sm:mt-6 sm:w-full justify-end sm:justify-center" onClick={(e) => e.stopPropagation()}>
                 <button
-                  className="flex-1 py-2 px-3 bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors border border-gray-200"
+                  className="hidden sm:block flex-1 py-2 px-3 bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors border border-gray-200"
                   onClick={() => navigate(`/user/${u._id}`)}
                 >
                   Perfil

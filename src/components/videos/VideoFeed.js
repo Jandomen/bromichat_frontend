@@ -351,19 +351,33 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
 
             {/* Comments Drawer (TikTok Style) */}
             {showComments && (
-                <div className="absolute inset-x-0 bottom-0 top-1/4 bg-zinc-900 rounded-t-3xl z-[100] flex flex-col animate-in slide-in-from-bottom duration-300 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] border-t border-white/10">
-                    <div className="p-4 flex items-center justify-between border-b border-white/5">
-                        <span className="text-white font-black text-sm uppercase tracking-widest">{localVideo.comments?.length || 0} Comentarios</span>
-                        <button onClick={() => setShowComments(false)} className="p-2 bg-white/5 rounded-full text-zinc-400 hover:text-white transition-colors">
+                <div className="absolute inset-x-0 bottom-0 top-[15%] sm:top-1/4 bg-[#0a0a0c] rounded-t-[2.5rem] z-[100] flex flex-col animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_60px_rgba(0,0,0,0.8)] border-t border-white/10">
+
+                    {/* NEW: Pull-down handle for mobile feel */}
+                    <div className="w-full flex justify-center pt-3 pb-1" onClick={() => setShowComments(false)}>
+                        <div className="w-12 h-1.5 bg-white/20 rounded-full mb-2"></div>
+                    </div>
+
+                    <div className="px-6 py-4 flex items-center justify-between border-b border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-600/10 rounded-xl">
+                                <MessageCircle size={18} className="text-red-500" />
+                            </div>
+                            <span className="text-white font-black text-sm uppercase tracking-[0.2em]">{localVideo.comments?.length || 0} Comentarios</span>
+                        </div>
+                        <button onClick={() => setShowComments(false)} className="p-2.5 bg-white/5 rounded-full text-zinc-400 hover:text-white transition-all active:scale-90">
                             <X size={20} />
                         </button>
                     </div>
 
-                    <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                    <div className="flex-grow overflow-y-auto p-6 space-y-6 scroll-smooth hide-scrollbar">
                         {localVideo.comments?.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full opacity-30">
-                                <MessageCircle size={48} className="text-zinc-500 mb-2" />
-                                <p className="text-white text-sm font-medium uppercase tracking-widest">No hay comentarios aún</p>
+                            <div className="flex flex-col items-center justify-center h-full opacity-40">
+                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                                    <MessageCircle size={40} className="text-zinc-500" />
+                                </div>
+                                <p className="text-white text-xs font-black uppercase tracking-widest text-center">Inicia la conversación...</p>
+                                <p className="text-zinc-500 text-[10px] mt-2 font-bold uppercase tracking-tighter">Sé el primero en comentar este clip</p>
                             </div>
                         ) : (
                             localVideo.comments?.filter(c => !c.parentId).map(c => (
@@ -381,16 +395,21 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
                         )}
                     </div>
 
-                    <form onSubmit={handleComment} className="p-4 bg-black/50 border-t border-white/5 flex gap-2">
-                        <input
-                            type="text"
-                            value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)}
-                            placeholder="Añade un comentario..."
-                            className="flex-1 bg-white/5 border border-white/10 rounded-full px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600/50 transition-all"
-                        />
-                        <button type="submit" className="p-3 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors shadow-lg">
-                            <Send size={20} />
+                    <form onSubmit={handleComment} className="p-6 bg-zinc-950/80 backdrop-blur-3xl border-t border-white/5 flex gap-3 pb-8 sm:pb-6">
+                        <div className="flex-grow relative">
+                            <input
+                                type="text"
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                placeholder="Escribe un comentario..."
+                                className="w-full bg-white/5 border border-white/10 rounded-[1.25rem] px-6 py-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-red-600/50 transition-all font-medium pr-12"
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                <span className="text-[10px] font-black text-white/20 uppercase tracking-tighter hidden sm:block">ENVIAR</span>
+                            </div>
+                        </div>
+                        <button type="submit" className="p-4 bg-red-600 rounded-[1.25rem] text-white hover:bg-red-700 transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-90 flex items-center justify-center shrink-0">
+                            <Send size={22} className="transform -rotate-12" />
                         </button>
                     </form>
                 </div>
