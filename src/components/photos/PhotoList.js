@@ -413,7 +413,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                 </div>
               </div>
 
-              <div className="flex-grow overflow-y-auto p-4 sm:p-6 space-y-6 max-h-[50vh] md:max-h-full custom-scrollbar">
+              <div className="flex-grow overflow-y-auto p-4 sm:p-6 space-y-6 max-h-[50vh] md:max-h-full custom-scrollbar overscroll-contain">
                 {currentPhotoDetails?.comments?.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 opacity-20">
                     <Lightbulb size={40} className="mb-4 text-white" />
@@ -435,8 +435,19 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                 )}
               </div>
 
-              <form onSubmit={handleComment} className="p-4 bg-black/40 border-t border-white/5 flex gap-2">
-                <input type="text" value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-600/50" />
+              <form onSubmit={handleComment} className="p-4 bg-black/40 border-t border-white/5 flex gap-2 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-4">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      handleComment(e);
+                    }
+                  }}
+                  placeholder="Añade un comentario..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-600/50"
+                />
                 <button type="submit" className="p-2.5 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 transition-colors flex items-center justify-center">
                   <Send size={14} />
                 </button>

@@ -558,7 +558,7 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                         </div>
 
                         {/* Input for Comment */}
-                        <form onSubmit={handleComment} className="mt-4 flex gap-2 items-center">
+                        <form onSubmit={handleComment} className="mt-4 flex gap-2 items-center pb-[env(safe-area-inset-bottom)] sm:pb-0">
                             <img
                                 src={user?.profilePicture ? getFullImageUrl(user.profilePicture) : defaultProfile}
                                 className="w-8 h-8 rounded-full object-cover border border-gray-100"
@@ -571,10 +571,15 @@ const PostItem = ({ post, onUpdate, isDetail = false }) => {
                                     type="text"
                                     name="comment"
                                     autoComplete="off"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            handleComment(e);
+                                        }
+                                    }}
                                     placeholder="Escribe un comentario..."
                                     className="w-full bg-transparent border-none text-[13px] text-gray-800 placeholder:text-gray-500 outline-none"
                                 />
-                                <button type="submit" className="text-primary-600 p-1 hover:bg-white rounded-full transition-all active:scale-90">
+                                <button type="submit" className="text-primary-600 p-1 hover:bg-white rounded-full transition-all active:scale-90 font-bold text-xs uppercase tracking-tighter sm:px-2">
                                     <Send size={14} />
                                 </button>
                             </div>

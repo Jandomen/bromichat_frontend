@@ -68,14 +68,14 @@ const MobileNav = ({ onPlusClick }) => {
                     <span className="text-[8px] font-black uppercase tracking-tighter">Cerca</span>
                 </Link>
 
-                <div className="relative -top-10 group">
+                <div className="relative -top-8 group">
                     <button
                         onClick={handlePlus}
-                        className="p-5 bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-full shadow-[0_20px_40px_rgba(220,38,38,0.4)] border-4 border-white active:scale-95 transition-all group-hover:rotate-90 duration-300 transform hover:scale-110 ring-4 ring-primary-100/50"
+                        className="p-4 bg-red-600/90 backdrop-blur-xl text-black rounded-full shadow-[0_15px_30px_rgba(220,38,38,0.4)] border-4 border-white/50 active:scale-95 transition-all group-hover:rotate-90 duration-500 transform hover:scale-110 ring-4 ring-red-500/20"
                         title="Nueva publicación"
                     >
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M12 4v16m8-8H4" />
                         </svg>
                     </button>
 

@@ -370,7 +370,7 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
                         </button>
                     </div>
 
-                    <div className="flex-grow overflow-y-auto p-6 space-y-6 scroll-smooth hide-scrollbar">
+                    <div className="flex-grow overflow-y-auto p-6 space-y-6 scroll-smooth hide-scrollbar overscroll-contain">
                         {localVideo.comments?.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full opacity-40">
                                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
@@ -395,12 +395,17 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
                         )}
                     </div>
 
-                    <form onSubmit={handleComment} className="p-6 bg-zinc-950/80 backdrop-blur-3xl border-t border-white/5 flex gap-3 pb-8 sm:pb-6">
+                    <form onSubmit={handleComment} className="p-4 sm:p-6 bg-zinc-950/80 backdrop-blur-3xl border-t border-white/5 flex gap-3 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:pb-6">
                         <div className="flex-grow relative">
                             <input
                                 type="text"
                                 value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        handleComment(e);
+                                    }
+                                }}
                                 placeholder="Escribe un comentario..."
                                 className="w-full bg-white/5 border border-white/10 rounded-[1.25rem] px-6 py-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-red-600/50 transition-all font-medium pr-12"
                             />

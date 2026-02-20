@@ -214,6 +214,11 @@ const CommentItem = ({
                                 type="text"
                                 value={replyText}
                                 onChange={e => setReplyText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        handleSubmitReply(e);
+                                    }
+                                }}
                                 className="flex-1 bg-gray-100 rounded-full px-4 py-1.5 text-xs font-medium text-gray-900 focus:outline-none focus:bg-gray-200 transition-all"
                                 placeholder={`Responde a ${comment.user?.username}...`}
                             />
