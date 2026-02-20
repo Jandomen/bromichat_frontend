@@ -48,31 +48,12 @@ const FriendsPosts = () => {
     const onNewPost = (post) => {
       setPosts(prev => {
         if (prev.some(p => p._id === post._id)) return prev;
-
-        // Only play sound if it's NOT our own post
-        const postAuthorId = post.user?._id || post.user;
-        const myId = currentUser?._id || currentUser;
-        if (postAuthorId !== myId) {
-          playNotificationSound();
-        }
-
         return [post, ...prev];
       });
     };
 
     const onPostUpdated = (post) => {
       setPosts(prev => {
-        const oldPost = prev.find(p => p._id === post._id);
-        // If it has more comments than before, play sound (unless it's our own comment)
-        if (oldPost && post.comments?.length > oldPost.comments?.length) {
-          const latestComment = post.comments[post.comments.length - 1];
-          const commenterId = latestComment?.user?._id || latestComment?.user;
-          const myId = currentUser?._id || currentUser;
-
-          if (commenterId !== myId) {
-            playNotificationSound();
-          }
-        }
         return prev.map(p => p._id === post._id ? post : p);
       });
     };

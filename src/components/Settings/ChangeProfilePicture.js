@@ -24,20 +24,33 @@ const ChangeProfilePicture = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast('Solo se permiten imágenes', 'error');
+    if (!file) {
+      console.log("No file selected or picker cancelled");
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      showToast('La imagen es demasiado grande. Máximo 2MB.', 'error');
+    // console.log("File metadata selected:", { name: file.name, size: file.size, type: file.type });
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Solo se permiten imágenes (JPG, PNG, GIF)', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // Increased to 5MB just in case, but usually 2MB is safe
+      showToast('La imagen es demasiado grande. Máximo 5MB.', 'error');
       return;
     }
 
     setSelectedFile(file);
-    setPreview(URL.createObjectURL(file));
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
+      showToast('Imagen seleccionada correctamente', 'success');
+    } catch (err) {
+      console.error("Error creating object URL:", err);
+      // Fallback: we don't set preview but we still have the file
+      showToast('Imagen lista para subir', 'success');
+    }
   };
 
   const updateUserState = (updatedUser) => {
@@ -51,7 +64,7 @@ const ChangeProfilePicture = () => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      showToast('Por favor, selecciona una imagen.', 'warning');
+      showToast('Por favor, selecciona una imagen primero.', 'warning');
       return;
     }
 
@@ -60,22 +73,28 @@ const ChangeProfilePicture = () => {
 
     try {
       setLoading(true);
+      // Let Axios handle the Content-Type with the correct boundary
       const response = await axios.put(
         `${process.env.REACT_APP_API_BACKEND}/user/profile-picture`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      updateUserState(response.data.user);
-      showToast('Foto de perfil actualizada', 'success');
-      setSelectedFile(null);
+      if (response.data && response.data.user) {
+        updateUserState(response.data.user);
+        showToast('¡Foto de perfil actualizada con éxito!', 'success');
+        setSelectedFile(null);
+      } else {
+        throw new Error("Respuesta incompleta del servidor");
+      }
     } catch (err) {
-      showToast('Hubo un error al actualizar la foto de perfil', 'error');
+      console.error("Upload error details:", err.response?.data || err.message);
+      const msg = err.response?.data?.message || err.response?.data?.error || 'No se pudo subir la foto. Intenta con una imagen más pequeña o de otro formato.';
+      showToast(msg, 'error');
     } finally {
       setLoading(false);
     }

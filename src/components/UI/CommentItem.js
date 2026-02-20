@@ -97,19 +97,25 @@ const CommentItem = ({
         setIsEditing(false);
     };
 
-    const isOwner = currentUser?._id === (comment.user?._id || comment.user);
+    const isOwner = useMemo(() => {
+        const currentUserId = currentUser?._id || currentUser?.id;
+        const commentUserId = comment.user?._id || comment.user?.id || comment.user;
+
+        if (!currentUserId || !commentUserId) return false;
+        return currentUserId.toString() === commentUserId.toString();
+    }, [currentUser, comment.user]);
 
     return (
         <div
             ref={commentRef}
-            className={`group/comment w-full flex flex-col transition-all duration-300 ${highlightedCommentId === comment._id ? 'bg-white/10 px-2 py-1 rounded-xl' : ''} ${isReply ? 'ml-6 sm:ml-10 mt-3' : 'mb-5'}`}
+            className={`group/comment w-full flex flex-col transition-all duration-300 ${highlightedCommentId === comment._id ? 'bg-zinc-100 px-2 py-1 rounded-xl' : ''} ${isReply ? 'ml-6 sm:ml-10 mt-3' : 'mb-5'}`}
         >
             <div className="flex gap-3 w-full items-start">
                 {/* Avatar */}
                 <div className="relative shrink-0 mt-0.5">
                     <img
                         src={getFullImageUrl(comment.user?.profilePicture)}
-                        className={`${isReply ? 'w-7 h-7' : 'w-10 h-10'} rounded-2xl object-cover border-2 border-white/10 shadow-lg transition-transform active:scale-95`}
+                        className={`${isReply ? 'w-7 h-7' : 'w-10 h-10'} rounded-2xl object-cover border-2 border-zinc-100 shadow-sm transition-transform active:scale-95`}
                         alt=""
                         onError={e => e.target.src = defaultProfile}
                     />
@@ -118,10 +124,10 @@ const CommentItem = ({
                 {/* Content Bubble Area */}
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-col items-start max-w-full">
-                        <div className={`relative px-4 py-3 rounded-[2rem] border shadow-xl shadow-black/10 ${isReply ? 'bg-zinc-100 border-zinc-200' : 'bg-white border-zinc-100'} w-full sm:w-auto`}>
+                        <div className={`relative px-4 py-3 rounded-[2rem] border shadow-xl shadow-black/5 ${isReply ? 'bg-zinc-100 border-zinc-200' : 'bg-white border-zinc-100'} w-full sm:w-auto`}>
                             <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-sm font-black text-zinc-900 leading-none tracking-tight">
-                                    {comment.user?.username}
+                                    {comment.user?.username || 'Usuario'}
                                 </span>
                                 {comment.isEdited && <span className="text-[10px] text-zinc-500 italic font-medium">(editado)</span>}
                             </div>
@@ -147,7 +153,7 @@ const CommentItem = ({
 
                         {/* Action Buttons */}
                         <div className="flex items-center gap-4 mt-1 ml-2">
-                            <span className="text-[11px] text-gray-500 font-medium whitespace-nowrap">
+                            <span className="text-[11px] text-zinc-500 font-medium whitespace-nowrap">
                                 {new Date(comment.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: '2-digit' })}
                             </span>
 
@@ -156,7 +162,7 @@ const CommentItem = ({
                                     setIsReplying(!isReplying);
                                     if (!isReplying) setReplyText(`@${comment.user?.username} `);
                                 }}
-                                className={`text-[12px] font-bold transition-all ${isReplying ? 'text-primary-600' : 'text-gray-500 hover:underline'}`}
+                                className={`text-[12px] font-bold transition-all ${isReplying ? 'text-red-600' : 'text-zinc-500 hover:text-zinc-800'}`}
                             >
                                 Responder
                             </button>
@@ -165,7 +171,7 @@ const CommentItem = ({
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowMenu(!showMenu)}
-                                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+                                        className={`p-1 transition-colors rounded-full ${showMenu ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100'}`}
                                     >
                                         <MoreHorizontal size={14} />
                                     </button>
@@ -173,21 +179,21 @@ const CommentItem = ({
                                     {showMenu && (
                                         <>
                                             <div
-                                                className="fixed inset-0 z-50"
+                                                className="fixed inset-0 z-50 cursor-default"
                                                 onClick={() => setShowMenu(false)}
                                             />
-                                            <div className="absolute left-0 bottom-full mb-1 w-28 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-[60] animate-in fade-in zoom-in-95 duration-100 origin-bottom-left">
+                                            <div className="absolute left-0 top-full mt-1 w-32 bg-white rounded-2xl shadow-2xl border border-zinc-100 py-2 z-[160] animate-in fade-in zoom-in-95 duration-200 origin-top-left">
                                                 <button
                                                     onClick={() => { setIsEditing(true); setShowMenu(false); }}
-                                                    className="w-full text-left px-3 py-2 text-[10px] font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                    className="w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
                                                 >
-                                                    <Edit2 size={12} /> Editar
+                                                    <Edit2 size={12} className="text-zinc-400" /> Editar
                                                 </button>
                                                 <button
                                                     onClick={() => { onDelete(comment._id); setShowMenu(false); }}
-                                                    className="w-full text-left px-3 py-2 text-[10px] font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                    className="w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                                                 >
-                                                    <Trash2 size={12} /> Borrar
+                                                    <Trash2 size={12} className="text-red-400" /> Borrar
                                                 </button>
                                             </div>
                                         </>
