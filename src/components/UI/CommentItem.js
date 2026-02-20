@@ -118,9 +118,9 @@ const CommentItem = ({
                 {/* Content Bubble Area */}
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-col items-start max-w-full">
-                        <div className={`relative px-4 py-3 rounded-[1.5rem] border border-white/5 shadow-xl ${isReply ? 'bg-white/5' : 'bg-white/10'} text-white w-full sm:w-auto`}>
+                        <div className={`relative px-4 py-3 rounded-[2rem] border shadow-xl shadow-black/10 ${isReply ? 'bg-zinc-100 border-zinc-200' : 'bg-white border-zinc-100'} w-full sm:w-auto`}>
                             <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-sm font-black text-white leading-none tracking-tight">
+                                <span className="text-sm font-black text-zinc-900 leading-none tracking-tight">
                                     {comment.user?.username}
                                 </span>
                                 {comment.isEdited && <span className="text-[10px] text-zinc-500 italic font-medium">(editado)</span>}
@@ -132,16 +132,16 @@ const CommentItem = ({
                                         autoFocus
                                         value={editText}
                                         onChange={e => setEditText(e.target.value)}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600/30 transition-all resize-none shadow-inner"
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-600/20 transition-all resize-none shadow-inner"
                                         rows="3"
                                     />
                                     <div className="flex justify-end gap-2">
-                                        <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors">Cancelar</button>
+                                        <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-zinc-600 transition-colors">Cancelar</button>
                                         <button onClick={handleUpdate} className="px-5 py-2 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700 active:scale-95 transition-all shadow-lg">Guardar</button>
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-[13px] sm:text-sm leading-relaxed text-zinc-200 font-medium break-words">{comment.comment}</p>
+                                <p className="text-[13px] sm:text-sm leading-relaxed text-zinc-800 font-semibold break-words">{comment.comment}</p>
                             )}
                         </div>
 
