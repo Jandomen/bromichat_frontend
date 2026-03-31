@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useUI } from '../context/UIContext';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
@@ -31,7 +31,7 @@ const VerifyEmail = () => {
             }
 
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BACKEND}/auth/verify-email?token=${token}`);
+                const response = await api.get(`/auth/verify-email?token=${token}`);
                 setStatus('success');
                 showToast(response.data.message || 'Correo verificado con éxito.', 'success');
                 setTimeout(() => navigate('/login'), 3000);
@@ -52,26 +52,26 @@ const VerifyEmail = () => {
                 <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[50%] bg-red-900/10 blur-[120px] rounded-full"></div>
             </div>
 
-            <div className="w-full max-w-md p-10 bg-black/40 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white text-center">
+            <div className="w-full max-w-[320px] p-6 bg-black/40 backdrop-blur-3xl rounded-[2rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white text-center">
                 <div className="mb-8 text-center">
-                    <div className="flex items-center justify-center gap-1 mb-6 transition-transform duration-700">
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-6 group cursor-pointer transition-all duration-300">
                         {logoImages.map((img, idx) => (
                             <img
                                 key={idx}
                                 src={img}
                                 alt="Logo"
-                                className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 object-contain transition-all hover:scale-125 hover:-translate-y-1 filter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] brightness-125"
                             />
                         ))}
                     </div>
-                    <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[9px] mt-2 mb-6">Verificación de Cuenta</p>
+                    <p className="text-gray-400 font-bold uppercase tracking-[0.2em] xs:tracking-[0.3em] text-[8px] xs:text-[9px] mt-2 mb-6">Verificación de Cuenta</p>
                 </div>
 
                 {status === 'verifying' && (
                     <div className="space-y-6 py-4">
                         <Loader2 className="w-16 h-16 text-red-500 animate-spin mx-auto opacity-80" />
                         <h3 className="text-xl font-bold">Verificando tu correo...</h3>
-                        <p className="text-sm text-gray-400 font-medium">Estamos validando tus credenciales sociales en <span className="text-red-500">BromiChat</span>.</p>
+                        <p className="text-sm text-gray-400 font-medium">Estamos validando tus credenciales sociales en <span className="text-red-500">Bromichat</span>.</p>
                     </div>
                 )}
 
@@ -85,7 +85,7 @@ const VerifyEmail = () => {
                         </p>
                         <button
                             onClick={() => navigate('/login')}
-                            className="w-full py-4 px-6 text-white text-xs font-black uppercase tracking-[0.2em] bg-green-600 rounded-2xl shadow-xl shadow-green-900/20 hover:bg-green-500 transition-all duration-300"
+                            className="w-full py-3 px-6 text-white text-[10px] font-black uppercase tracking-widest bg-emerald-600 rounded-xl shadow-lg hover:-translate-y-0.5"
                         >
                             Ir al Login ahora
                         </button>
@@ -101,7 +101,7 @@ const VerifyEmail = () => {
                         </p>
                         <button
                             onClick={() => navigate('/login')}
-                            className="w-full py-4 px-6 text-white text-xs font-black uppercase tracking-[0.2em] bg-red-600 rounded-2xl shadow-xl shadow-red-900/20 hover:bg-red-500 transition-all duration-300"
+                            className="w-full py-3 px-6 text-white text-[10px] font-black uppercase tracking-widest bg-red-600 rounded-xl shadow-lg hover:-translate-y-0.5"
                         >
                             Volver al Login
                         </button>
@@ -110,7 +110,7 @@ const VerifyEmail = () => {
 
                 <div className="mt-10 pt-6 border-t border-white/5">
                     <p className="text-[10px] text-gray-600 uppercase font-black tracking-[0.2em]">
-                        BromiChat © {new Date().getFullYear()}
+                        Bromichat © {new Date().getFullYear()}
                     </p>
                 </div>
             </div>

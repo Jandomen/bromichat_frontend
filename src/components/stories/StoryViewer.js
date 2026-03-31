@@ -233,11 +233,11 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
             <div className={`absolute inset-0 z-50 flex flex-col justify-between pointer-events-none transition-opacity duration-300 ${isUIVisible ? 'opacity-100' : 'opacity-0'}`}>
 
                 {/* --- HEADER --- */}
-                <div className="pt-4 px-3 bg-gradient-to-b from-black/60 to-transparent pb-10 pointer-events-auto">
+                <div className="pt-2 px-2 bg-gradient-to-b from-black/60 to-transparent pb-8 pointer-events-auto">
                     {/* Progress Bars */}
-                    <div className="flex gap-1.5 mb-3">
+                    <div className="flex gap-1 mb-2">
                         {currentGroup.stories.map((s, idx) => (
-                            <div key={s._id} className="h-0.5 flex-1 bg-white/30 rounded-full overflow-hidden">
+                            <div key={s._id} className="h-[1.5px] xs:h-0.5 flex-1 bg-white/30 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-white transition-all duration-100 ease-linear shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                                     style={{
@@ -251,74 +251,74 @@ const StoryViewer = ({ storyGroups, initialGroupIndex, onClose, currentUserId })
 
                     {/* User Info & Controls */}
                     <div className="flex items-center justify-between">
-                        <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3 group">
+                        <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-2 group">
                             <img
                                 src={getFullImageUrl(currentGroup.user.profilePicture)}
                                 alt={currentGroup.user.username}
-                                className="w-10 h-10 rounded-full border border-white/20 object-cover shadow-md"
+                                className="w-6 h-6 xs:w-8 xs:h-8 md:w-10 md:h-10 rounded-full border border-white/20 object-cover shadow-md"
                                 onError={(e) => (e.target.src = defaultProfile)}
                             />
                             <div className="flex flex-col">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-white font-bold text-sm tracking-tight drop-shadow-md">
+                                <div className="flex items-center gap-1.5 xs:gap-2">
+                                    <span className="text-white font-black text-[10px] xs:text-xs md:text-sm tracking-tighter sm:tracking-tight drop-shadow-md lowercase">
                                         {currentGroup.user.username}
                                     </span>
-                                    <span className="text-white/60 text-xs font-medium">
+                                    <span className="text-white/60 text-[10px] md:text-xs font-medium">
                                         {new Date(currentStory.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
                             </div>
                         </Link>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 xs:gap-4">
                             {/* Options Menu (Placeholder for now, acts as close or more) */}
-                            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-white p-2">
-                                <X size={26} className="drop-shadow-md" />
+                            <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-white p-1">
+                                <X size={18} className="xs:w-[24px] xs:h-[24px] md:w-[26px] md:h-[26px] drop-shadow-md" />
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* --- FOOTER --- */}
-                <div className="pb-6 pt-12 px-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-auto">
+                <div className="pb-4 pt-10 px-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-auto">
                     {isOwner ? (
                         /* Owner Controls */
                         <div className="flex items-center justify-between">
                             <button
                                 onClick={(e) => { e.stopPropagation(); setShowViewers(true); setIsPaused(true); }}
-                                className="flex items-center gap-2 text-white font-bold text-sm bg-white/10 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-transform"
+                                className="flex items-center gap-1.5 text-white font-black text-[10px] xs:text-sm bg-white/10 px-3 py-1.5 xs:px-4 xs:py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-transform uppercase tracking-tighter"
                             >
-                                <Eye size={18} />
+                                <Eye size={14} className="xs:w-[18px]" />
                                 <span>{currentStory.views?.length || 0} vistas</span>
                             </button>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 xs:gap-3">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); handleDelete(); }}
-                                    className="p-3 bg-red-600/80 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform"
+                                    className="p-2 xs:p-3 bg-red-600/80 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform"
                                 >
-                                    <Trash2 size={20} />
+                                    <Trash2 size={16} className="xs:w-[20px]" />
                                 </button>
-                                <button className="p-3 bg-white/10 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
-                                    <MoreHorizontal size={20} />
+                                <button className="p-2 xs:p-3 bg-white/10 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
+                                    <MoreHorizontal size={16} className="xs:w-[20px]" />
                                 </button>
                             </div>
                         </div>
                     ) : (
                         /* Viewer Controls (Simplified - User Info) */
-                        <div className="flex items-center gap-3">
-                            <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-3 group">
+                        <div className="flex items-center gap-2">
+                            <Link to={`/user/${currentGroup.user._id}`} className="flex items-center gap-2 xs:gap-3 group">
                                 <img
                                     src={getFullImageUrl(currentGroup.user.profilePicture)}
                                     alt={currentGroup.user.username}
-                                    className="w-12 h-12 rounded-full border-2 border-white/20 object-cover shadow-md"
+                                    className="w-8 h-8 xs:w-11 xs:h-11 md:w-12 md:h-12 rounded-full border border-white/20 object-cover shadow-md"
                                     onError={(e) => (e.target.src = defaultProfile)}
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-white font-bold text-lg tracking-tight drop-shadow-md">
+                                    <span className="text-white font-black text-xs xs:text-base md:text-lg tracking-tighter sm:tracking-tight drop-shadow-md lowercase">
                                         {currentGroup.user.username}
                                     </span>
-                                    <span className="text-white/60 text-xs font-medium">
+                                    <span className="text-white/60 text-[8px] xs:text-[10px] md:text-xs font-bold uppercase tracking-widest">
                                         Ver perfil
                                     </span>
                                 </div>

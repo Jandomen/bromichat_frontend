@@ -39,11 +39,11 @@ const UserGallery = ({ photos = [], scrollToTop }) => {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2 xs:gap-3">
         {validPhotos.map((photo, index) => (
           <div
             key={photo._id || index}
-            className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all"
+            className="group relative aspect-square overflow-hidden rounded-md bg-gray-100 cursor-pointer shadow-sm hover:shadow-md transition-all"
             onClick={() => setSelectedMediaIndex(index)}
           >
             <img

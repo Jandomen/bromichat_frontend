@@ -22,14 +22,14 @@ const NotFound = () => {
         <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] bg-red-900/10 blur-[100px] rounded-full"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center">
+      <div className="relative z-10 flex flex-col items-center w-full px-4">
         {/* Animated 404 Text */}
-        <h1 className="text-[10rem] md:text-[14rem] font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 drop-shadow-2xl mb-8">
+        <h1 className="text-7xl xs:text-9xl sm:text-[12rem] md:text-[14rem] font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 drop-shadow-2xl mb-8">
           404
         </h1>
-
+ 
         {/* Floating Letters Logo */}
-        <div className="flex flex-nowrap justify-center gap-1 sm:gap-3 mb-12 overflow-hidden">
+        <div className="flex flex-nowrap justify-center gap-0.5 xs:gap-1 sm:gap-3 mb-12 overflow-hidden w-full max-w-[95vw]">
           {letters.map((letter, index) => {
             const scaleFactor = 1 - index * 0.05;
             return (
@@ -37,11 +37,10 @@ const NotFound = () => {
                 key={index}
                 src={letter}
                 alt={`letter-${index}`}
-                className="drop-shadow-[0_4px_10px_rgba(255,0,0,0.3)] hover:scale-110 hover:-translate-y-2 transition-transform duration-500"
+                className="drop-shadow-[0_4px_10px_rgba(255,0,0,0.3)] hover:scale-110 transition-transform duration-500 min-w-[18px] xs:min-w-[24px]"
                 style={{
                   width: `calc(${scaleFactor * 8}vw)`, // Slightly smaller than Home
                   maxWidth: "90px",
-                  minWidth: "24px",
                   animation: `float 6s ease-in-out infinite ${index * 0.2}s`
                 }}
               />
@@ -51,7 +50,7 @@ const NotFound = () => {
 
         <h2 className="text-2xl md:text-3xl font-light text-white mb-6">Página no encontrada</h2>
         <p className="text-gray-400 max-w-md mx-auto mb-10 text-base">
-          Parece que te has perdido en el espacio digital de BromiChat.
+          Parece que te has perdido en el espacio digital de Bromichat.
         </p>
 
         <Link to="/">

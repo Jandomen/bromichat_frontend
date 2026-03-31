@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { startAuthentication } from '@simplewebauthn/browser';
 import api from '../services/api';
-import { Mail, Lock, Fingerprint, ChevronRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, ChevronRight, Loader2, ShieldCheck } from 'lucide-react';
 
 import bImg from '../assets/b-removebg-preview.png';
 import rImg from '../assets/r-removebg-preview.png';
@@ -27,50 +26,23 @@ const AdminLogin = () => {
 
     const logoImages = [bImg, rImg, oImg, mImg, iImg, cImg, hImg, aImg, tImg];
 
-    const handleBiometricLogin = async () => {
-        try {
-            const optionsRes = await api.post('/webauthn/login-challenge', { email });
-            const options = optionsRes.data;
-            const asseResp = await startAuthentication({ optionsJSON: options });
-            const verifyRes = await api.post('/webauthn/login-verify', asseResp);
-            const { token, user } = verifyRes.data;
-
-            if (token && user) {
-                if (user.role !== 'admin') {
-                    showToast('Acceso denegado: se requieren permisos de administrador', 'error');
-                    return;
-                }
-                login({ token, user });
-                showToast('¡Bienvenido Administrador!', 'success');
-                navigate('/admin');
-            }
-        } catch (error) {
-            console.error('Biometric login error:', error);
-            showToast(error.response?.data?.error || 'Error en la autenticación biométrica.', 'error');
-        }
-    };
-
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoggingIn(true);
         try {
             const response = await api.post('/auth/login', { email, password });
-            console.log('[DEBUG] Respuesta Admin Login:', response.data);
-
             const { token, user } = response.data;
 
             if (token && user) {
                 if (user.role !== 'admin') {
-                    console.log('[DEBUG] Rol insuficiente:', user.role);
                     showToast('Acceso denegado: se requieren permisos de administrador', 'error');
                     return;
                 }
                 login({ token, user });
                 showToast('¡Bienvenido Administrador!', 'success');
-                navigate('/admin');
+                navigate('/admin/dashboard');
             }
         } catch (error) {
-            console.error('[DEBUG] Error Login:', error);
             showToast(error.response?.data?.message || 'Error al iniciar sesión', 'error');
         } finally {
             setIsLoggingIn(false);
@@ -78,142 +50,88 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] p-6 selection:bg-red-500/30 relative overflow-hidden font-['Outfit']">
-            {/* Ambient Background */}
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#020202] px-4 selection:bg-red-500/30 relative overflow-hidden font-['Outfit']">
+            {/* Ambient Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.1, 0.15, 0.1]
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-red-600/20 blur-[150px] rounded-full"
-                />
-                <motion.div
-                    animate={{
-                        scale: [1, 1.1, 1],
-                        opacity: [0.05, 0.1, 0.05]
-                    }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute bottom-0 right-0 w-[60%] h-[60%] bg-red-900/20 blur-[150px] rounded-full"
-                />
+                <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-red-600/5 blur-[120px] rounded-full" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.02] via-transparent to-transparent opacity-50" />
             </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-md p-1 bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_0_50px_-12px_rgba(220,38,38,0.3)] border border-white/5 relative z-10"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-sm relative z-10"
             >
-                <div className="p-8 sm:p-10 bg-gradient-to-b from-white/5 to-transparent rounded-[2.3rem]">
-                    <div className="text-center mb-10">
-                        <motion.div
-                            className="flex items-center justify-center gap-1 mb-6"
-                            initial="hidden"
-                            animate="visible"
-                            variants={{
-                                visible: { transition: { staggerChildren: 0.05 } }
-                            }}
-                        >
-                            {logoImages.map((img, idx) => (
-                                <motion.img
-                                    key={idx}
-                                    src={img}
-                                    variants={{
-                                        hidden: { y: 20, opacity: 0 },
-                                        visible: { y: 0, opacity: 1 }
-                                    }}
-                                    alt="Logo"
-                                    className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]"
-                                />
-                            ))}
-                        </motion.div>
-                        <motion.h1
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className="text-white text-2xl font-black uppercase tracking-widest"
-                        >
-                            Admin Portal
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.6 }}
-                            className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[9px] mt-2"
-                        >
-                            Acceso Restringido - Administrador
-                        </motion.p>
+                {/* Logo Section */}
+                <div className="text-center mb-10">
+                    <div className="flex items-center justify-center -space-x-1 xs:-space-x-1.5 mb-6">
+                        {logoImages.map((img, idx) => (
+                            <img key={idx} src={img} alt="" className="h-8 w-8 xs:h-10 xs:w-10 object-contain drop-shadow-[0_10px_20px_rgba(239,68,68,0.2)]" />
+                        ))}
                     </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-600/10 border border-red-500/20 rounded-full mb-3">
+                        <ShieldCheck size={12} className="text-red-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Security Gate</span>
+                    </div>
+                    <h1 className="text-white text-3xl font-black uppercase tracking-tighter mb-1">Bromichat</h1>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[9px] opacity-70">Administración de Red Global</p>
+                </div>
 
-                    <form className="space-y-6" onSubmit={handleLogin}>
+                {/* Login Card */}
+                <div className="bg-[#0a0a0a] border border-white/[0.07] rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+                    
+                    <form className="space-y-6 relative" onSubmit={handleLogin}>
                         <div className="space-y-2">
-                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-2" htmlFor="email">Email Admin</label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-red-500 transition-colors" />
+                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1" htmlFor="email">Email Corporativo</label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 transition-colors" />
                                 <input
                                     type="email"
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full pl-12 pr-6 py-4 border border-white/5 rounded-2xl bg-white/[0.03] text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 focus:bg-white/[0.06] transition-all font-medium"
+                                    className="w-full pl-12 pr-6 py-4 border border-white/5 rounded-2xl bg-white/[0.02] text-white placeholder-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/30 transition-all text-sm font-bold"
                                     placeholder="admin@bromichat.com"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-2" htmlFor="password">PIN de Acceso</label>
-                            <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-red-500 transition-colors" />
+                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1" htmlFor="password">Llave Maestra</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 transition-colors" />
                                 <input
                                     type="password"
                                     id="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full pl-12 pr-6 py-4 border border-white/5 rounded-2xl bg-white/[0.03] text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 focus:bg-white/[0.06] transition-all font-medium"
+                                    className="w-full pl-12 pr-6 py-4 border border-white/5 rounded-2xl bg-white/[0.02] text-white placeholder-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/30 transition-all text-sm font-bold"
                                     placeholder="••••••••"
                                 />
                             </div>
                         </div>
 
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                        <button
                             type="submit"
                             disabled={isLoggingIn}
-                            className="w-full py-4 px-6 text-white text-xs font-black uppercase tracking-[0.2em] bg-red-600 hover:bg-red-500 rounded-2xl shadow-lg shadow-red-900/40 transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:grayscale"
+                            className="w-full py-4.5 px-6 text-white text-xs font-black uppercase tracking-[0.2em] bg-red-600 hover:bg-red-500 rounded-2xl shadow-xl shadow-red-900/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
                         >
                             {isLoggingIn ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    Autenticar <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    Desbloquear Acceso <ChevronRight size={18} />
                                 </>
                             )}
-                        </motion.button>
-
-                        <div className="relative my-8">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-white/5"></div>
-                            </div>
-                            <div className="relative flex justify-center text-[9px] uppercase font-black tracking-widest">
-                                <span className="bg-[#0a0a0a] px-4 text-gray-700">Seguridad Biométrica</span>
-                            </div>
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.08)" }}
-                            whileTap={{ scale: 0.98 }}
-                            type="button"
-                            onClick={handleBiometricLogin}
-                            className="w-full py-4 px-6 flex items-center justify-center gap-3 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-white/5 rounded-2xl bg-white/[0.02] transition-all"
-                        >
-                            <Fingerprint className="w-5 h-5 text-red-500" /> Acceso con Huella
-                        </motion.button>
+                        </button>
                     </form>
+                </div>
+
+                <div className="mt-8 text-center">
+                    <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Solo personal autorizado de Bromichat</p>
                 </div>
             </motion.div>
         </div>

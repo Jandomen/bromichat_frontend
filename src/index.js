@@ -9,8 +9,7 @@ import { SocketProvider } from './context/SocketContext';
 import { UIProvider } from './context/UIContext';
 import { CallProvider } from './context/CallContext';
 
-// Polyfills para compatibilidad con simple-peer (WebRTC)
-// Se colocan inmediatamente después de los imports para cumplir con ESLint
+
 window.Buffer = Buffer;
 window.process = process;
 window.global = window;

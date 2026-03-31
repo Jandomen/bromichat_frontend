@@ -51,29 +51,29 @@ const ProductSearch = () => {
   return (
     <div className="space-y-12 animate-slide-up">
       {/* Search Input Area */}
-      <div className="relative group max-w-3xl mx-auto">
-        <div className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
-          {loading ? <Loader2 className="w-8 h-8 animate-spin" /> : <Search className="w-8 h-8" />}
+      <div className="relative group max-w-3xl mx-auto mb-6">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
         </div>
         <input
           type="text"
-          placeholder="¿Qué estás buscando hoy? Escribe aquí..."
+          placeholder="¿Qué estás buscando? Escribe aquí..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-20 pr-10 py-8 bg-white border-4 border-gray-50 focus:border-red-500/10 focus:bg-white rounded-[2.5rem] outline-none transition-all font-black text-gray-800 placeholder:text-gray-300 shadow-2xl shadow-gray-200/50 text-xl"
+          className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white border-2 border-gray-100 focus:border-red-500/30 focus:bg-white rounded-2xl outline-none transition-all font-black text-gray-800 placeholder:text-gray-400 shadow-md shadow-gray-200/50 text-[10px] sm:text-xs uppercase tracking-widest"
         />
       </div>
 
       {/* Category Selection for Search */}
-      <div className="flex gap-3 overflow-x-auto pb-6 -mx-4 px-4 no-scrollbar scroll-smooth justify-center">
+      <div className="flex gap-2 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar scroll-smooth justify-center">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`
-              whitespace-nowrap px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all
+              whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all
               ${selectedCategory === cat
-                ? 'bg-red-600 text-white shadow-xl shadow-red-200 scale-105'
+                ? 'bg-red-600 text-white shadow-md shadow-red-200 scale-105'
                 : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-100 hover:border-red-100'}
             `}
           >

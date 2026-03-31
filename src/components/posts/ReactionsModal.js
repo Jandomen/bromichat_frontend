@@ -8,6 +8,17 @@ import { REACTION_TYPES } from '../UI/ReactionPicker';
 const ReactionsModal = ({ isOpen, onClose, reactions }) => {
     const [activeTab, setActiveTab] = useState('all');
 
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        }
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     // Contar reacciones por tipo

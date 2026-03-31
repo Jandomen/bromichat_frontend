@@ -113,29 +113,29 @@ export default function Notifications() {
 
         <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-6 gap-4 border-b border-gray-200 pb-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              <Bell className="text-red-600" size={28} />
+            <h2 className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-1.5 xs:gap-2">
+              <Bell className="text-red-600 xs:w-6 xs:h-6 sm:w-7 sm:h-7" size={20} />
               Notificaciones
             </h2>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500 mt-0.5 xs:mt-1">
               Tienes <span className="font-bold text-red-600">{unreadGeneralCount}</span> notificaciones nuevas
             </p>
           </div>
 
-          <div className="flex gap-3 text-sm font-medium">
+          <div className="flex gap-2 xs:gap-3">
             {generalNotifications.length > 0 && (
               <>
                 <button
                   onClick={markAllAsRead}
-                  className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition shadow-sm flex items-center gap-2"
+                  className="px-2 xs:px-3 py-1.5 xs:py-2 text-[9px] xs:text-[10px] sm:text-xs bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition shadow-sm flex items-center gap-1 xs:gap-2 font-medium"
                 >
-                  <span>✓✓</span> Marcar todo leído
+                  <span className="tracking-tighter">✓✓</span> Marcar todo leído
                 </button>
                 <button
                   onClick={handleDeleteAllNotifications}
-                  className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition shadow-sm flex items-center gap-2"
+                  className="px-2 xs:px-3 py-1.5 xs:py-2 text-[9px] xs:text-[10px] sm:text-xs bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition shadow-sm flex items-center gap-1 xs:gap-2 font-medium"
                 >
-                  <span>🗑️</span> Borrar todo
+                  <span className="text-[10px] xs:text-xs">🗑️</span> Borrar todo
                 </button>
               </>
             )}
@@ -143,27 +143,27 @@ export default function Notifications() {
         </div>
 
         {generalNotifications.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Bell className="text-gray-300" size={40} />
+          <div className="text-center py-12 xs:py-16 sm:py-20 bg-white rounded-xl xs:rounded-2xl shadow-sm border border-gray-100">
+            <div className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 xs:mb-4">
+              <Bell className="text-gray-300 w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-800">No hay notificaciones</h3>
-            <p className="text-gray-500 mt-2">Te avisaremos cuando haya actividad reciente.</p>
+            <h3 className="text-base xs:text-lg sm:text-xl font-semibold text-gray-800">No hay notificaciones</h3>
+            <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500 mt-1.5 xs:mt-2">Te avisaremos cuando haya actividad reciente.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 xs:space-y-3">
             {generalNotifications.map((notification) => (
               <div
                 key={notification._id}
                 onClick={() => handleNotificationClick(notification)}
-                className={`group relative p-4 rounded-xl border transition-all duration-200 cursor-pointer flex gap-4 items-start ${!notification.isRead
-                  ? 'bg-white border-red-100 shadow-md shadow-red-50 hover:shadow-lg hover:border-red-200'
+                className={`group relative p-2.5 xs:p-3 sm:p-4 rounded-lg xs:rounded-xl border transition-all duration-200 cursor-pointer flex gap-2.5 xs:gap-3 sm:gap-4 items-start ${!notification.isRead
+                  ? 'bg-white border-red-100 shadow-[0_2px_8px_rgba(220,38,38,0.05)] hover:shadow-md hover:border-red-200'
                   : 'bg-gray-50/80 border-transparent hover:bg-white hover:shadow-sm hover:border-gray-200'
                   }`}
               >
                 {/* Unread Indicator */}
                 {!notification.isRead && (
-                  <span className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+                  <span className="absolute top-2.5 xs:top-4 right-2.5 xs:right-4 w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
                 )}
 
                 {/* Sender Avatar */}
@@ -173,20 +173,20 @@ export default function Notifications() {
                       ? getFullImageUrl(notification.sender.profilePicture)
                       : defaultProfile}
                     alt="Avatar"
-                    className={`w-14 h-14 rounded-full object-cover border-2 ${!notification.isRead ? 'border-red-100' : 'border-gray-200'}`}
+                    className={`w-9 h-9 xs:w-11 xs:h-11 sm:w-14 sm:h-14 rounded-full object-cover border-[1.5px] xs:border-2 ${!notification.isRead ? 'border-red-100' : 'border-gray-200'}`}
                     onError={(e) => { e.target.src = defaultProfile; }}
                   />
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-gray-100">
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 xs:p-1 shadow-sm border border-gray-100 scale-75 xs:scale-90 sm:scale-100 transform origin-bottom-right">
                     {renderIcon(notification.type)}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-grow pr-8">
-                  <div className="text-gray-900 leading-relaxed text-[15px]">
+                <div className="flex-grow pr-6 xs:pr-8">
+                  <div className="text-gray-900 text-[10px] xs:text-[11px] sm:text-[15px] leading-snug xs:leading-normal">
                     {notification.message}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1 font-medium flex items-center gap-1">
+                  <div className="text-[8px] xs:text-[9.5px] sm:text-xs text-gray-400 mt-0.5 xs:mt-1 font-medium flex items-center gap-1">
                     {new Date(notification.createdAt).toLocaleDateString(undefined, {
                       day: 'numeric', month: 'short', year: '2-digit'
                     })} • {new Date(notification.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
@@ -199,10 +199,10 @@ export default function Notifications() {
                     e.stopPropagation();
                     deleteNotification(notification._id);
                   }}
-                  className="absolute bottom-4 right-4 text-gray-300 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100"
+                  className="absolute bottom-2 xs:bottom-4 right-2 xs:right-4 text-gray-300 hover:text-red-500 transition-colors p-1.5 xs:p-2 rounded-full hover:bg-red-50 lg:opacity-0 lg:group-hover:opacity-100"
                   title="Eliminar notificación"
                 >
-                  <span className="text-lg font-bold leading-none">&times;</span>
+                  <span className="text-sm xs:text-base sm:text-lg font-bold leading-none">&times;</span>
                 </button>
               </div>
             ))}
@@ -213,10 +213,10 @@ export default function Notifications() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-red-600 text-white p-3 rounded-full shadow-xl hover:bg-red-700 hover:scale-110 transition-all z-50 focus:outline-none focus:ring-4 focus:ring-red-300"
+          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 p-3 sm:p-4 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 text-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/40 hover:scale-110 active:scale-95 transition-all outline-none z-50"
           aria-label="Volver arriba"
         >
-          <ArrowUp size={24} />
+          <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       )}
     </div>

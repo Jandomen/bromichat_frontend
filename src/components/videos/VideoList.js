@@ -130,6 +130,36 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
     }
   };
 
+  const handleQuickToggle = async (video, type) => {
+    try {
+      const updatedData = {
+         title: video.title,
+         description: video.description,
+         category: video.category || 'Todos',
+         allowFeed: type === 'feed' ? !video.allowFeed : video.allowFeed,
+         isPrivate: type === 'privacy' ? !video.isPrivate : video.isPrivate
+      };
+      
+      const res = await axios.put(`${process.env.REACT_APP_API_BACKEND}/videos/update/${video._id}`, updatedData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setVideos(prev => prev.map(v => v._id === video._id ? { ...v, ...res.data } : v));
+      
+      if (type === 'privacy') {
+        showToast(res.data.isPrivate ? 'Video oculto (Privado)' : 'Video hecho Público', 'success');
+      } else {
+        showToast(res.data.allowFeed ? 'Añadido al Feed Global Short' : 'Quitado del Feed Global Short', 'success');
+      }
+
+      if (currentVideoDetails?._id === video._id) {
+         setCurrentVideoDetails(prev => ({...prev, isPrivate: res.data.isPrivate, allowFeed: res.data.allowFeed}));
+      }
+    } catch (err) {
+      showToast('Error al actualizar ajuste', 'error');
+    }
+  };
+
   const handleVideoHover = (videoId, isHovering) => {
     const videoEl = videoRefs.current[videoId];
     if (videoEl) {
@@ -222,12 +252,12 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
 
   // Layout selection
   const gridClasses = type === 'youtube'
-    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    : "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6";
+    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-4 sm:gap-8"
+    : "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-6";
 
   const cardClasses = type === 'youtube'
     ? "bg-white overflow-hidden transition-all duration-300 group cursor-pointer"
-    : "group relative bg-zinc-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-white/5 transform hover:-translate-y-2 cursor-pointer";
+    : "group relative bg-zinc-900 rounded-lg xs:rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-white/5 transform hover:-translate-y-2 cursor-pointer";
 
   const videoAspect = type === 'youtube' ? "aspect-video rounded-2xl" : "aspect-[9/16]";
 
@@ -299,18 +329,18 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
 
             {/* YouTube style info block */}
             {type === 'youtube' && (
-              <div className="mt-4 flex gap-3">
+              <div className="mt-2 xs:mt-3 sm:mt-4 flex gap-2 xs:gap-3 sm:gap-3">
                 <img
                   src={getFullImageUrl(video.user?.profilePicture)}
-                  className="w-10 h-10 rounded-[1.2rem] object-cover mt-1 border-2 border-gray-50 transition-transform group-hover:scale-110 shadow-sm"
+                  className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg xs:rounded-xl sm:rounded-[1.2rem] object-cover mt-0.5 xs:mt-1 border xs:border-2 border-gray-50 transition-transform group-hover:scale-110 shadow-sm flex-shrink-0"
                   alt=""
                   onError={e => e.target.src = defaultProfile}
                 />
-                <div className="flex-1 min-w-0 pr-8 relative">
-                  <h3 className="font-bold text-gray-900 text-base leading-snug line-clamp-2 group-hover:text-red-600 transition-colors uppercase tracking-tight">{video.title}</h3>
-                  <div className="flex flex-col mt-1 opacity-60">
-                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">@{video.user?.username}</span>
-                    <span className="text-[10px] font-bold text-gray-400 mt-0.5">{video.createdAt ? new Date(video.createdAt).toLocaleDateString('es-ES') : ''}</span>
+                <div className="flex-1 min-w-0 pr-4 xs:pr-6 sm:pr-8 relative">
+                  <h3 className="font-bold text-gray-900 text-[9.5px] xs:text-[11px] sm:text-base leading-snug line-clamp-2 group-hover:text-red-600 transition-colors uppercase tracking-tight">{video.title}</h3>
+                  <div className="flex flex-col mt-0.5 xs:mt-1 opacity-60">
+                    <span className="text-[7.5px] xs:text-[9px] sm:text-[11px] font-black text-gray-500 uppercase tracking-widest truncate">@{video.user?.username}</span>
+                    <span className="text-[7px] xs:text-[8px] sm:text-[10px] font-bold text-gray-400 mt-0.5">{video.createdAt ? new Date(video.createdAt).toLocaleDateString('es-ES') : ''}</span>
                   </div>
                 </div>
               </div>
@@ -347,13 +377,59 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
       {lightboxIndex !== null && (
         <div {...handlers} className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[200] flex items-center justify-center animate-in fade-in duration-300" onClick={() => setLightboxIndex(null)}>
           <div className="relative w-screen h-screen bg-black flex flex-col md:flex-row" onClick={e => e.stopPropagation()}>
-            {/* Close button - high visibility */}
-            <button
-              onClick={() => setLightboxIndex(null)}
-              className="absolute top-6 right-6 z-[220] p-4 bg-white/10 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all shadow-2xl active:scale-90"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            
+            {/* Action Buttons Top Right */}
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[220] flex items-center gap-2 sm:gap-3">
+              {videos[lightboxIndex]?.user?._id === currentUser?._id && (
+                <Menu as="div" className="relative shrink-0">
+                  <Menu.Button className="p-3 sm:p-4 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all shadow-2xl active:scale-90 flex items-center justify-center">
+                    <FaEllipsisV size={16} />
+                  </Menu.Button>
+                  <Menu.Items className="absolute right-0 mt-3 w-56 sm:w-64 bg-zinc-900/95 backdrop-blur-3xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 z-[300] origin-top-right">
+                    <div className="p-2 space-y-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => handleQuickToggle(videos[lightboxIndex], 'privacy')} className={`${active ? 'bg-white/10' : ''} w-full text-left px-4 py-3 text-xs font-bold text-white flex items-center gap-3 rounded-xl transition-colors`}>
+                            {videos[lightboxIndex].isPrivate ? <FaGlobe className="text-blue-400" size={14} /> : <FaLock className="text-red-500" size={14} />}
+                            {videos[lightboxIndex].isPrivate ? 'Hacer Público' : 'Hacer Privado'}
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => handleQuickToggle(videos[lightboxIndex], 'feed')} className={`${active ? 'bg-white/10' : ''} w-full text-left px-4 py-3 text-xs font-bold text-white flex items-center gap-3 rounded-xl transition-colors`}>
+                            {videos[lightboxIndex].allowFeed ? <FaPlay className="text-zinc-500 scale-75" size={14} /> : <FaPlay className="text-green-500 scale-75" size={14} />}
+                            {videos[lightboxIndex].allowFeed ? 'Ocultar de Feed Global' : 'Añadir a Feed Global'}
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <div className="h-px bg-white/10 my-1 mx-2"></div>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => handleEditClick(videos[lightboxIndex])} className={`${active ? 'bg-indigo-600' : ''} w-full text-left px-4 py-3 text-xs font-bold text-white flex items-center gap-3 rounded-xl transition-colors`}>
+                            <FaEdit size={14} /> Opciones Avanzadas
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => handleDelete(videos[lightboxIndex].publicId)} className={`${active ? 'bg-red-600' : ''} w-full text-left px-4 py-3 text-xs font-bold text-white flex items-center gap-3 rounded-xl transition-colors`}>
+                            <FaTrash size={14} /> Eliminar Video
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Menu>
+              )}
+              
+              <button
+                onClick={() => setLightboxIndex(null)}
+                className="p-3 sm:p-4 bg-white/10 hover:bg-red-600 text-white rounded-full backdrop-blur-xl border border-white/20 transition-all shadow-2xl active:scale-90"
+              >
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
 
             <div className="flex-grow relative bg-black flex items-center justify-center group/vid">
               <button className="absolute left-4 z-10 text-white/20 hover:text-white p-4 transition-all opacity-0 group-hover/vid:opacity-100" onClick={handlePrev}><FaChevronLeft size={32} /></button>
@@ -362,51 +438,72 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
             </div>
 
             <div className="w-full md:w-96 bg-zinc-900 flex flex-col border-l border-white/5">
-              <div className="p-6 border-b border-white/5">
-                <div className="flex items-center gap-3 mb-4">
-                  <img src={getFullImageUrl(currentVideoDetails?.user?.profilePicture)} className="w-10 h-10 rounded-full object-cover border border-white/10" alt="" onError={e => e.target.src = defaultProfile} />
-                  <div>
-                    <h2 className="text-white font-black text-sm uppercase truncate">@{currentVideoDetails?.user?.username || 'Cargando...'}</h2>
-                    <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">{videos[lightboxIndex].createdAt ? new Date(videos[lightboxIndex].createdAt).toLocaleDateString('es-ES') : ''}</span>
+              <div className="p-4 sm:p-6 border-b border-white/5">
+                <div className="flex items-center gap-2 xs:gap-3 mb-2 xs:mb-4">
+                  <img src={getFullImageUrl(currentVideoDetails?.user?.profilePicture)} className="w-8 h-8 xs:w-10 xs:h-10 rounded-full object-cover border border-white/10" alt="" onError={e => e.target.src = defaultProfile} />
+                  <div className="min-w-0">
+                    <h2 className="text-white font-black text-[11px] xs:text-sm uppercase truncate">@{currentVideoDetails?.user?.username || 'Cargando...'}</h2>
+                    <span className="text-[8.5px] xs:text-[10px] text-zinc-500 font-bold tracking-widest uppercase truncate block">{videos[lightboxIndex].createdAt ? new Date(videos[lightboxIndex].createdAt).toLocaleDateString('es-ES') : ''}</span>
                   </div>
                 </div>
-                <p className="text-zinc-300 text-sm leading-relaxed mb-4">{videos[lightboxIndex].description || videos[lightboxIndex].title}</p>
+                <p className="text-zinc-300 text-[11px] xs:text-sm leading-relaxed mb-6">{videos[lightboxIndex].description || videos[lightboxIndex].title}</p>
 
-                <div className="flex items-center justify-around py-4 border-t border-b border-white/5">
-                  <div className="relative group/react">
+                {/* Integrated Horizontal Interaction Bar (Sophisticated Design) */}
+                <div className="flex flex-row items-center justify-around gap-2 bg-black/40 backdrop-blur-2xl p-2.5 rounded-2xl border border-white/10 mb-6 shadow-2xl">
+                    
+                    {/* Reactions: "ME LATE" */}
+                    <div className="relative group/react flex-1">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const userReaction = currentVideoDetails.reactions?.find(r => r.user === currentUser?._id);
+                                if (userReaction) handleReact(userReaction.type);
+                                else handleReact('like');
+                            }}
+                            className="flex items-center justify-center w-full gap-2 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
+                        >
+                            <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
+                                {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <FaHeart className="w-4 h-4 text-white/50 group-hover/btn:text-white transition-all" />}
+                            </div>
+                            <div className="flex flex-col items-start leading-none">
+                                <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">ME LATE</span>
+                                <span className="text-[10px] font-black text-white">{currentVideoDetails?.reactions?.length || 0}</span>
+                            </div>
+                        </button>
+                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-2 group-hover/react:translate-y-0 z-[150] absolute bottom-full mb-3 left-0">
+                            <ReactionPicker
+                                onSelect={(type) => handleReact(type)}
+                                currentReaction={currentVideoDetails?.reactions?.find(r => r.user === currentUser?._id)?.type}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="w-[1px] h-6 bg-white/20 shrink-0" />
+
+                    {/* Comments: "OPINAR" */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const userReaction = currentVideoDetails.reactions?.find(r => r.user === currentUser?._id);
-                        if (userReaction) {
-                          handleReact(userReaction.type);
-                        } else {
-                          handleReact('like');
-                        }
-                      }}
-                      className="flex flex-col items-center gap-1"
+                        className="flex flex-col items-center justify-center flex-1 gap-1 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
                     >
-                      <div className={`p-3 rounded-full transition-all ${currentReactionData ? 'bg-red-600 text-white' : 'hover:bg-white/5 text-zinc-400'}`}>
-                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <FaHeart size={18} />}
-                      </div>
-                      <span className="text-[10px] font-black text-zinc-500">{currentVideoDetails?.reactions?.length || 0}</span>
+                        <FaComment className="w-4 h-4 text-white/50 group-hover/btn:text-white transition-colors" />
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">OPINAR</span>
+                            <span className="text-[10px] font-black text-white">{currentVideoDetails?.comments?.length || 0}</span>
+                        </div>
                     </button>
 
-                    <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-1 group-hover/react:translate-y-0 z-[150]">
-                      <ReactionPicker
-                        onSelect={(type) => handleReact(type)}
-                        currentReaction={currentVideoDetails?.reactions?.find(r => r.user === currentUser?._id)?.type}
-                      />
-                    </div>
-                  </div>
-                  <button className="flex flex-col items-center gap-1 text-zinc-400 hover:text-blue-500 transition-colors">
-                    <FaComment size={18} />
-                    <span className="text-[10px] font-black text-zinc-500">{currentVideoDetails?.comments?.length || 0}</span>
-                  </button>
-                  <button onClick={handleShare} className="flex flex-col items-center gap-1 text-zinc-400 hover:text-green-500 transition-colors">
-                    <FaShare size={18} />
-                    <span className="text-[10px] font-black text-zinc-500">COMPARTIR</span>
-                  </button>
+                    <div className="w-[1px] h-6 bg-white/20 shrink-0" />
+
+                    {/* Share: "VIRALIZAR" */}
+                    <button
+                        onClick={handleShare}
+                        className="flex flex-col items-center justify-center flex-1 gap-1 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
+                    >
+                        <FaShare className="w-4 h-4 text-white/50 group-hover/btn:text-white transition-colors" />
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">VIRALIZAR</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-tighter">Go!</span>
+                        </div>
+                    </button>
                 </div>
               </div>
 
@@ -432,9 +529,9 @@ const VideoList = ({ videos, setVideos, token, type = 'grid' }) => {
                 )}
               </div>
 
-              <form onSubmit={handleComment} className="p-4 bg-black/40 border-t border-white/5 flex gap-2">
-                <input type="text" value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-red-600/50" />
-                <button type="submit" className="p-2.5 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors"><FaPaperPlane size={14} /></button>
+              <form onSubmit={handleComment} className="p-2 xs:p-4 bg-black/40 border-t border-white/5 flex gap-1.5 xs:gap-2 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:pb-4">
+                <input type="text" value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-3 xs:px-4 py-1.5 xs:py-2 text-[10px] xs:text-xs text-white focus:outline-none focus:ring-1 focus:ring-red-600/50" />
+                <button type="submit" className="p-2 xs:p-2.5 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors flex items-center justify-center"><FaPaperPlane size={12} className="xs:w-[14px] xs:h-[14px]" /></button>
               </form>
             </div>
           </div>

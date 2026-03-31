@@ -93,24 +93,24 @@ const StoryArchive = () => {
     );
 
     return (
-        <div className="space-y-10 animate-fade-in pb-12">
+        <div className="space-y-6 xs:space-y-8 sm:space-y-10 animate-fade-in pb-6 xs:pb-8 sm:pb-12">
             {/* Header with Stats & Filter */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-3 bg-slate-900 text-white rounded-[1.25rem] shadow-xl">
-                            <History size={24} />
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 xs:gap-5 sm:gap-6 px-1.5 xs:px-2">
+                <div className="space-y-1.5 xs:space-y-2">
+                    <div className="flex items-center gap-2 xs:gap-3">
+                        <div className="p-2 xs:p-2.5 sm:p-3 bg-slate-900 text-white rounded-xl xs:rounded-[1.25rem] shadow-xl">
+                            <History size={20} className="xs:w-6 xs:h-6" />
                         </div>
-                        <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">
+                        <h3 className="text-lg xs:text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight italic">
                             Tu <span className="text-primary-600">Galería</span> de Momentos
                         </h3>
                     </div>
-                    <p className="text-sm text-slate-400 font-bold max-w-sm italic">
+                    <p className="text-xs xs:text-sm text-slate-400 font-bold max-w-sm italic">
                         Un espacio privado donde tus historias permanecen vivas para siempre.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
+                <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 bg-slate-100/80 p-1 xs:p-1.5 rounded-xl xs:rounded-2xl border border-slate-200 shadow-inner">
                     {[
                         { id: 'all', label: 'Todos', icon: Filter },
                         { id: 'active', label: 'Activos', icon: Eye },
@@ -119,12 +119,12 @@ const StoryArchive = () => {
                         <button
                             key={btn.id}
                             onClick={() => setFilter(btn.id)}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-tighter transition-all duration-300 ${filter === btn.id
-                                ? 'bg-white text-primary-600 shadow-lg shadow-primary-500/10 scale-105'
+                            className={`flex items-center gap-1.5 xs:gap-2 px-3 xs:px-4 sm:px-5 py-1.5 xs:py-2 sm:py-2.5 rounded-lg xs:rounded-xl font-black text-[9px] xs:text-[10px] uppercase tracking-tighter transition-all duration-300 ${filter === btn.id
+                                ? 'bg-white text-primary-600 shadow-lg shadow-primary-500/10 scale-[1.03] xs:scale-105'
                                 : 'text-slate-500 hover:text-slate-900'
                                 }`}
                         >
-                            <btn.icon size={14} strokeWidth={3} />
+                            <btn.icon size={12} className="xs:w-3.5 xs:h-3.5" strokeWidth={3} />
                             {btn.label}
                         </button>
                     ))}
@@ -132,13 +132,13 @@ const StoryArchive = () => {
             </div>
 
             {archivedStories.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 shadow-sm relative overflow-hidden group">
+                <div className="flex flex-col items-center justify-center py-16 xs:py-20 sm:py-24 bg-white rounded-[2rem] xs:rounded-[2.5rem] sm:rounded-[3rem] border-2 border-dashed border-slate-100 shadow-sm relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary-50/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    <div className="relative w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl border border-white">
-                        <History size={36} className="text-slate-300" />
+                    <div className="relative w-16 h-16 xs:w-20 xs:h-20 bg-slate-50 rounded-2xl xs:rounded-[2rem] flex items-center justify-center mb-4 xs:mb-6 shadow-xl border border-white">
+                        <History size={28} className="xs:w-9 xs:h-9 text-slate-300" />
                     </div>
-                    <h4 className="text-lg font-black text-slate-800 uppercase tracking-tight">Baúl Vacío</h4>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Tus historias archivadas aparecerán aquí automáticamente</p>
+                    <h4 className="text-base xs:text-lg font-black text-slate-800 uppercase tracking-tight">Baúl Vacío</h4>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] xs:text-[10px] sm:text-xs mt-1 xs:mt-2 text-center px-4">Tus historias archivadas aparecerán aquí automáticamente</p>
                 </div>
             ) : sortedGroups.length === 0 ? (
                 <div className="text-center py-20 grayscale opacity-40">
@@ -158,11 +158,11 @@ const StoryArchive = () => {
                                 <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-slate-200" />
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 xs:gap-4 sm:gap-6">
                                 {group.items.map((story) => (
                                     <div
                                         key={story._id}
-                                        className="group relative aspect-[9/16] rounded-3xl overflow-hidden bg-slate-950 shadow-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-primary-500/10 ring-1 ring-white/10"
+                                        className="group relative aspect-[9/16] rounded-2xl xs:rounded-3xl overflow-hidden bg-slate-950 shadow-2xl cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-primary-500/10 ring-1 ring-white/10"
                                         onClick={() => setSelectedStory(story)}
                                     >
                                         {/* Media Content */}
@@ -174,41 +174,41 @@ const StoryArchive = () => {
                                                 <video src={story.mediaUrl} className="w-full h-full object-cover opacity-85" />
                                             )}
                                             {story.type === 'text' && (
-                                                <div className="w-full h-full flex items-center justify-center p-6 text-center text-white font-black text-xs uppercase" style={{ backgroundColor: story.backgroundColor }}>
-                                                    <span className="line-clamp-6 leading-relaxed bg-black/10 p-2 rounded-xl backdrop-blur-sm">{story.content}</span>
+                                                <div className="w-full h-full flex items-center justify-center p-3 xs:p-4 sm:p-6 text-center text-white font-black text-[10px] xs:text-xs uppercase" style={{ backgroundColor: story.backgroundColor }}>
+                                                    <span className="line-clamp-6 leading-relaxed bg-black/10 p-1.5 xs:p-2 rounded-lg xs:rounded-xl backdrop-blur-sm">{story.content}</span>
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Status Badges */}
-                                        <div className="absolute top-4 inset-x-4 flex justify-between items-start z-10">
-                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-xl rounded-2xl text-[10px] font-black text-white border border-white/10 shadow-lg">
-                                                <Eye size={12} strokeWidth={3} />
+                                        <div className="absolute top-2 xs:top-3 sm:top-4 inset-x-2 xs:inset-x-3 sm:inset-x-4 flex justify-between items-start z-10">
+                                            <div className="flex items-center gap-1 xs:gap-1.5 px-1.5 xs:px-2 py-0.5 xs:py-1 bg-black/40 backdrop-blur-xl rounded-full text-[8px] xs:text-[9px] sm:text-[10px] font-black text-white border border-white/10 shadow-lg">
+                                                <Eye size={10} className="xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5" strokeWidth={3} />
                                                 {story.views?.length || 0}
                                             </div>
 
                                             {new Date(story.expiresAt) > new Date() && (
-                                                <div className="px-3 py-1.5 bg-green-500/90 backdrop-blur-md rounded-2xl text-[9px] font-black text-white shadow-lg shadow-green-500/20 uppercase tracking-tighter flex items-center gap-1">
-                                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                <div className="px-1.5 xs:px-2 py-0.5 xs:py-1 bg-green-500/90 backdrop-blur-md rounded-full text-[7px] xs:text-[8px] sm:text-[9px] font-black text-white shadow-lg shadow-green-500/20 uppercase tracking-tighter flex items-center gap-1">
+                                                    <div className="w-1 h-1 xs:w-1.5 xs:h-1.5 bg-white rounded-full animate-pulse" />
                                                     Activo
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Hover Actions Bar */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
-                                            <div className="flex items-center gap-2">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-3 xs:p-4 sm:p-5">
+                                            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-1.5 xs:gap-2">
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedStory(story); }}
-                                                    className="flex-1 bg-white text-black py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+                                                    className="flex-1 bg-white text-black py-2 xs:py-2.5 sm:py-3 rounded-xl font-black text-[9px] xs:text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-xl"
                                                 >
                                                     Explorar
                                                 </button>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleDelete(story._id); }}
-                                                    className="p-3 bg-red-600 text-white rounded-2xl hover:bg-red-500 transition-all active:scale-90 shadow-xl"
+                                                    className="p-2 xs:p-2.5 sm:p-3 bg-red-600 text-white rounded-xl hover:bg-red-500 transition-all active:scale-90 shadow-xl flex items-center justify-center"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={14} className="xs:w-4 xs:h-4" />
                                                 </button>
                                             </div>
                                         </div>

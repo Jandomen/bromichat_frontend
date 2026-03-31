@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
+import api from '../services/api';
 
 const UIContext = createContext();
 
@@ -14,6 +15,28 @@ export const UIProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [confirmModal, setConfirmModal] = useState(null);
+    const [settings, setSettings] = useState({});
+
+    const applySettings = useCallback((sets) => {
+        if (sets.primaryColor) document.documentElement.style.setProperty('--primary-color', sets.primaryColor);
+        if (sets.accentColor) document.documentElement.style.setProperty('--accent-color', sets.accentColor);
+        if (sets.appBackground) document.documentElement.style.setProperty('--app-bg', sets.appBackground);
+    }, []);
+
+    const fetchSettings = useCallback(async () => {
+        try {
+            const res = await api.get('/admin/settings/public');
+            const sets = res.data.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {});
+            setSettings(sets);
+            applySettings(sets);
+        } catch (error) {
+            console.warn('Could not fetch public app branding settings.');
+        }
+    }, [applySettings]);
+
+    useEffect(() => {
+        fetchSettings();
+    }, [fetchSettings]);
 
     const showNotification = useCallback((data, duration = 4000) => {
         const id = Date.now();
@@ -65,7 +88,9 @@ export const UIProvider = ({ children }) => {
             selectedPostId,
             setSelectedPostId,
             highlightedCommentId,
-            setHighlightedCommentId
+            setHighlightedCommentId,
+            appSettings: settings,
+            refreshSettings: fetchSettings
         }}>
             {children}
         </UIContext.Provider>

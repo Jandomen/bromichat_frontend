@@ -80,15 +80,15 @@ const VideoUpload = ({ onUpload }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-8">
-      <div className="bg-gradient-to-r from-red-600 to-red-800 p-6 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-3">
-          <FaFilm /> Subir Nuevo Video
+    <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-4 xs:mb-8">
+      <div className="bg-gradient-to-r from-red-600 to-red-800 p-3 xs:p-4 sm:p-6 text-white">
+        <h2 className="text-sm xs:text-lg sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+          <FaFilm className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5" /> Subir Nuevo Video
         </h2>
-        <p className="text-red-100 mt-1 opacity-80">Comparte tus mejores momentos con la comunidad.</p>
+        <p className="text-red-100 mt-0.5 xs:mt-1 font-semibold text-[8px] xs:text-[10px] sm:text-sm opacity-80">Comparte tus mejores momentos con la comunidad.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-8 space-y-6">
+      <form onSubmit={handleSubmit} className="p-3 xs:p-5 sm:p-8 space-y-3 xs:space-y-4 sm:space-y-6">
 
         {/* Drag and Drop Area */}
         <div
@@ -113,11 +113,11 @@ const VideoUpload = ({ onUpload }) => {
 
           {!videoFile ? (
             <div className="text-center pointer-events-none">
-              <div className="bg-red-100 text-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaCloudUploadAlt size={32} />
+              <div className="bg-red-100 text-red-600 w-10 h-10 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-2 xs:mb-4">
+                <FaCloudUploadAlt className="w-5 h-5 xs:w-6 xs:h-6 sm:w-8 sm:h-8" />
               </div>
-              <p className="text-gray-700 font-medium text-lg">Arrastra y suelta tu video aquí</p>
-              <p className="text-gray-400 text-sm mt-1">o haz clic para explorar tus archivos</p>
+              <p className="text-gray-700 font-black text-[10px] xs:text-xs sm:text-lg uppercase tracking-tight">Arrastra y suelta tu video aquí</p>
+              <p className="text-gray-400 font-bold text-[8px] xs:text-[9.5px] sm:text-sm mt-0.5 xs:mt-1 uppercase tracking-widest">o explora tus archivos</p>
             </div>
           ) : (
             <div className="w-full">
@@ -149,91 +149,76 @@ const VideoUpload = ({ onUpload }) => {
 
         {/* Inputs */}
         <div className="space-y-4">
-          <div className="relative">
+          <div className="flex flex-col gap-1.5 xs:gap-2 relative">
+            <label htmlFor="video-title" className="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+              Título del Video
+            </label>
             <input
               type="text"
               id="video-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all bg-transparent placeholder-transparent"
-              placeholder="Título del video"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs sm:text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all font-semibold text-gray-800"
+              placeholder="Un título pegadizo..."
               required
             />
-            <label
-              htmlFor="video-title"
-              className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-red-500"
-            >
-              Título del Video
-            </label>
           </div>
 
-          <div className="relative">
+          <div className="flex flex-col gap-1.5 xs:gap-2 relative">
+            <label htmlFor="video-desc" className="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+              Descripción Corta
+            </label>
             <textarea
               id="video-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows="3"
-              className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all bg-transparent placeholder-transparent resize-none"
-              placeholder="Descripción"
+              rows="2"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs sm:text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all placeholder-gray-300 resize-none min-h-[60px]"
+              placeholder="Añade algún detalle..."
             />
-            <label
-              htmlFor="video-desc"
-              className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-red-500"
-            >
-              Descripción (Opcional)
-            </label>
           </div>
 
           {/* Category Selector */}
-          <div className="relative">
-            <select
-              id="video-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all bg-transparent appearance-none"
-            >
-              {VIDEO_CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <label
-              htmlFor="video-category"
-              className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-500 transition-all"
-            >
-              Categoría (Opcional)
+          <div className="flex flex-col gap-1.5 xs:gap-2 relative">
+            <label htmlFor="video-category" className="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+              Categoría Temática
             </label>
-            <div className="absolute right-4 top-3.5 pointer-events-none text-gray-400">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+            <div className="relative">
+              <select
+                id="video-category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs sm:text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all appearance-none font-semibold text-gray-700"
+              >
+                {VIDEO_CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={isPrivate}
-                  onChange={(e) => setIsPrivate(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+          <div className="flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <label className="flex items-center justify-between cursor-pointer group">
+              <span className="text-xs sm:text-sm font-bold text-gray-700">Video Privado (Ocultar)</span>
+              <div className="relative shrink-0">
+                <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} className="sr-only peer" />
+                <div className="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600 shadow-inner"></div>
               </div>
-              <span className="text-sm font-semibold text-gray-700">Video Privado</span>
             </label>
 
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={allowFeed}
-                  onChange={(e) => setAllowFeed(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+            <div className="h-px bg-gray-200 w-full" />
+
+            <label className="flex items-center justify-between cursor-pointer group">
+              <span className="text-xs sm:text-sm font-bold text-gray-700">Aparecer en Feed Global Shorts</span>
+              <div className="relative shrink-0">
+                <input type="checkbox" checked={allowFeed} onChange={(e) => setAllowFeed(e.target.checked)} className="sr-only peer" />
+                <div className="w-10 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
               </div>
-              <span className="text-sm font-semibold text-gray-700">Compartir en Feed (Shorts)</span>
             </label>
           </div>
         </div>
@@ -241,12 +226,12 @@ const VideoUpload = ({ onUpload }) => {
         <button
           type="submit"
           disabled={loading || !videoFile || !title}
-          className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:-translate-y-1 ${loading || !videoFile || !title
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
-            : 'bg-gradient-to-r from-red-600 to-pink-600 text-white hover:shadow-red-500/30'
+          className={`w-full py-3.5 sm:py-4 mt-2 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-xs shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 ${loading || !videoFile || !title
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+            : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-red-500/30'
             }`}
         >
-          {loading ? 'Subiendo video...' : 'Publicar Video'}
+          {loading ? 'Preparando Video...' : 'Publicar Video'}
         </button>
 
       </form>

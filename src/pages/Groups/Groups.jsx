@@ -90,48 +90,48 @@ const Groups = () => {
             <div className="min-h-screen bg-gray-50/50 pb-12">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
                     {/* Header Section */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-6">
                         <div>
-                            <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-                                <span className="p-2 bg-blue-100 text-blue-600 rounded-xl">
-                                    <FaUsers size={28} />
+                            <h1 className="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-2 uppercase tracking-widest">
+                                <span className="p-1.5 bg-blue-100 text-blue-600 rounded-lg shadow-sm">
+                                    <FaUsers size={16} />
                                 </span>
                                 Grupos
                             </h1>
-                            <p className="text-gray-500 mt-1 ml-14">Conecta y comparte con personas de tus mismos intereses</p>
+                            <p className="text-gray-500 mt-0.5 ml-9 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em]">Conecta y comparte con personas de tus mismos intereses</p>
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-all font-bold active:scale-95"
+                            className="bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2 shadow-md shadow-blue-200 transition-all font-black text-[10px] sm:text-[11px] uppercase tracking-widest active:scale-95"
                         >
-                            <FaPlus /> Crear Grupo
+                            <FaPlus size={10} /> Crear Grupo
                         </button>
                     </div>
 
                     {/* Search and Filters */}
-                    <div className="mb-8 relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <FaSearch className="text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                    <div className="mb-6 relative group">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FaSearch className="text-gray-400 group-focus-within:text-blue-500 transition-colors text-xs" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Buscar grupos por nombre o descripción..."
+                            placeholder="Buscar por nombre..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-lg"
+                            className="w-full pl-8 pr-3 py-2 sm:py-2.5 bg-white border border-gray-100 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest placeholder-gray-400"
                         />
                     </div>
 
                     {/* Groups Grid */}
                     {filteredGroups.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fadeIn">
                             {filteredGroups.map((group) => (
                                 <Link
                                     to={`/groups/${group._id}`}
                                     key={group._id}
-                                    className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
+                                    className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 group flex flex-col"
                                 >
-                                    <div className="h-40 relative">
+                                    <div className="h-24 sm:h-28 relative flex-shrink-0">
                                         {group.coverImage ? (
                                             <img
                                                 src={getFullImageUrl(group.coverImage)}
@@ -140,24 +140,24 @@ const Groups = () => {
                                             />
                                         ) : (
                                             <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white/20">
-                                                <FaUsers size={64} />
+                                                <FaUsers size={32} />
                                             </div>
                                         )}
-                                        <div className="absolute top-4 right-4">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${group.privacy === 'public' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                        <div className="absolute top-2 right-2">
+                                            <span className={`px-2 py-0.5 rounded-full text-[7px] sm:text-[8px] font-black uppercase tracking-widest ${group.privacy === 'public' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
                                                 }`}>
                                                 {group.privacy === 'public' ? '🌍 Público' : '🔒 Privado'}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="p-6">
-                                        <h3 className="font-extrabold text-xl text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                    <div className="p-3 sm:p-4 flex flex-col flex-grow">
+                                        <h3 className="font-black text-[11px] sm:text-[13px] text-gray-900 mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1 uppercase tracking-wider">
                                             {group.name}
                                         </h3>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <div className="flex -space-x-2">
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            <div className="flex -space-x-1.5">
                                                 {group.members?.slice(0, 3).map((member, i) => (
-                                                    <div key={member._id || i} className="w-6 h-6 rounded-full border-2 border-white bg-gray-200 overflow-hidden flex items-center justify-center">
+                                                    <div key={member._id || i} className="w-5 h-5 rounded-full border-2 border-white bg-gray-200 overflow-hidden flex items-center justify-center shadow-sm">
                                                         {member.profilePicture ? (
                                                             <img
                                                                 src={getFullImageUrl(member.profilePicture)}
@@ -166,29 +166,29 @@ const Groups = () => {
                                                                 onError={(e) => { e.target.src = '/default-profile.png'; }}
                                                             />
                                                         ) : (
-                                                            <span className="text-[10px] font-bold text-gray-400 capitalize">
+                                                            <span className="text-[7px] font-bold text-gray-400 capitalize">
                                                                 {member.username?.charAt(0) || '?'}
                                                             </span>
                                                         )}
                                                     </div>
                                                 ))}
                                                 {group.members?.length > 3 && (
-                                                    <div className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-500">
+                                                    <div className="w-5 h-5 rounded-full border-2 border-white bg-gray-50 flex items-center justify-center text-[7px] font-bold text-gray-500 shadow-sm">
                                                         +{group.members.length - 3}
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="text-gray-500 text-sm font-medium">
-                                                {group.members?.length || 0} miembros
+                                            <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest ml-1">
+                                                {group.members?.length || 0} compas
                                             </span>
                                         </div>
-                                        <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed h-10 mb-4 italic">
-                                            {group.description || 'Sin descripción disponible.'}
+                                        <p className="text-gray-500 text-[10px] line-clamp-2 leading-relaxed h-[28px] mb-3 italic font-medium">
+                                            {group.description || 'Sin descripción.'}
                                         </p>
-                                        <div className="pt-4 border-t border-gray-50 flex items-center justify-between text-blue-600 font-bold text-sm">
-                                            Ver grupo
-                                            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        <div className="mt-auto pt-2 border-t border-gray-50 flex items-center justify-between text-blue-600 font-black text-[9px] uppercase tracking-widest">
+                                            Entrar
+                                            <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                             </svg>
                                         </div>
                                     </div>

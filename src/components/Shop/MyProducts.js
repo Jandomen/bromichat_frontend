@@ -142,24 +142,24 @@ const MyProducts = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="p-8 lg:p-10">
-              <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Editar Producto</h3>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Actualiza los detalles de tu oferta</p>
+                  <h3 className="text-xl sm:text-2xl font-black text-gray-900 uppercase tracking-tight">Editar Producto</h3>
+                  <p className="text-gray-400 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest mt-1">Actualiza los detalles de tu oferta</p>
                 </div>
-                <button onClick={() => setEditingProduct(null)} className="p-3 hover:bg-gray-100 rounded-2xl transition-colors">
-                  <X className="w-6 h-6 text-gray-400" />
+                <button onClick={() => setEditingProduct(null)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                  <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
 
               <form onSubmit={handleEdit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Título</label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Título</label>
                   <div className="relative group">
-                    <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-red-500 transition-colors" />
+                    <Tag className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-red-500 transition-colors" />
                     <input
                       type="text"
-                      className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-800"
+                      className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-3.5 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-bold text-gray-800 text-[10px] sm:text-xs"
                       value={newTitle}
                       onChange={e => setNewTitle(e.target.value)}
                       required
@@ -180,25 +180,25 @@ const MyProducts = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Precio</label>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Precio</label>
                     <div className="relative group">
-                      <Banknote className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-red-500 transition-colors" />
+                      <Banknote className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-red-500 transition-colors" />
                       <input
                         type="number"
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-800"
+                        className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-3.5 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-bold text-gray-800 text-[10px] sm:text-xs"
                         value={newPrice}
                         onChange={e => setNewPrice(e.target.value)}
                         required
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Moneda</label>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Moneda</label>
                     <select
                       value={newCurrency}
                       onChange={e => setNewCurrency(e.target.value)}
-                      className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-black text-gray-800 cursor-pointer shadow-sm"
+                      className="w-full px-4 py-3 sm:py-3.5 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-black text-gray-800 text-[10px] sm:text-xs cursor-pointer shadow-sm"
                     >
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>

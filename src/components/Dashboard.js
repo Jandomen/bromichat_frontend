@@ -14,7 +14,6 @@ import api from '../services/api';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const [refresh, setRefresh] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
   const [appSettings, setAppSettings] = useState({ adsEnabled: false, welcomeMessage: '' });
@@ -24,14 +23,31 @@ const Dashboard = () => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
     };
+
+    const handleGlobalKeys = (e) => {
+      if (e.key.toLowerCase() === 'p' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        scrollToCreate();
+        // Give time for scroll to finish before focusing
+        setTimeout(() => {
+          const textarea = createPostRef.current?.querySelector('textarea');
+          textarea?.focus();
+        }, 500);
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleGlobalKeys);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleGlobalKeys);
+    };
   }, []);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/settings/public');
+        const res = await api.get('/admin/settings/public');
         setAppSettings(res.data);
       } catch (err) {
         console.error('Error fetching public settings');
@@ -129,28 +145,28 @@ const Dashboard = () => {
         <div className="lg:col-span-6 space-y-6 sm:space-y-8">
           {/* Mobile/Tablet Profile & Quick Links */}
           <section className="lg:hidden block space-y-4">
-            <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
                 <Link to="/profile" className="shrink-0">
                   <img
                     src={getFullImageUrl(user?.profilePicture)}
-                    className="w-12 h-12 rounded-xl object-cover border-2 border-primary-100"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover border border-primary-100"
                     alt="Me"
                     loading="lazy"
                     onError={(e) => e.target.src = defaultProfile}
                   />
                 </Link>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Bienvenido,</p>
-                  <p className="text-sm font-black text-gray-800 uppercase">{user?.username}</p>
+                  <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Bienvenido,</p>
+                  <p className="text-[11px] sm:text-xs font-black text-gray-800 uppercase">{user?.username}</p>
                 </div>
               </div>
-              <Link to="/search" className="p-3 bg-primary-50 text-primary-600 rounded-2xl shadow-sm hover:bg-primary-100 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <Link to="/search" className="p-2 bg-primary-50 text-primary-600 rounded-xl shadow-sm hover:bg-primary-100 transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </Link>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+            <div className="flex gap-1 text-[8.5px] px-1 overflow-x-auto pb-1 no-scrollbar">
               {[
                 { l: 'Compas', i: '👥', h: '/friends' },
                 { l: 'Guardados', i: '🔖', h: '/saved' },
@@ -159,8 +175,8 @@ const Dashboard = () => {
                 { l: 'Galería', i: '🖼️', h: '/gallery' },
                 { l: 'Tienda', i: '🛍️', h: '/shop' }
               ].map(item => (
-                <Link key={item.l} to={item.h} className="flex-shrink-0 flex items-center gap-2 px-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm text-xs font-bold text-gray-600 hover:bg-gray-50 active:scale-95 transition-all">
-                  <span>{item.i}</span>
+                <Link key={item.l} to={item.h} className="flex-shrink-0 flex items-center gap-1 px-2 py-1.5 sm:px-4 sm:py-2.5 bg-white border border-gray-100 rounded-xl shadow-sm font-bold text-gray-600 hover:bg-gray-50 active:scale-95 transition-all">
+                  <span className="text-[9px] sm:text-xs">{item.i}</span>
                   {item.l}
                 </Link>
               ))}
@@ -181,11 +197,11 @@ const Dashboard = () => {
           </section>
 
           <section ref={createPostRef} className="animate-slide-up">
-            <CreatePost onPostCreated={() => setRefresh(!refresh)} />
+            <CreatePost />
           </section>
 
           <section className="animate-slide-up">
-            <FriendsPosts key={refresh} />
+            <FriendsPosts />
           </section>
         </div>
 
@@ -232,9 +248,10 @@ const Dashboard = () => {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 bg-primary-600 text-white p-4 rounded-2xl shadow-2xl shadow-primary-500/40 hover:bg-primary-700 hover:-translate-y-1 transition-all z-50 animate-bounce-short"
+            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 p-3 sm:p-4 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 text-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/40 hover:scale-110 active:scale-95 transition-all outline-none z-50 animate-bounce-short"
+            title="Volver Arriba"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
           </button>
         )}
       </div>
