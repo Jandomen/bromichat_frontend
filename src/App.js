@@ -40,6 +40,9 @@ import CallModal from "./components/calls/CallModal";
 import PostDetailModal from "./components/posts/PostDetailModal";
 import MobileNav from "./components/UI/MobileNav";
 import NetworkStatus from "./components/UI/NetworkStatus";
+import Terms from "./pages/Static/Terms";
+import Privacy from "./pages/Static/Privacy";
+import Support from "./pages/Static/Support";
 
 function ChatRouteWrapper() {
   const { conversationId } = useParams();
@@ -71,16 +74,16 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/admin-auth-portal-secret" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLogin />} />
 
-        {/* Protected Routes */}
+        
         <Route
           path="/dashboard"
           element={
@@ -113,7 +116,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        {/* New Community Groups Routes */}
+       
         <Route
           path="/groups"
           element={
@@ -309,7 +312,7 @@ export default function App() {
           }
         />
         <Route
-          path="/admin"
+          path="/admin/dashboard"
           element={
             <AdminRoute>
               <AdminDashboard />
@@ -318,6 +321,11 @@ export default function App() {
         />
 
         
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/support" element={<Support />} />
+
+        {/* 404 Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <MobileNav />
@@ -329,3 +337,6 @@ export default function App() {
     </Router>
   );
 }
+
+
+

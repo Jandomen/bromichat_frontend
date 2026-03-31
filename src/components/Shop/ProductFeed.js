@@ -39,9 +39,9 @@ const ProductFeed = () => {
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`
-              whitespace-nowrap px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all
+              whitespace-nowrap px-3 py-1.5 sm:px-5 sm:py-2 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all
               ${selectedCategory === cat
-                ? 'bg-red-600 text-white shadow-xl shadow-red-200 scale-105'
+                ? 'bg-red-600 text-white shadow-md shadow-red-200'
                 : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-100 hover:border-red-100'}
             `}
           >

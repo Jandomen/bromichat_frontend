@@ -67,35 +67,34 @@ const MyBlockedUsersList = ({ onUnblockUser }) => {
   }
 
   return (
-    <div className="p-4 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-2 text-gray-900">Mis Usuarios Bloqueados</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
+    <div className="w-full bg-white rounded">
+      {error && <p className="text-red-500 mb-2 text-xs xs:text-sm">{error}</p>}
       {blockedUsers.length > 0 ? (
         <ul className="space-y-2">
           {blockedUsers.map((user) => (
             <li
               key={user._id}
-              className="flex items-center justify-between p-2 hover:bg-gray-100"
+              className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg xs:rounded-xl transition-colors"
             >
               <div
-                className="flex items-center cursor-pointer"
+                className="flex items-center cursor-pointer min-w-0 flex-1 mr-2"
                 onClick={() => navigate(`/user/${user._id}`)}
               >
                 <img
                   src={getFullImageUrl(user.profilePicture)}
                   alt={user.username}
-                  className="w-10 h-10 rounded-full object-cover mr-3"
+                  className="w-8 h-8 xs:w-10 xs:h-10 rounded-full object-cover mr-2 xs:mr-3 flex-shrink-0"
                 />
-                <div>
-                  <p className="font-semibold">{user.username}</p>
-                  <p className="text-sm text-gray-600">
+                <div className="min-w-0 pr-2">
+                  <p className="font-semibold text-xs xs:text-sm truncate">{user.username}</p>
+                  <p className="text-[10px] xs:text-xs text-gray-600 truncate">
                     {user.name} {user.lastName}
                   </p>
                 </div>
               </div>
               {onUnblockUser && (
                 <button
-                  className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                  className="bg-gray-500 text-white px-2.5 py-1.5 xs:px-3 xs:py-1.5 text-[10px] xs:text-xs rounded-lg hover:bg-gray-600 transition-colors flex-shrink-0"
                   onClick={() => onUnblockUser(user._id)}
                 >
                   Desbloquear
@@ -105,7 +104,7 @@ const MyBlockedUsersList = ({ onUnblockUser }) => {
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500 italic">No tienes usuarios bloqueados.</p>
+        <p className="text-gray-500 text-[10px] xs:text-xs italic">No tienes usuarios bloqueados.</p>
       )}
     </div>
   );

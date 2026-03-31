@@ -213,23 +213,23 @@ const GroupProfile = () => {
                         {/* Title and Stats */}
                         <div className="flex-1 space-y-4">
                             <div>
-                                <h1 className="text-3xl sm:text-5xl font-bold text-slate-950 tracking-tight leading-tight">
+                                <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight leading-loose uppercase">
                                     {group.name}
                                 </h1>
-                                <div className="mt-3 flex flex-wrap items-center gap-3">
-                                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest ${group.privacy === 'public' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                        {group.privacy === 'public' ? <FaGlobe size={12} /> : <FaLock size={12} />}
+                                <div className="mt-2 flex flex-wrap items-center gap-2">
+                                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-widest ${group.privacy === 'public' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                        {group.privacy === 'public' ? <FaGlobe size={10} /> : <FaLock size={10} />}
                                         {group.privacy === 'public' ? 'Público' : 'Privado'}
                                     </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-xl text-xs font-black uppercase tracking-widest">
-                                        <FaUsers size={12} />
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-widest">
+                                        <FaUsers size={10} />
                                         {group.members.length} miembros
                                     </div>
                                 </div>
                             </div>
 
                             <div className="max-w-2xl">
-                                <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+                                <h2 className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5 flex items-center gap-2">
                                     <div className="w-1 h-3 bg-blue-500 rounded-full"></div>
                                     Acerca de esta comunidad
                                 </h2>
@@ -243,24 +243,26 @@ const GroupProfile = () => {
                         <div className="flex flex-col gap-3 w-full lg:w-72">
                             {/* Primary Actions (Member Only) */}
                             {isMember && (
-                                <div className="grid grid-cols-1 gap-3">
+                                <div className="grid grid-cols-1 gap-2 sm:gap-3">
                                     <SendMessageButton
                                         groupId={groupId}
                                         variant="full"
-                                        className="w-full !rounded-2xl !py-4 !font-black !shadow-lg !shadow-emerald-100 !bg-emerald-600 hover:!bg-emerald-700 !text-white !transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                                        className="w-full !rounded-[1rem] sm:!rounded-2xl !py-3 sm:!py-3.5 !font-black !shadow-md !shadow-emerald-100 !bg-emerald-600 hover:!bg-emerald-700 !text-white !transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest text-[9px] sm:text-[10px]"
                                     />
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="flex items-center justify-center gap-2 bg-amber-50 text-amber-600 p-4 rounded-2xl font-black hover:bg-amber-100 transition-all border border-amber-100 shadow-sm active:scale-95 text-xs uppercase tracking-widest"
-                                        >
-                                            <FaEdit size={14} /> Editar
-                                        </button>
+                                    <div className={`grid ${group.creator?._id === currentUser?._id ? 'grid-cols-2' : 'grid-cols-1'} gap-2 sm:gap-3`}>
+                                        {group.creator?._id === currentUser?._id && (
+                                            <button
+                                                onClick={() => setShowEditModal(true)}
+                                                className="flex items-center justify-center gap-1.5 sm:gap-2 bg-amber-50 text-amber-600 p-3 sm:p-3.5 rounded-[1rem] sm:rounded-2xl font-black hover:bg-amber-100 transition-all border border-amber-100 shadow-sm active:scale-95 text-[9px] sm:text-[10px] uppercase tracking-widest"
+                                            >
+                                                <FaEdit size={12} /> Editar
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => setShowInviteModal(true)}
-                                            className="flex items-center justify-center gap-2 bg-blue-50 text-blue-600 p-4 rounded-2xl font-black hover:bg-blue-100 transition-all border border-blue-100 shadow-sm active:scale-95 text-xs uppercase tracking-widest"
+                                            className="flex items-center justify-center gap-1.5 sm:gap-2 bg-blue-50 text-blue-600 p-3 sm:p-3.5 rounded-[1rem] sm:rounded-2xl font-black hover:bg-blue-100 transition-all border border-blue-100 shadow-sm active:scale-95 text-[9px] sm:text-[10px] uppercase tracking-widest"
                                         >
-                                            <FaPlus size={14} /> Invitar
+                                            <FaPlus size={12} /> Invitar
                                         </button>
                                     </div>
                                 </div>
@@ -270,7 +272,7 @@ const GroupProfile = () => {
                             <div className="flex flex-col gap-3">
                                 <button
                                     onClick={handleJoinLeave}
-                                    className={`w-full py-4 rounded-2xl font-black transition-all active:scale-95 uppercase tracking-widest text-xs shadow-lg ${isMember
+                                    className={`w-full py-3 sm:py-3.5 rounded-[1rem] sm:rounded-2xl font-black transition-all active:scale-95 uppercase tracking-widest text-[9px] sm:text-[10px] shadow-sm ${isMember
                                         ? 'bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200 shadow-gray-100'
                                         : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100'
                                         }`}
@@ -281,9 +283,9 @@ const GroupProfile = () => {
                                 {group.creator?._id === currentUser?._id && (
                                     <button
                                         onClick={handleDeleteGroup}
-                                        className="w-full py-4 rounded-2xl font-black bg-red-50 text-red-600 hover:bg-red-100 transition-all border border-red-100 shadow-sm shadow-red-50 active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+                                        className="w-full py-3 sm:py-3.5 rounded-[1rem] sm:rounded-2xl font-black bg-red-50 text-red-600 hover:bg-red-100 transition-all border border-red-100 shadow-sm shadow-red-50 active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 uppercase tracking-widest text-[9px] sm:text-[10px]"
                                     >
-                                        <FaTrash size={14} /> Eliminar Grupo
+                                        <FaTrash size={12} /> Eliminar Grupo
                                     </button>
                                 )}
                             </div>

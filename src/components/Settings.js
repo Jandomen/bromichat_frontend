@@ -12,7 +12,6 @@ import DeleteAccount from "./Settings/DeleteAccount";
 import ChangePassword from "./Settings/ChangePassword";
 import ChangeEmail from "./Settings/ChangeEmail";
 import PrivacySettings from "./Settings/PrivacySettings";
-import BiometricSettings from "./Settings/BiometricSettings";
 import StorySettings from "./Settings/StorySettings";
 import PermissionSettings from "./Settings/PermissionSettings"; // Updated Import
 import StoryArchive from "./Settings/StoryArchive";
@@ -28,7 +27,6 @@ import {
   FileText,
   ChevronRight,
   Mail,
-  Fingerprint,
   History,
   Menu,
   ChevronLeft,
@@ -127,22 +125,22 @@ const Settings = () => {
     <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
       <Header />
 
-      <main className="flex-grow container mx-auto mt-8 px-4 sm:px-6 lg:px-8 mb-12">
+      <main className="flex-grow container mx-auto mt-2 xs:mt-4 sm:mt-8 px-2 xs:px-3 sm:px-6 lg:px-8 mb-6 sm:mb-12">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex flex-col md:flex-row gap-4 xs:gap-5 sm:gap-8">
             {/* Sidebar Navigation */}
             <aside className={`md:w-72 flex-shrink-0 ${!isMobileMenuOpen ? 'hidden md:block' : 'w-full block'}`}>
-              <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden sticky top-24">
-                <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+              <div className="bg-white rounded-[1.5rem] xs:rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden sticky top-24">
+                <div className="p-4 xs:p-6 sm:p-8 border-b border-gray-50 flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">Ajustes</h2>
-                    <p className="text-sm font-bold text-primary-600 uppercase tracking-widest mt-1">BromiChat Pro</p>
+                    <h2 className="text-lg xs:text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Ajustes</h2>
+                    <p className="text-[10px] xs:text-xs sm:text-sm font-bold text-primary-600 uppercase tracking-widest mt-0.5 xs:mt-1">Bromichat Pro</p>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-2xl md:hidden">
-                    <Menu className="w-6 h-6 text-gray-400" />
+                  <div className="p-2 xs:p-3 bg-gray-50 rounded-xl xs:rounded-2xl md:hidden">
+                    <Menu className="w-5 h-5 xs:w-6 xs:h-6 text-gray-400" />
                   </div>
                 </div>
-                <nav className="p-4 space-y-2">
+                <nav className="p-2 xs:p-3 sm:p-4 space-y-1 xs:space-y-2">
                   {sections.map(({ id, icon: Icon, label, danger }) => (
                     <button
                       key={id}
@@ -150,17 +148,17 @@ const Settings = () => {
                         setActiveTab(id);
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 group
+                      className={`w-full flex items-center gap-2.5 xs:gap-3 sm:gap-4 px-3 py-2.5 xs:px-4 xs:py-3 sm:px-5 sm:py-4 rounded-xl xs:rounded-2xl transition-all duration-300 group
                         ${activeTab === id
                           ? (danger ? 'bg-red-50 text-red-600' : 'bg-primary-50 text-primary-700 shadow-lg shadow-primary-500/10 scale-[1.02]')
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                     >
-                      <div className={`p-2 rounded-xl transition-colors ${activeTab === id ? (danger ? 'bg-red-100' : 'bg-primary-100') : 'bg-gray-50 group-hover:bg-white'}`}>
-                        <Icon size={20} className={activeTab === id ? 'stroke-[2.5px]' : 'stroke-[1.5]'} />
+                      <div className={`p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors ${activeTab === id ? (danger ? 'bg-red-100' : 'bg-primary-100') : 'bg-gray-50 group-hover:bg-white'}`}>
+                        <Icon size={18} className={`xs:w-5 xs:h-5 ${activeTab === id ? 'stroke-[2.5px]' : 'stroke-[1.5]'}`} />
                       </div>
-                      <span className="font-bold tracking-tight">{label}</span>
-                      <ChevronRight className={`w-5 h-5 ml-auto transition-transform ${activeTab === id ? 'translate-x-1 opacity-100' : 'opacity-0'}`} />
+                      <span className="font-bold tracking-tight text-xs xs:text-sm sm:text-base">{label}</span>
+                      <ChevronRight className={`w-4 h-4 xs:w-5 xs:h-5 ml-auto transition-transform ${activeTab === id ? 'translate-x-1 opacity-100' : 'opacity-0'}`} />
                     </button>
                   ))}
                 </nav>
@@ -169,51 +167,51 @@ const Settings = () => {
 
             {/* Main Content Area */}
             <div className={`flex-1 min-w-0 ${isMobileMenuOpen ? 'hidden md:block' : 'block'}`}>
-              <div className="md:hidden mb-6">
+              <div className="md:hidden mb-3 xs:mb-4 sm:mb-6">
                 <button
                   onClick={() => setIsMobileMenuOpen(true)}
-                  className="flex items-center gap-2 text-primary-600 font-black uppercase tracking-widest text-sm bg-primary-50 px-6 py-3 rounded-2xl hover:bg-primary-100 transition-colors"
+                  className="flex items-center gap-1.5 xs:gap-2 text-primary-600 font-black uppercase tracking-widest text-[10px] xs:text-xs sm:text-sm bg-primary-50 px-4 py-2 xs:px-5 xs:py-2.5 sm:px-6 sm:py-3 rounded-xl xs:rounded-2xl hover:bg-primary-100 transition-colors"
                 >
-                  <ChevronLeft size={18} strokeWidth={3} />
+                  <ChevronLeft size={16} className="xs:w-[18px]" strokeWidth={3} />
                   Volver al Menú
                 </button>
               </div>
 
               {error && (
-                <div className="mb-6 p-5 bg-red-50 border border-red-100 rounded-[2rem] text-red-600 flex items-center gap-4 animate-in fade-in slide-in-from-top-2">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    <Shield className="w-6 h-6 flex-shrink-0" />
+                <div className="mb-4 xs:mb-6 p-3 xs:p-4 sm:p-5 bg-red-50 border border-red-100 rounded-xl xs:rounded-[2rem] text-red-600 flex items-center gap-3 xs:gap-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="p-1.5 xs:p-2 bg-white rounded-lg xs:rounded-xl shadow-sm">
+                    <Shield className="w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0" />
                   </div>
-                  <p className="font-bold">{error}</p>
+                  <p className="font-bold text-xs xs:text-sm sm:text-base">{error}</p>
                 </div>
               )}
 
-              <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/40 border border-gray-100 overflow-hidden min-h-[500px] animate-in fade-in zoom-in-95 duration-500">
+              <div className="bg-white rounded-[1.5rem] xs:rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl shadow-gray-200/40 border border-gray-100 overflow-hidden min-h-[500px] animate-in fade-in zoom-in-95 duration-500">
 
                 {/* Profile Section */}
                 {activeTab === 'profile' && (
                   <div className="divide-y divide-gray-50">
-                    <div className="p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                          <Camera className="w-6 h-6" />
+                    <div className="p-4 xs:p-5 sm:p-8">
+                      <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-6">
+                        <div className="p-2 xs:p-3 bg-blue-50 text-blue-600 rounded-lg xs:rounded-xl">
+                          <Camera className="w-5 h-5 xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Foto de Perfil</h3>
-                          <p className="text-sm text-gray-500">Actualiza tu imagen pública</p>
+                          <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Foto de Perfil</h3>
+                          <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Actualiza tu imagen pública</p>
                         </div>
                       </div>
                       <ChangeProfilePicture />
                     </div>
 
-                    <div className="p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                          <FileText className="w-6 h-6" />
+                    <div className="p-4 xs:p-5 sm:p-8">
+                      <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-6">
+                        <div className="p-2 xs:p-3 bg-indigo-50 text-indigo-600 rounded-lg xs:rounded-xl">
+                          <FileText className="w-5 h-5 xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Biografía</h3>
-                          <p className="text-sm text-gray-500">Cuéntale al mundo sobre ti</p>
+                          <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Biografía</h3>
+                          <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Cuéntale al mundo sobre ti</p>
                         </div>
                       </div>
                       <EditBio />
@@ -224,67 +222,55 @@ const Settings = () => {
                 {/* Security Section */}
                 {activeTab === 'security' && (
                   <div className="divide-y divide-gray-50">
-                    <div className="p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                          <Shield className="w-6 h-6" />
+                    <div className="p-4 xs:p-5 sm:p-8">
+                      <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-6">
+                        <div className="p-2 xs:p-3 bg-emerald-50 text-emerald-600 rounded-lg xs:rounded-xl">
+                          <Shield className="w-5 h-5 xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900">Privacidad y Acceso</h3>
-                          <p className="text-sm text-gray-500">Gestiona quién puede ver tu información</p>
+                          <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Privacidad y Acceso</h3>
+                          <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Gestiona quién puede ver tu información</p>
                         </div>
                       </div>
                       <PrivacySettings />
                     </div>
 
-                    <div className="p-6 sm:p-8 bg-gray-50/50">
-                      <div className="grid gap-8 lg:grid-cols-2">
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 text-gray-900 font-semibold border-b pb-2">
-                            <Lock className="w-5 h-5 text-gray-500" /> Contraseña
+                    <div className="p-4 xs:p-5 sm:p-8 bg-gray-50/50">
+                      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+                        <div className="space-y-4 xs:space-y-6">
+                          <div className="flex items-center gap-2.5 xs:gap-3 text-xs xs:text-sm sm:text-base text-gray-900 font-semibold border-b pb-2">
+                            <Lock className="w-4 h-4 xs:w-5 xs:h-5 text-gray-500" /> Contraseña
                           </div>
                           <ChangePassword />
                         </div>
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-3 text-gray-900 font-semibold border-b pb-2">
-                            <Mail className="w-5 h-5 text-gray-500" /> Correo Electrónico
+                        <div className="space-y-4 xs:space-y-6">
+                          <div className="flex items-center gap-2.5 xs:gap-3 text-xs xs:text-sm sm:text-base text-gray-900 font-semibold border-b pb-2">
+                            <Mail className="w-4 h-4 xs:w-5 xs:h-5 text-gray-500" /> Correo Electrónico
                           </div>
                           <ChangeEmail />
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                          <Fingerprint className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900">Autenticación Biométrica</h3>
-                          <p className="text-sm text-gray-500">Configura el acceso seguro sin contraseña</p>
-                        </div>
-                      </div>
-                      <BiometricSettings />
-                    </div>
                   </div>
                 )}
 
                 {/* Notifications Section */}
                 {activeTab === 'notifications' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                        <Volume2 className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-8">
+                      <div className="p-2 xs:p-3 bg-amber-50 text-amber-600 rounded-lg xs:rounded-xl">
+                        <Volume2 className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Preferencias de Sonido</h3>
-                        <p className="text-sm text-gray-500">Personaliza tus alertas</p>
+                        <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Preferencias de Sonido</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Personaliza tus alertas</p>
                       </div>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                      <div className="flex items-center justify-between mb-6">
-                        <span className="font-medium text-gray-900">Activar sonidos de notificación</span>
+                    <div className="bg-gray-50 rounded-xl xs:rounded-2xl p-4 xs:p-6 border border-gray-100">
+                      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 mb-4 xs:mb-6">
+                        <span className="font-medium text-xs xs:text-sm sm:text-base text-gray-900">Activar sonidos de notificación</span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -294,19 +280,19 @@ const Settings = () => {
                             }
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                          <div className="w-9 xs:w-11 h-5 xs:h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 xs:after:h-5 after:w-4 xs:after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                         </label>
                       </div>
 
                       {sonidoHabilitado && (
                         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Tono de alerta</label>
-                            <div className="flex gap-4">
+                            <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-2">Tono de alerta</label>
+                            <div className="flex flex-col xs:flex-row gap-3 xs:gap-4">
                               <select
                                 value={archivoSonido}
                                 onChange={(e) => setArchivoSonido(e.target.value)}
-                                className="flex-grow border-gray-200 rounded-xl shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 bg-white"
+                                className="w-full flex-grow text-xs xs:text-sm border-gray-200 rounded-lg xs:rounded-xl shadow-sm focus:border-red-500 focus:ring-red-500 py-2 xs:py-2.5 bg-white"
                               >
                                 <option value="/sounds/notification-1-270124.mp3">Clásico (Standard)</option>
                                 <option value="/sounds/new-notification-021-370045.mp3">Moderno (Pop)</option>
@@ -317,9 +303,9 @@ const Settings = () => {
                                   const audio = new Audio(archivoSonido);
                                   audio.play().catch(e => console.error("Error playing sound", e));
                                 }}
-                                className="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                                className="w-full justify-center xs:w-auto px-4 xs:px-5 py-2 xs:py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium text-xs xs:text-sm rounded-lg xs:rounded-xl transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                               >
-                                <Volume2 className="w-5 h-5 text-gray-600" />
+                                <Volume2 className="w-4 h-4 xs:w-5 xs:h-5 text-gray-600" />
                                 <span>Probar Sonido</span>
                               </button>
                             </div>
@@ -332,14 +318,14 @@ const Settings = () => {
 
                 {/* Stories Section */}
                 {activeTab === 'stories' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-yellow-50 text-yellow-600 rounded-xl">
-                        <History className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-8">
+                      <div className="p-2 xs:p-3 bg-yellow-50 text-yellow-600 rounded-lg xs:rounded-xl">
+                        <History className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Historias</h3>
-                        <p className="text-sm text-gray-500">Configura la visibilidad y límites</p>
+                        <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Historias</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Configura la visibilidad y límites</p>
                       </div>
                     </div>
                     <StorySettings />
@@ -348,14 +334,14 @@ const Settings = () => {
 
                 {/* Permissions Section (Replaces SOS) */}
                 {activeTab === 'permissions' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                        <Smartphone className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-8">
+                      <div className="p-2 xs:p-3 bg-blue-50 text-blue-600 rounded-lg xs:rounded-xl">
+                        <Smartphone className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Permisos de la Aplicación</h3>
-                        <p className="text-sm text-gray-500">Administra el acceso a hardware y servicios</p>
+                        <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Permisos de la Aplicación</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Administra el acceso a hardware y servicios</p>
                       </div>
                     </div>
                     <PermissionSettings />
@@ -364,14 +350,14 @@ const Settings = () => {
 
                 {/* Story Archive Section */}
                 {activeTab === 'archive' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="p-3 bg-primary-50 text-primary-600 rounded-xl">
-                        <History className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-8">
+                      <div className="p-2 xs:p-3 bg-primary-50 text-primary-600 rounded-lg xs:rounded-xl">
+                        <History className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Archivo de Historias</h3>
-                        <p className="text-sm text-gray-500">Tus momentos guardados para siempre</p>
+                        <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Archivo de Historias</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Tus momentos guardados para siempre</p>
                       </div>
                     </div>
                     <StoryArchive />
@@ -380,14 +366,14 @@ const Settings = () => {
 
                 {/* Blocked Users Section */}
                 {activeTab === 'privacy' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
-                        <UserX className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-6">
+                      <div className="p-2 xs:p-3 bg-rose-50 text-rose-600 rounded-lg xs:rounded-xl">
+                        <UserX className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Usuarios Bloqueados</h3>
-                        <p className="text-sm text-gray-500">Gestiona tu lista negra</p>
+                        <h3 className="text-base xs:text-lg font-bold text-gray-900 leading-tight">Usuarios Bloqueados</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500">Gestiona tu lista negra</p>
                       </div>
                     </div>
                     <MyBlockedUsersList onUnblockUser={handleUnblockUser} />
@@ -396,17 +382,17 @@ const Settings = () => {
 
                 {/* Delete Account Section */}
                 {activeTab === 'account' && (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="p-3 bg-red-100 text-red-600 rounded-xl">
-                        <Trash2 className="w-6 h-6" />
+                  <div className="p-4 xs:p-5 sm:p-8">
+                    <div className="flex items-center gap-3 xs:gap-4 mb-4 xs:mb-6">
+                      <div className="p-2 xs:p-3 bg-red-100 text-red-600 rounded-lg xs:rounded-xl">
+                        <Trash2 className="w-5 h-5 xs:w-6 xs:h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-red-700">Zona de Peligro</h3>
-                        <p className="text-sm text-red-500">Acciones irreversibles para tu cuenta</p>
+                        <h3 className="text-base xs:text-lg font-bold text-red-700 leading-tight">Zona de Peligro</h3>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-red-500">Acciones irreversibles para tu cuenta</p>
                       </div>
                     </div>
-                    <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
+                    <div className="bg-red-50 border border-red-100 rounded-xl xs:rounded-2xl p-4 xs:p-6">
                       <DeleteAccount />
                     </div>
                   </div>

@@ -491,7 +491,7 @@ const UserInfo = ({ user }) => {
   return (
     <div className="relative">
       {/* Cover Image */}
-      <div className="h-64 md:h-80 w-full relative group overflow-hidden">
+      <div className="h-32 xs:h-40 sm:h-48 md:h-64 w-full relative group overflow-hidden">
         <img
           src={userData.coverPhoto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"}
           alt="Cover"
@@ -501,7 +501,7 @@ const UserInfo = ({ user }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
 
         {userData._id === currentUser._id && (
-          <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-0">
             <input
               type="file"
               id="cover-upload"
@@ -511,9 +511,9 @@ const UserInfo = ({ user }) => {
             />
             <label
               htmlFor="cover-upload"
-              className="cursor-pointer flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/30 transition-all font-bold text-xs uppercase tracking-widest"
+              className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-black/40 hover:bg-black/60 text-white rounded-lg sm:rounded-xl backdrop-blur-md border border-white/20 transition-all font-bold text-[8px] sm:text-[10px] uppercase tracking-widest"
             >
-              <span>📷</span>
+              <span className="text-[10px] sm:text-xs">📷</span>
               <span>Cambiar Portada</span>
             </label>
           </div>
@@ -521,19 +521,19 @@ const UserInfo = ({ user }) => {
       </div>
 
       {/* Profile Info Area */}
-      <div className="px-8 pb-8 relative">
-        <div className="flex flex-col md:flex-row-reverse items-center md:items-end -mt-20 md:-mt-24 mb-6 gap-8 text-center md:text-left">
+      <div className="px-4 sm:px-6 pb-4 sm:pb-6 relative">
+        <div className="flex flex-col md:flex-row items-center md:items-end -mt-10 sm:-mt-12 md:-mt-16 mb-4 sm:mb-6 gap-3 sm:gap-6 text-center md:text-left">
 
           {/* Profile Picture */}
-          <div className="relative group">
-            <div className={`w-40 h-40 md:w-48 md:h-48 rounded-3xl p-1.5 transition-all duration-500 hover:rotate-2 shadow-2xl ${userData?.hasStories
+          <div className="relative group shrink-0">
+            <div className={`w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl md:rounded-3xl p-1 transition-all duration-500 hover:rotate-2 shadow-xl ${userData?.hasStories
               ? userData.allStoriesViewed
-                ? 'bg-gray-300 shadow-gray-200/20 p-[3px]'
-                : 'bg-gradient-to-tr from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/20 p-2'
-              : 'bg-white shadow-black/10 p-2'
+                ? 'bg-gray-300 shadow-gray-200/20 p-[2px]'
+                : 'bg-gradient-to-tr from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/20 p-1.5'
+              : 'bg-white shadow-black/10 p-1.5'
               }`}>
               <div
-                className="w-full h-full rounded-2xl overflow-hidden relative block group cursor-pointer"
+                className="w-full h-full rounded-[0.9rem] md:rounded-2xl overflow-hidden relative block group cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
                   if (userData?.hasStories) {
@@ -550,10 +550,10 @@ const UserInfo = ({ user }) => {
                   onError={(e) => e.target.src = defaultProfile}
                 />
 
-                <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
+                <div className="absolute bottom-1 right-1 w-3 h-3 md:w-4 md:h-4 bg-green-500 border-2 border-white rounded-full shadow-md"></div>
 
                 {userData?.hasStories && !userData.allStoriesViewed && (
-                  <div className="absolute top-2 right-2 bg-yellow-500 text-[8px] font-black text-white px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg animate-pulse">
+                  <div className="absolute top-1 right-1 bg-yellow-500 text-[6px] md:text-[8px] font-black text-white px-1.5 py-0.5 rounded-full uppercase tracking-widest shadow-md animate-pulse">
                     Historia
                   </div>
                 )}
@@ -562,56 +562,61 @@ const UserInfo = ({ user }) => {
           </div>
 
           {/* Name & Bio */}
-          <div className="flex-1 md:pb-4">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
-              <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight flex items-center gap-4">
-                <span className="bg-yellow-400/20 px-4 py-1 rounded-2xl backdrop-blur-sm border border-yellow-400/10 inline-block">
+          <div className="flex-1 md:pb-2 flex flex-col items-center md:items-start w-full">
+            <div className="flex flex-col md:flex-row items-center gap-1 sm:gap-2 mb-2 w-full justify-center md:justify-start">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-black text-gray-900 tracking-tight flex items-center justify-center md:justify-start gap-2 max-w-full">
+                <span className="bg-yellow-400/20 px-3 py-0.5 rounded-xl md:rounded-2xl backdrop-blur-sm border border-yellow-400/10 truncate">
                   {userData.name} {userData.lastName}
                 </span>
 
                 {userData._id !== currentUser?._id && !userData.isBlocked && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2 shrink-0">
                     <button
                       onClick={() => callUser(userData._id, `${userData.name} ${userData.lastName}`, getFullImageUrl(userData.profilePicture), "video")}
-                      className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-2xl shadow-lg shadow-green-500/20 transition-all hover:scale-110 active:scale-95 group relative"
+                      className="p-1.5 sm:p-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-md transition-all hover:scale-110 active:scale-95 group relative"
                       title="Llamada de Video"
                     >
-                      <VideoIcon size={20} />
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                      <VideoIcon size={14} className="sm:w-5 sm:h-5" />
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
                     </button>
                     <button
                       onClick={() => callUser(userData._id, `${userData.name} ${userData.lastName}`, getFullImageUrl(userData.profilePicture), "audio")}
-                      className="p-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-110 active:scale-95"
+                      className="p-1.5 sm:p-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-md transition-all hover:scale-110 active:scale-95"
                       title="Llamada de Voz"
                     >
-                      <Phone size={20} />
+                      <Phone size={14} className="sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 )}
               </h1>
-              <span className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-black uppercase tracking-widest self-center md:self-auto">
-                @{userData.username}
-              </span>
             </div>
 
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-6 text-sm">
-              <Link to={`/user/${userData._id}/friends`} className="flex items-center gap-2 group decoration-none">
-                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.friends?.length || 0}</span>
-                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Compas</span>
+            <div className="flex flex-col md:flex-row items-center gap-2 mb-2 sm:mb-3">
+               <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-primary-50 text-primary-600 rounded-full text-[8.5px] sm:text-[9.5px] md:text-[10px] font-black uppercase tracking-widest text-center">
+                 @{userData.username}
+               </span>
+            </div>
+
+            <div className="flex justify-center md:justify-start items-center gap-3 sm:gap-5 md:gap-6 w-full">
+              <Link to={`/user/${userData._id}/friends`} className="flex flex-col items-center group decoration-none">
+                <span className="font-black text-gray-900 text-xs sm:text-sm md:text-base tabular-nums transition-colors group-hover:text-primary-600">{userData.friends?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[7px] sm:text-[8px] md:text-[9px]">Compas</span>
               </Link>
-              <Link to={`/user/${userData._id}/followers`} className="flex items-center gap-2 group decoration-none">
-                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.followers?.length || 0}</span>
-                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Seguidores</span>
+              <div className="w-px h-6 bg-gray-200" />
+              <Link to={`/user/${userData._id}/followers`} className="flex flex-col items-center group decoration-none">
+                <span className="font-black text-gray-900 text-xs sm:text-sm md:text-base tabular-nums transition-colors group-hover:text-primary-600">{userData.followers?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[7px] sm:text-[8px] md:text-[9px]">Seguidores</span>
               </Link>
-              <Link to={`/user/${userData._id}/following`} className="flex items-center gap-2 group decoration-none">
-                <span className="font-black text-gray-900 text-lg tabular-nums transition-colors group-hover:text-primary-600">{userData.following?.length || 0}</span>
-                <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Siguiendo</span>
+              <div className="w-px h-6 bg-gray-200" />
+              <Link to={`/user/${userData._id}/following`} className="flex flex-col items-center group decoration-none">
+                <span className="font-black text-gray-900 text-xs sm:text-sm md:text-base tabular-nums transition-colors group-hover:text-primary-600">{userData.following?.length || 0}</span>
+                <span className="font-bold text-gray-400 uppercase tracking-widest text-[7px] sm:text-[8px] md:text-[9px]">Siguiendo</span>
               </Link>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center md:justify-start md:pb-6">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 w-full md:w-auto mt-3 md:mt-0 justify-center md:justify-end md:pb-2">
             {userData._id !== currentUser._id && (
               <>
                 {!userData.isBlocked && (
@@ -620,61 +625,63 @@ const UserInfo = ({ user }) => {
                       <button
                         onClick={() => handleRemoveFriend(userData._id)}
                         disabled={loading}
-                        className="px-6 py-3 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all group"
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-lg sm:rounded-xl font-black text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest flex items-center gap-1.5 transition-all group"
                       >
-                        <PersonRemoveIcon className="w-4 h-4 transition-transform group-hover:scale-110" /> Eliminar Compa
+                        <PersonRemoveIcon className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover:scale-110" /> Eliminar
                       </button>
                     ) : (
                       <button
                         onClick={() => handleAddFriend(userData._id)}
                         disabled={loading}
-                        className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-primary-500/30 group"
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg sm:rounded-xl font-black text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest flex items-center gap-1.5 transition-all shadow-md group"
                       >
-                        <PersonAddIcon className="w-4 h-4 transition-transform group-hover:scale-125" /> Añadir Compa
+                        <PersonAddIcon className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover:scale-125" /> Añadir
                       </button>
                     )}
 
                     <button
                       onClick={() => userData.isFollowing ? handleUnfollow(userData._id) : handleFollow(userData._id)}
                       disabled={loading}
-                      className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${userData.isFollowing
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl font-black text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-widest flex items-center gap-1.5 transition-all ${userData.isFollowing
                         ? 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                         : 'bg-primary-50 text-primary-600 hover:bg-primary-100'
                         }`}
                     >
-                      {userData.isFollowing ? <VisibilityOffIcon className="w-4 h-4" /> : <VisibilityIcon className="w-4 h-4" />}
-                      {userData.isFollowing ? 'Dejar de seguir' : 'Seguir'}
+                      {userData.isFollowing ? <VisibilityOffIcon className="w-3 h-3 sm:w-4 sm:h-4" /> : <VisibilityIcon className="w-3 h-3 sm:w-4 sm:h-4" />}
+                      {userData.isFollowing ? 'Dejar' : 'Seguir'}
                     </button>
 
-                    <SendMessageButton recipientId={userData._id} variant="pill" />
+                    <div className="scale-75 sm:scale-90 md:scale-100 origin-center transition-all">
+                       <SendMessageButton recipientId={userData._id} variant="pill" />
+                    </div>
                   </>
                 )}
 
                 <button
                   onClick={() => userData.isBlocked ? handleUnblockUser(userData._id) : handleBlockUser(userData._id)}
                   disabled={loading}
-                  className={`p-3 rounded-2xl transition-all ${userData.isBlocked ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                  className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all ${userData.isBlocked ? 'bg-red-600 text-white shadow-md' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                     }`}
                   title={userData.isBlocked ? "Desbloquear" : "Bloquear"}
                 >
-                  {userData.isBlocked ? <LockOpenIcon className="w-5 h-5" /> : <BlockIcon className="w-5 h-5" />}
+                  {userData.isBlocked ? <LockOpenIcon className="w-4 h-4 sm:w-5 sm:h-5" /> : <BlockIcon className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
               </>
             )}
 
             {userData._id === currentUser?._id && (
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 md:gap-3 w-full justify-center md:justify-end">
                 <button
                   onClick={() => navigate('/settings')}
-                  className="px-8 py-3 bg-gray-900 hover:bg-black text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-black/10"
+                  className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg sm:rounded-xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md group"
                 >
-                  ✏️ Editar Mi Perfil
+                  <span className="text-xs sm:text-sm">✏️</span> Editar Mi Perfil
                 </button>
 
                 {currentUser?.sosSettings?.isEnabled && (
                   <button
                     onClick={() => setIsSosModalOpen(true)}
-                    className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-red-500/40 animate-pulse"
+                    className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg sm:rounded-xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-md animate-pulse"
                   >
                     🆘 SOS
                   </button>

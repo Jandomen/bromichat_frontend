@@ -39,7 +39,7 @@ const SuspensionScreen = () => {
                 <h1 className="text-4xl lg:text-5xl font-black text-white mb-6 uppercase tracking-tighter">Acceso Restringido</h1>
 
                 <p className="text-lg text-gray-400 mb-12 leading-relaxed">
-                    Tu acceso a los servicios de <span className="text-red-500 font-bold uppercase tracking-widest text-sm">BromiChat Enterprise</span> ha sido suspendido temporalmente por el departamento de moderación.
+                    Tu acceso a los servicios de <span className="text-red-500 font-bold uppercase tracking-widest text-sm">Bromichat Enterprise</span> ha sido suspendido temporalmente por el departamento de moderación.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

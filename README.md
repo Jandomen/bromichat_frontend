@@ -1,6 +1,6 @@
-# BromiChat Frontend
+# Bromichat Frontend
 
-**BromiChat Frontend** es una aplicación web moderna construida con React para proporcionar una interfaz de usuario interactiva y responsiva para una experiencia de chat en tiempo real. Este proyecto utiliza **Create React App** para un entorno de desarrollo optimizado y está diseñado para integrarse con un backend de mensajería (no incluido en este repositorio).
+**Bromichat Frontend** es una aplicación web moderna construida con React para proporcionar una interfaz de usuario interactiva y responsiva para una experiencia de chat en tiempo real. Este proyecto utiliza **Create React App** para un entorno de desarrollo optimizado y está diseñado para integrarse con un backend de mensajería (no incluido en este repositorio).
 
 ## Características
 

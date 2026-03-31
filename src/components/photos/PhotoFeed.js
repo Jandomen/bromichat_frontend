@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
-import { Smile, Lightbulb, Users, X, Send, Trash2, Eye, Plus } from 'lucide-react';
-import defaultProfile from '../../assets/default-profile.png';
+import { Smile, Lightbulb, Users, X, Send, Trash2 } from 'lucide-react';
 import ReactionPicker, { REACTION_TYPES } from '../UI/ReactionPicker';
-import { getFullImageUrl } from '../../utils/getProfilePicture';
 import ShareModal from '../posts/ShareModal';
 import CommentItem from '../UI/CommentItem';
 
@@ -209,79 +206,61 @@ const PhotoCard = ({ photo, token, currentUser, isFullscreen, onToggleFullscreen
             {/* NEW: TikTok Style UI (Less Cluttered) */}
             <div className={`absolute inset-0 z-50 pointer-events-none transition-opacity duration-500 ${showInfo && !showComments ? 'opacity-100' : 'opacity-0'}`}>
 
-                {/* Right Side Interaction Bar */}
-                <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 pointer-events-auto">
-                    {/* Profile */}
-                    <div className="relative group/avatar">
-                        <Link to={`/user/${photo.user?._id}`} onClick={(e) => e.stopPropagation()}>
-                            <img
-                                src={getFullImageUrl(photo.user?.profilePicture)}
-                                className="w-12 h-12 rounded-full border-2 border-white shadow-xl object-cover"
-                                alt=""
-                                onError={e => e.target.src = defaultProfile}
-                            />
-                        </Link>
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-zinc-900 shadow-lg">
-                            <Plus size={12} className="text-white" />
-                        </div>
-                    </div>
-
-                    {/* Like/Reaction */}
-                    <div className="flex flex-col items-center gap-1 group/react relative">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const userReaction = localPhoto.reactions?.find(r => r.user === currentUser?._id);
-                                if (userReaction) {
-                                    handleReact(userReaction.type);
-                                } else {
-                                    handleReact('like');
-                                }
-                            }}
-                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
-                        >
-                            {currentReactionData ? <span className="text-2xl">{currentReactionData.emoji}</span> : <Smile className="w-6 h-6" />}
-                        </button>
-                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.reactions?.length || 0}</span>
-
-                        {/* Reaction Picker on side */}
-                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-300 absolute right-14 top-0">
+                {/* Real-Time Sophisticated Interaction Center (Responsive 340px Optimized) */}
+                <div className="absolute right-4 bottom-28 sm:bottom-32 flex flex-col items-center gap-5 sm:gap-7 pointer-events-auto">
+                    
+                    {/* Reactions: "ME LATE" */}
+                    <div className="flex flex-col items-center gap-1.5 group/react relative">
+                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 transform translate-x-2 group-hover/react:translate-x-0 absolute right-16 top-0 z-[160]">
                             <ReactionPicker
                                 onSelect={(type) => handleReact(type)}
                                 currentReaction={localPhoto.reactions?.find(r => r.user === currentUser?._id)?.type}
                                 align="right"
                             />
                         </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const userReaction = localPhoto.reactions?.find(r => r.user === currentUser?._id);
+                                if (userReaction) handleReact(userReaction.type);
+                                else handleReact('like');
+                            }}
+                            className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-white/10 backdrop-blur-3xl flex items-center justify-center text-white border border-white/20 shadow-2xl active:scale-90 transition-all group/btn"
+                        >
+                            {currentReactionData ? <span className="text-2xl drop-shadow-lg">{currentReactionData.emoji}</span> : <Smile size={24} className="text-white/70 group-hover/btn:text-white transition-colors" />}
+                        </button>
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] xs:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">ME LATE</span>
+                            <span className="text-[10px] xs:text-xs font-black text-white drop-shadow-lg">{localPhoto.reactions?.length || 0}</span>
+                        </div>
                     </div>
 
-                    {/* Comments */}
-                    <div className="flex flex-col items-center gap-1">
+                    {/* Comments: "OPINAR" */}
+                    <div className="flex flex-col items-center gap-1.5">
                         <button
                             onClick={(e) => { e.stopPropagation(); setShowComments(true); }}
-                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
+                            className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-white/10 backdrop-blur-3xl flex items-center justify-center text-white border border-white/20 shadow-2xl active:scale-90 transition-all group/btn"
                         >
-                            <Lightbulb className="w-6 h-6" />
+                            <Lightbulb size={24} className="text-white/70 group-hover/btn:text-white transition-colors" />
                         </button>
-                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.comments?.length || 0}</span>
-                    </div>
-
-                    {/* Views */}
-                    <div className="flex flex-col items-center gap-1">
-                        <div className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg">
-                            <Eye className="w-6 h-6 text-zinc-300" />
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] xs:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">OPINAR</span>
+                            <span className="text-[10px] xs:text-xs font-black text-white drop-shadow-lg">{localPhoto.comments?.length || 0}</span>
                         </div>
-                        <span className="text-[10px] font-black text-white drop-shadow-lg">{localPhoto.views || 0}</span>
                     </div>
 
-                    {/* Share */}
-                    <div className="flex flex-col items-center gap-1">
+                    {/* Viral: "VIRALIZAR" */}
+                    <div className="flex flex-col items-center gap-1.5">
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(true); }}
-                            className="w-12 h-12 rounded-full bg-zinc-900/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-lg"
+                            className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-white/10 backdrop-blur-3xl flex items-center justify-center text-white border border-white/20 shadow-2xl active:scale-90 transition-all group/btn"
                         >
-                            <Users className="w-6 h-6" />
+                            <Users size={24} className="text-white/70 group-hover/btn:text-white transition-colors" />
                         </button>
-                        <span className="text-[10px] font-bold text-white uppercase tracking-tighter drop-shadow-lg">VIRAL</span>
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] xs:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">VIRALIZAR</span>
+                            <span className="text-[10px] xs:text-xs font-black text-white drop-shadow-lg uppercase tracking-tighter">Go!</span>
+                        </div>
                     </div>
 
                     {/* Delete (Owner) */}

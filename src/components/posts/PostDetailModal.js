@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
@@ -33,12 +34,15 @@ const PostDetailModal = () => {
         if (selectedPostId && token) {
             fetchPost(selectedPostId);
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         } else {
             setPost(null);
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         }
         return () => {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         };
     }, [selectedPostId, token, fetchPost]);
 
@@ -58,6 +62,13 @@ const PostDetailModal = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedPostId, handleClose]);
+
+    const location = useLocation();
+    useEffect(() => {
+        if (selectedPostId) {
+            handleClose();
+        }
+    }, [location.pathname, handleClose, selectedPostId]);
 
     useEffect(() => {
         if (!socket || !selectedPostId) return;

@@ -102,21 +102,21 @@ const Gallery = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 space-y-10 max-w-7xl animate-fade-in">
+      <main className="flex-grow container mx-auto px-2 py-4 xs:px-4 xs:py-6 sm:py-8 space-y-4 xs:space-y-6 sm:space-y-10 max-w-7xl animate-fade-in pb-24 lg:pb-12">
 
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 border-b border-zinc-100 pb-10">
+        {/* Professional Header Section */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-100 pb-10">
           <div className="space-y-2">
-            <h1 className="text-5xl font-black text-zinc-900 tracking-tighter flex items-center gap-4">
-              <span className="text-indigo-600 bg-indigo-50 p-4 rounded-3xl shadow-inner italic">📸</span>
-              Galeria
+            <h1 className="text-4xl sm:text-5xl font-black text-zinc-900 tracking-tighter flex items-center gap-4">
+              <span className="text-indigo-600 bg-indigo-50 p-4 rounded-3xl shadow-inner text-3xl sm:text-4xl">📸</span>
+              Galería Elite
             </h1>
-            <p className="text-zinc-500 font-bold ml-1 uppercase tracking-widest text-xs opacity-60">Descubre los momentos de la comunidad</p>
+            <p className="text-zinc-400 font-bold ml-1 uppercase tracking-[0.3em] text-[10px] sm:text-xs">Estudio de Curación Visual</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center w-full lg:w-auto">
-            {/* View Switching Tabs */}
-            <div className="flex p-1.5 bg-zinc-100 rounded-[1.5rem] w-full sm:w-auto shadow-inner border border-zinc-200/50">
+            {/* View Switching Professional Tabs */}
+            <div className="flex p-1.5 bg-zinc-100 rounded-2xl w-full sm:w-auto shadow-inner border border-zinc-200/50">
               {[
                 { id: 'discover', label: 'Explorar', icon: <Search size={18} /> },
                 { id: 'feed', label: 'Feed', icon: <ImageIcon size={18} /> },
@@ -125,7 +125,7 @@ const Gallery = () => {
                 <button
                   key={tab.id}
                   onClick={() => setView(tab.id)}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all duration-300 ${view === tab.id ? 'bg-white text-indigo-600 shadow-xl shadow-indigo-100 scale-105 active:scale-95' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50'}`}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-black text-xs sm:text-sm transition-all duration-500 ${view === tab.id ? 'bg-white text-indigo-600 shadow-xl shadow-indigo-100/50 scale-105' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/30'}`}
                 >
                   {tab.icon}
                   {tab.label}
@@ -137,14 +137,14 @@ const Gallery = () => {
 
         {/* Global Search Bar */}
         {(view === 'discover' || view === 'my') && (
-          <div className="animate-slide-up space-y-6">
+          <div className="animate-slide-up space-y-3 xs:space-y-4 sm:space-y-6">
             <PhotoSearch
               onSearch={handleSearch}
               placeholder={view === 'my' ? "Busca en tus fotos..." : "Busca fotos en toda la comunidad..."}
             />
 
             {view === 'discover' && (
-              <div className="flex gap-3 overflow-x-auto pb-4 px-4 max-w-4xl mx-auto no-scrollbar scroll-smooth">
+              <div className="flex gap-1.5 xs:gap-2 sm:gap-3 overflow-x-auto pb-2 xs:pb-3 sm:pb-4 px-2 xs:px-4 max-w-4xl mx-auto no-scrollbar scroll-smooth">
                 {['Mundo', 'Arte', 'Naturaleza', 'Retratos', 'Viajes', 'Comida', 'Moda', 'Arquitectura'].map((cat, i) => (
                   <button
                     key={cat}
@@ -152,7 +152,7 @@ const Gallery = () => {
                       setSelectedCategory(cat);
                       fetchGlobalFeed(cat);
                     }}
-                    className={`whitespace-nowrap px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'}`}
+                    className={`whitespace-nowrap px-3 xs:px-4 sm:px-6 py-1.5 xs:py-2 rounded-lg xs:rounded-xl text-[8.5px] xs:text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'}`}
                   >
                     {cat}
                   </button>
@@ -171,11 +171,11 @@ const Gallery = () => {
           )}
 
           {view === 'my' && (
-            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="space-y-6 xs:space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
               <PhotoUpload token={token} onUpload={fetchUserPhotos} />
-              <div className="pt-6">
-                <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
-                  <div className="w-8 h-[2px] bg-indigo-600 rounded-full"></div>
+              <div className="pt-2 xs:pt-4 sm:pt-6">
+                <h3 className="text-[10px] xs:text-[11px] sm:text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 xs:mb-6 sm:mb-8 flex items-center gap-2 xs:gap-3">
+                  <div className="w-4 xs:w-6 sm:w-8 h-[1.5px] xs:h-[2px] bg-indigo-600 rounded-full"></div>
                   Tu Galería Personal
                 </h3>
                 <PhotoList
@@ -193,16 +193,16 @@ const Gallery = () => {
 
           {view === 'discover' && (
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                  <div className="w-8 h-[2px] bg-indigo-600 rounded-full"></div>
+              <div className="flex flex-wrap items-center justify-between gap-y-2 mb-4 xs:mb-6 sm:mb-8">
+                <h3 className="text-[10px] xs:text-[11px] sm:text-xs font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2 xs:gap-3">
+                  <div className="w-4 xs:w-6 sm:w-8 h-[1.5px] xs:h-[2px] bg-indigo-600 rounded-full"></div>
                   Descubrimientos Populares
                 </h3>
                 <button
                   onClick={fetchGlobalFeed}
-                  className="p-2 hover:bg-zinc-100 rounded-xl text-zinc-400 hover:text-indigo-600 transition-all flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  className="px-2 py-1.5 xs:p-2 hover:bg-zinc-100 rounded-lg xs:rounded-xl text-zinc-400 hover:text-indigo-600 transition-all flex items-center gap-1.5 xs:gap-2 font-bold text-[8.5px] xs:text-[9.5px] sm:text-[10px] uppercase tracking-widest"
                 >
-                  <RefreshCcw size={14} className={loading ? 'animate-spin' : ''} />
+                  <RefreshCcw size={12} className={`sm:w-[14px] sm:h-[14px] ${loading ? 'animate-spin' : ''}`} />
                   Actualizar Feed
                 </button>
               </div>

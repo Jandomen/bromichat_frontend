@@ -146,15 +146,15 @@ const StoriesBar = () => {
     const hasMyStories = myStoriesGroup && myStoriesGroup.stories.length > 0;
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 relative z-10">
+        <div className="bg-white p-2 xs:p-3 sm:p-4 rounded-xl shadow-sm border border-gray-200 mb-4 sm:mb-6 relative z-10">
 
             {/* Horizontal Scroll Area */}
             <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
 
                 {/* My Story Node */}
-                <div className="flex flex-col items-center gap-2 cursor-pointer flex-shrink-0" onClick={handleMyStoryClick}>
-                    <div className={`w-16 h-16 rounded-full p-[2px] ${hasMyStories ? 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500' : 'bg-gray-200'}`}>
-                        <div className="w-full h-full rounded-full border-2 border-white overflow-hidden relative bg-white">
+                <div className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0" onClick={handleMyStoryClick}>
+                    <div className={`w-10 h-10 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-full p-[1.5px] ${hasMyStories ? 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500' : 'bg-gray-200'}`}>
+                        <div className="w-full h-full rounded-full border border-white overflow-hidden relative bg-white">
                             <img
                                 src={getFullImageUrl(currentUser?.profilePicture)}
                                 alt="Me"
@@ -170,8 +170,8 @@ const StoriesBar = () => {
                             )}
                         </div>
                     </div>
-                    <span className="text-xs font-medium text-gray-700 max-w-[64px] truncate">
-                        Tu historia
+                    <span className="text-[9px] sm:text-xs font-medium text-gray-700 max-w-[48px] xs:max-w-[56px] sm:max-w-[64px] truncate text-center lowercase tracking-tighter sm:tracking-normal">
+                        tu historia
                     </span>
                     <input
                         type="file"
@@ -189,11 +189,11 @@ const StoriesBar = () => {
                     return (
                         <div
                             key={group.user._id}
-                            className="flex flex-col items-center gap-2 cursor-pointer flex-shrink-0"
+                            className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0"
                             onClick={() => handleStoryClick(stories.indexOf(group))}
                         >
-                            <div className={`w-16 h-16 rounded-full p-[2px] ${allViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500'}`}>
-                                <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-white">
+                            <div className={`w-10 h-10 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-full p-[1.5px] ${allViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500'}`}>
+                                <div className="w-full h-full rounded-full border border-white overflow-hidden bg-white">
                                     <img
                                         src={getFullImageUrl(group.user.profilePicture)}
                                         alt={group.user.username}
@@ -202,7 +202,7 @@ const StoriesBar = () => {
                                     />
                                 </div>
                             </div>
-                            <span className="text-xs font-medium text-gray-700 max-w-[64px] truncate">
+                            <span className="text-[9px] sm:text-xs font-medium text-gray-700 max-w-[48px] xs:max-w-[56px] sm:max-w-[64px] truncate text-center lowercase tracking-tighter sm:tracking-normal">
                                 {group.user.username}
                             </span>
                         </div>
@@ -212,9 +212,9 @@ const StoriesBar = () => {
 
             {/* Create Options Modal/Overlay */}
             {showCreateOptions && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowCreateOptions(false)}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-scaleIn" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Gestionar Historia</h3>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowCreateOptions(false)}>
+                    <div className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-[280px] xs:max-w-sm shadow-2xl animate-scaleIn" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-sm xs:text-lg font-black text-gray-900 mb-3 sm:mb-4 text-center lowercase tracking-tighter">gestionar historia</h3>
 
                         <div className="space-y-3">
                             {hasMyStories && (

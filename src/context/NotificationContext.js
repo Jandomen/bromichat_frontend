@@ -134,14 +134,14 @@ export const NotificationProvider = ({ children }) => {
       playNotificationSound();
 
       if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(notification.sender?.name || 'BromiChat', {
+        new Notification(notification.sender?.name || 'Bromichat', {
           body: notification.message,
           icon: getFullImageUrl(notification.sender?.profilePicture) || '/logo192.png',
         });
       }
 
       showNotification({
-        title: notification.sender?.name || 'BromiChat',
+        title: notification.sender?.name || 'Bromichat',
         message: notification.message,
         type: notification.type,
         senderAvatar: notification.sender?.profilePicture,

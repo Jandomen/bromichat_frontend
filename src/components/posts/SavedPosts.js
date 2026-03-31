@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import Header from '../Header';
 import Footer from '../Footer';
@@ -15,10 +15,7 @@ const SavedPosts = () => {
     useEffect(() => {
         const fetchSavedPosts = async () => {
             try {
-                const res = await axios.get(
-                    `${process.env.REACT_APP_API_BACKEND}/users/saved`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                const res = await api.get('/user/saved');
                 setSavedPosts(res.data);
             } catch (error) {
                 showToast('Error al cargar publicaciones guardadas', 'error');
@@ -44,14 +41,13 @@ const SavedPosts = () => {
         <div className="flex flex-col min-h-screen bg-[#fcfcfc] font-sans selection:bg-primary-200">
             <Header />
 
-            <main className="flex-grow pt-8 pb-24 lg:pb-12 px-4 max-w-4xl mx-auto w-full">
-                <div className="flex items-center gap-6 mb-12">
-                    <div className="w-16 h-16 rounded-[2rem] bg-primary-600 flex items-center justify-center shadow-xl shadow-primary-200">
-                        <span className="text-3xl">🔖</span>
+            <main className="flex-grow pt-2 sm:pt-8 pb-24 lg:pb-12 px-2 xs:px-4 max-w-4xl mx-auto w-full">
+                <div className="flex flex-col xs:flex-row items-center xs:items-start text-center xs:text-left gap-1.5 xs:gap-6 mb-2 xs:mb-12 lowercase">
+                    <div className="w-6 h-6 xs:w-16 xs:h-16 rounded-md xs:rounded-[2rem] bg-primary-600 flex items-center justify-center shadow-md xs:shadow-xl shadow-primary-200 flex-shrink-0">
+                        <span className="text-[10px] xs:text-3xl">🔖</span>
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">Publicaciones Guardadas</h1>
-                        <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.2em] mt-1">Tu colección personal de historias favoritas</p>
+                        <h1 className="text-[11px] xs:text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Publicaciones Guardadas</h1>
                     </div>
                 </div>
 
@@ -68,7 +64,7 @@ const SavedPosts = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-8 animate-fade-in">
+                    <div className="space-y-4 xs:space-y-8 animate-fade-in">
                         {savedPosts.map(post => (
                             <PostItem
                                 key={post._id}

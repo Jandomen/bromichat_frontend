@@ -35,13 +35,13 @@ const Header = () => {
           <div className="flex flex-row justify-between items-center gap-2 sm:gap-4">
 
             {/* Logo Section */}
-            <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <div className="flex items-center gap-[1px] xs:gap-0.5 sm:gap-1.5 shrink-0 group cursor-pointer transition-all duration-300">
               {logoImages.map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Letra ${index + 1}`}
-                  className="h-6 w-6 sm:h-10 sm:w-10 transition-transform hover:scale-110 filter drop-shadow-md object-contain"
+                  className="h-5 w-5 xs:h-6 xs:w-6 sm:h-10 sm:w-10 transition-all hover:scale-125 hover:-translate-y-1 filter drop-shadow-[0_0_12px_rgba(255,255,255,0.5)] brightness-125 object-contain"
                 />
               ))}
             </div>
@@ -66,7 +66,7 @@ const Header = () => {
               <li className="list-none shrink-0"><NotificationButton /></li>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="w-11 h-11 flex items-center justify-center bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all border border-white/10"
+                className="w-10 h-10 flex items-center justify-center bg-transparent backdrop-blur-md rounded-2xl text-white hover:bg-white/10 transition-all shadow-sm border border-transparent hover:border-white/20 active:scale-95"
                 aria-label="Menú principal"
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -83,27 +83,45 @@ const Header = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest pl-2">Navegación</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><DashBoard /><span className="text-[9px] font-bold uppercase">Inicio</span></div>
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><Profile /><span className="text-[9px] font-bold uppercase">Perfil</span></div>
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><VideoButton /><span className="text-[9px] font-bold uppercase">Videos</span></div>
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><GaleryButton /><span className="text-[9px] font-bold uppercase">Galeria</span></div>
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><GroupButton /><span className="text-[9px] font-bold uppercase">Grupos</span></div>
-                  <div className="flex flex-col items-center gap-2 bg-white/5 p-3 rounded-2xl border border-white/5" onClick={() => setIsMenuOpen(false)}><ShopingButton /><span className="text-[9px] font-bold uppercase">Tienda</span></div>
+              <div className="flex flex-col gap-3 xs:gap-4">
+                <h3 className="text-[8px] xs:text-[9px] font-black text-zinc-500 uppercase tracking-widest pl-1 xs:pl-2">Navegación</h3>
+                <div className="grid grid-cols-2 gap-2 Lg:gap-4">
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><DashBoard /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Inicio</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><Profile /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Perfil</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><VideoButton /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Videos</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><GaleryButton /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Galeria</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><GroupButton /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Grupos</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 xs:gap-2 bg-white/5 p-1.5 xs:p-2 sm:p-3 rounded-xl border border-white/5" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-90 sm:scale-100"><ShopingButton /></div>
+                    <span className="text-[7.5px] xs:text-[8px] sm:text-[9px] font-bold uppercase">Tienda</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/10">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-4 bg-white/5 p-3 rounded-2xl" onClick={() => setIsMenuOpen(false)}>
-                    <SettingsButton />
-                    <span className="text-xs font-bold uppercase tracking-widest">Configuración</span>
+              <div className="pt-4 xs:pt-6 border-t border-white/10">
+                <div className="flex flex-col gap-2 xs:gap-4">
+                  <div className="flex items-center gap-2 xs:gap-4 bg-white/5 p-2 xs:p-3 rounded-xl" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-100"><SettingsButton /></div>
+                    <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-widest">Configuración</span>
                   </div>
-                  <div className="flex items-center gap-4 bg-red-600/10 p-3 rounded-2xl border border-red-600/20" onClick={() => setIsMenuOpen(false)}>
-                    <LogoutButton />
-                    <span className="text-xs font-bold uppercase tracking-widest text-red-500">Cerrar Sesión</span>
+                  <div className="flex items-center gap-2 xs:gap-4 bg-red-600/10 p-2 xs:p-3 rounded-xl border border-red-600/20" onClick={() => setIsMenuOpen(false)}>
+                    <div className="scale-75 xs:scale-100"><LogoutButton /></div>
+                    <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold uppercase tracking-widest text-red-500">Cerrar Sesión</span>
                   </div>
                 </div>
               </div>

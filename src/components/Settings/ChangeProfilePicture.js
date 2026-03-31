@@ -119,10 +119,10 @@ const ChangeProfilePicture = () => {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row items-center gap-8">
+      <div className="flex flex-col sm:flex-row items-center gap-4 xs:gap-6 sm:gap-8">
         {/* Image preview */}
         <div className="relative group mx-auto sm:mx-0">
-          <div className="w-32 h-32 rounded-full p-1 bg-white border-2 border-dashed border-gray-300 group-hover:border-blue-500 transition-colors">
+          <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 rounded-full p-1 bg-white border-2 border-dashed border-gray-300 group-hover:border-blue-500 transition-colors">
             <img
               src={preview || defaultProfile}
               alt="Vista previa"
@@ -130,14 +130,14 @@ const ChangeProfilePicture = () => {
             />
           </div>
           {selectedFile && (
-            <div className="absolute -bottom-2 inset-x-0 mx-auto w-fit px-3 py-1 bg-gray-900/80 backdrop-blur text-white text-xs rounded-full truncate max-w-[120px]">
+            <div className="absolute -bottom-2 inset-x-0 mx-auto w-fit px-2 xs:px-3 py-0.5 xs:py-1 bg-gray-900/80 backdrop-blur text-white text-[10px] xs:text-xs rounded-full truncate max-w-[100px] xs:max-w-[120px]">
               {selectedFile.name}
             </div>
           )}
         </div>
 
         <div className="flex-1 w-full text-center sm:text-left">
-          <div className="flex flex-wrap gap-4 justify-center sm:justify-start items-center">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2 xs:gap-3 sm:gap-4 justify-center sm:justify-start items-center">
             {/* Custom file input */}
             <div className="relative">
               <input
@@ -149,11 +149,11 @@ const ChangeProfilePicture = () => {
               />
               <label
                 htmlFor="file-upload"
-                className="flex items-center gap-2 px-6 py-2.5 bg-blue-50 text-blue-700 font-medium rounded-xl cursor-pointer hover:bg-blue-100 transition-all duration-200 border border-blue-200"
+                className="flex items-center justify-center w-full sm:w-auto gap-1.5 xs:gap-2 px-4 xs:px-6 py-2 xs:py-2.5 text-xs xs:text-sm sm:text-base bg-blue-50 text-blue-700 font-medium rounded-lg xs:rounded-xl cursor-pointer hover:bg-blue-100 transition-all duration-200 border border-blue-200"
               >
-                <FaPaperclip className="text-blue-600" />
+                <FaPaperclip className="text-blue-600 w-3 h-3 xs:w-4 xs:h-4" />
                 <span>
-                  {selectedFile ? 'Cambiar imagen' : 'Seleccionar archivo'}
+                  {selectedFile ? 'Cambiar' : 'Seleccionar'}
                 </span>
               </label>
             </div>
@@ -162,9 +162,9 @@ const ChangeProfilePicture = () => {
               <button
                 onClick={handleUpload}
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all duration-200"
+                className="flex items-center justify-center w-full sm:w-auto gap-1.5 xs:gap-2 px-4 xs:px-6 py-2 xs:py-2.5 text-xs xs:text-sm sm:text-base bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg xs:rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all duration-200"
               >
-                <Upload className="w-4 h-4" />
+                <Upload className="w-3 h-3 xs:w-4 xs:h-4" />
                 {loading ? 'Subiendo...' : 'Guardar Foto'}
               </button>
             )}
@@ -172,14 +172,14 @@ const ChangeProfilePicture = () => {
             {user?.profilePicture && (
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-2 px-6 py-2.5 bg-white text-red-600 font-medium rounded-xl border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
+                className="flex items-center justify-center w-full sm:w-auto gap-1.5 xs:gap-2 px-4 xs:px-6 py-2 xs:py-2.5 text-xs xs:text-sm sm:text-base bg-white text-red-600 font-medium rounded-lg xs:rounded-xl border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3 h-3 xs:w-4 xs:h-4" />
                 Eliminar
               </button>
             )}
           </div>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-3 xs:mt-4 text-[10px] xs:text-xs sm:text-sm text-gray-500 text-center sm:text-left">
             Formatos permitidos: JPG, PNG o GIF. Tamaño máximo 2MB.
           </p>
         </div>

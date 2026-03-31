@@ -6,6 +6,17 @@ import defaultProfile from '../../assets/default-profile.png';
 const ShareModal = ({ isOpen, onClose, onShare, item, type = 'post' }) => {
     const [comment, setComment] = useState('');
 
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        }
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const handleSubmit = (e) => {
