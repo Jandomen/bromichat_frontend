@@ -39,23 +39,23 @@ const EditBio = () => {
     <div className="w-full">
       <div className="relative">
         <textarea
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none resize-none min-h-[100px] text-gray-700"
+          className="w-full px-3 xs:px-4 py-2 xs:py-3 text-xs xs:text-sm rounded-lg xs:rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none resize-none min-h-[80px] xs:min-h-[100px] text-gray-700"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           rows={3}
           placeholder="Escribe algo sobre ti..."
         />
-        <div className="mt-3 flex items-center justify-between">
-          <span className={`text-xs ${bio.length > 300 ? 'text-red-500' : 'text-gray-400'}`}>
+        <div className="mt-2 xs:mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className={`text-[10px] xs:text-xs ${bio.length > 300 ? 'text-red-500' : 'text-gray-400'}`}>
             {bio.length} caracteres
           </span>
 
           <button
             onClick={handleSaveBio}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 disabled:scale-100 disabled:shadow-none transform hover:-translate-y-0.5 transition-all duration-200"
+            className="flex items-center justify-center gap-1.5 xs:gap-2 px-4 xs:px-6 py-2 xs:py-2.5 text-xs xs:text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-lg xs:rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 disabled:scale-100 disabled:shadow-none transform hover:-translate-y-0.5 transition-all duration-200"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-3 h-3 xs:w-4 xs:h-4" />
             {loading ? "Guardando..." : "Guardar Bio"}
           </button>
         </div>

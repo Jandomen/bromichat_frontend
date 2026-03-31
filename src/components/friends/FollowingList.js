@@ -12,7 +12,6 @@ const FollowingList = ({ minimal = false }) => {
   const { token, user: activeUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Si no hay paramId, usamos el del usuario activo
   const userId = paramId || activeUser?._id;
 
   const [following, setFollowing] = useState([]);
@@ -52,56 +51,56 @@ const FollowingList = ({ minimal = false }) => {
   );
 
   const Content = (
-    <div className={`max-w-4xl mx-auto p-4 animate-fade-in ${minimal ? 'p-0' : ''}`}>
-      <div className={`bg-white rounded-[2rem] shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden ${minimal ? 'shadow-none border-none rounded-none' : ''}`}>
+    <div className={`max-w-4xl mx-auto p-2 xs:p-4 animate-fade-in ${minimal ? 'p-0' : ''}`}>
+      <div className={`bg-white rounded-[1.5rem] xs:rounded-[2rem] shadow-sm sm:shadow-xl border border-gray-100 overflow-hidden ${minimal ? 'shadow-none border-none rounded-none' : ''}`}>
         {/* Header & Tabs */}
         {!minimal && (
-          <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-            <h2 className="text-3xl font-black text-gray-900 mb-6 flex items-center gap-3">
-              <span className="p-3 bg-green-50 text-green-600 rounded-2xl"><FaUserPlus /></span>
-              Conexiones
+          <div className="p-2 xs:p-5 border-b border-gray-50 bg-gray-50/20">
+            <h2 className="text-[12px] xs:text-xl sm:text-3xl font-black text-gray-900 mb-4 flex items-center gap-2 lowercase tracking-tighter">
+              <span className="p-1 xs:p-2 bg-green-50 text-green-600 rounded-lg"><FaUserPlus size={12} /></span>
+              conexiones
             </h2>
 
-            <div className="flex gap-4 mb-6">
-              <Link to={`/user/${userId}/friends`} className="px-6 py-3 rounded-2xl bg-white text-gray-400 hover:text-gray-900 font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-                <FaUserFriends /> Compas
+            <div className="flex gap-1 mb-4 overflow-x-auto no-scrollbar pb-1">
+              <Link to={`/user/${userId}/friends`} className="px-3 py-1.5 rounded-lg bg-white text-gray-400 hover:text-gray-900 font-black text-[9px] uppercase tracking-tighter transition-all flex-shrink-0 flex items-center gap-1">
+                <FaUserFriends size={10} /> Compas
               </Link>
-              <Link to={`/user/${userId}/followers`} className="px-6 py-3 rounded-2xl bg-white text-gray-400 hover:text-gray-900 font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-                <FaUsers /> Seguidores
+              <Link to={`/user/${userId}/followers`} className="px-3 py-1.5 rounded-lg bg-white text-gray-400 hover:text-gray-900 font-black text-[9px] uppercase tracking-tighter transition-all flex-shrink-0 flex items-center gap-1">
+                <FaUsers size={10} /> Seguidores
               </Link>
-              <Link to={`/user/${userId}/following`} className="px-6 py-3 rounded-2xl bg-green-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-green-500/30 flex items-center gap-2">
-                <FaUserPlus /> Siguiendo
+              <Link to={`/user/${userId}/following`} className="px-3 py-1.5 rounded-lg bg-green-600 text-white font-black text-[9px] uppercase tracking-tighter shadow-sm flex-shrink-0 flex items-center gap-1">
+                <FaUserPlus size={10} /> Siguiendo
               </Link>
             </div>
 
             {/* Search Bar */}
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                <FaSearch className="text-gray-300 group-focus-within:text-green-500 transition-colors" />
+              <div className="absolute inset-y-0 left-0 pl-3 xs:pl-5 flex items-center pointer-events-none">
+                <FaSearch size={8} className="text-gray-300 group-focus-within:text-green-500 transition-colors" />
               </div>
               <input
                 type="text"
-                placeholder="Buscar por nombre o usuario..."
+                placeholder="Buscar seguidos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all text-sm font-medium"
+                className="w-full pl-8 xs:pl-12 pr-4 py-1.5 xs:py-2.5 bg-white border border-gray-200 rounded-lg xs:rounded-xl shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all text-[9.5px] xs:text-sm font-medium"
               />
             </div>
           </div>
         )}
 
-        <div className={`${minimal ? 'p-0' : 'p-8'}`}>
+        <div className={`${minimal ? 'p-0' : 'p-3 xs:p-8'}`}>
           {minimal && (
-            <div className="mb-6 relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <FaSearch className="text-gray-300 group-focus-within:text-primary-500 transition-colors text-xs" />
+            <div className="mb-3 relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch size={8} className="text-gray-300 group-focus-within:text-primary-500 transition-colors" />
               </div>
               <input
                 type="text"
                 placeholder="Filtrar seguidos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all text-xs font-medium"
+                className="w-full pl-8 pr-3 py-1.5 xs:py-2.5 bg-gray-50 border border-gray-100 rounded-lg xs:rounded-xl focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all text-[9.5px] xs:text-sm font-medium"
               />
             </div>
           )}
@@ -116,25 +115,27 @@ const FollowingList = ({ minimal = false }) => {
               <p className="text-red-700 font-medium">{error}</p>
             </div>
           ) : filteredFollowing.length > 0 ? (
-            <div className={`grid grid-cols-1 ${minimal ? 'sm:grid-cols-2' : 'md:grid-cols-2'} gap-4`}>
+            <div className={`grid grid-cols-1 ${minimal ? 'sm:grid-cols-2' : 'md:grid-cols-2'} gap-1.5 xs:gap-2`}>
               {filteredFollowing.map((user) => (
                 <div
                   key={user._id}
-                  className="flex items-center p-4 bg-gray-50/50 hover:bg-white border border-transparent hover:border-green-100 hover:shadow-xl hover:shadow-green-500/5 rounded-3xl cursor-pointer transition-all duration-300 group"
+                  className="flex items-center p-1.5 xs:p-2 bg-gray-50/50 hover:bg-white border border-transparent hover:border-green-100 hover:shadow-xl hover:shadow-green-500/5 rounded-xl xs:rounded-2xl cursor-pointer transition-all duration-300 group"
                   onClick={() => navigate(`/user/${user._id}`)}
                 >
                   <div className="relative">
                     <img
                       src={getFullImageUrl(user.profilePicture)}
                       alt={user.username}
-                      className="w-16 h-16 rounded-2xl object-cover ring-4 ring-white shadow-md group-hover:scale-110 transition-transform"
+                      className="w-8 h-8 xs:w-10 xs:h-10 rounded-lg xs:rounded-xl object-cover ring-1 ring-white shadow-sm group-hover:scale-105 transition-transform"
                       onError={(e) => (e.target.src = defaultProfile)}
                     />
-                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 border-4 border-white rounded-full shadow-sm ${user.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 border-2 border-white rounded-full shadow-sm ${user.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
                   </div>
-                  <div className="ml-4 flex-1">
-                    <p className="font-black text-gray-900 group-hover:text-green-600 transition-colors">@{user.username}</p>
-                    <p className="text-sm text-gray-500 font-medium">
+                  <div className="ml-1.5 xs:ml-2.5 flex-1 min-w-0">
+                    <p className="font-black text-gray-900 group-hover:text-green-600 transition-colors text-[9px] xs:text-[11px] truncate lowercase tracking-tighter">
+                      @{user.username}
+                    </p>
+                    <p className="text-[8px] xs:text-[10px] text-gray-400 font-bold truncate tracking-widest uppercase">
                       {user.name} {user.lastName}
                     </p>
                   </div>

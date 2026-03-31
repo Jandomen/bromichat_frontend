@@ -95,13 +95,13 @@ const ProductUpload = () => {
             {!preview ? (
               <label
                 htmlFor="product-image"
-                className="flex flex-col items-center justify-center w-full aspect-video border-4 border-dashed border-gray-100 rounded-[2rem] cursor-pointer hover:bg-red-50 hover:border-red-200 transition-all group"
+                className="flex flex-col items-center justify-center w-full aspect-[21/9] sm:aspect-video border-2 sm:border-4 border-dashed border-gray-100 rounded-[1.5rem] sm:rounded-[2rem] cursor-pointer hover:bg-red-50 hover:border-red-200 transition-all group"
               >
-                <div className="bg-red-50 p-6 rounded-full group-hover:bg-red-100 transition-colors mb-4">
-                  <ImagePlus className="w-10 h-10 text-red-500" />
+                <div className="bg-red-50 p-4 sm:p-6 rounded-full group-hover:bg-red-100 transition-colors mb-2 sm:mb-4">
+                  <ImagePlus className="w-6 h-6 sm:w-10 sm:h-10 text-red-500" />
                 </div>
-                <span className="font-black text-gray-800 uppercase tracking-widest text-xs">Subir Foto del Producto</span>
-                <span className="text-gray-400 text-[10px] mt-2 font-bold uppercase tracking-widest">Formatos: JPG, PNG, WEBP</span>
+                <span className="font-black text-gray-800 uppercase tracking-widest text-[9px] sm:text-xs">Subir Foto del Producto</span>
+                <span className="text-gray-400 text-[8px] sm:text-[10px] mt-1 sm:mt-2 font-bold uppercase tracking-widest">Formatos: JPG, PNG, WEBP</span>
               </label>
             ) : (
               <div className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl shadow-gray-300">
@@ -126,44 +126,44 @@ const ProductUpload = () => {
 
           <div className="grid grid-cols-1 gap-6">
             {/* Title */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Título del Producto</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Título del Producto</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
-                  <Tag className="w-5 h-5" />
+                <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
+                  <Tag className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <input
                   type="text"
                   placeholder="Ej: Cámara Vintage 1970"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-800 placeholder:text-gray-300 shadow-sm"
+                  className="w-full pl-9 sm:pl-12 pr-4 sm:pr-6 py-3 sm:py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-bold text-gray-800 text-[10px] sm:text-xs placeholder:text-gray-300 shadow-sm"
                   required
                 />
               </div>
             </div>
 
             {/* Price & Currency */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Precio y Moneda</label>
-              <div className="flex gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Precio y Moneda</label>
+              <div className="flex gap-2 sm:gap-4">
                 <div className="relative flex-1 group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
-                    <Banknote className="w-5 h-5" />
+                  <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">
+                    <Banknote className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <input
                     type="number"
                     placeholder="0.00"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-800 placeholder:text-gray-300 shadow-sm"
+                    className="w-full pl-9 sm:pl-12 pr-4 sm:pr-6 py-3 sm:py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-bold text-gray-800 text-[10px] sm:text-xs placeholder:text-gray-300 shadow-sm"
                     required
                   />
                 </div>
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-32 px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-black text-gray-800 shadow-sm cursor-pointer"
+                  className="w-24 sm:w-32 px-3 sm:px-4 py-3 sm:py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-black text-gray-800 text-[10px] sm:text-xs shadow-sm cursor-pointer"
                 >
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
@@ -175,17 +175,17 @@ const ProductUpload = () => {
             </div>
 
             {/* Description */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Descripción</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Descripción</label>
               <div className="relative group">
-                <div className="absolute left-4 top-6 text-gray-400 group-focus-within:text-red-500 transition-colors">
-                  <FileText className="w-5 h-5" />
+                <div className="absolute left-3 sm:left-4 top-3 sm:top-4 text-gray-400 group-focus-within:text-red-500 transition-colors">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <textarea
-                  placeholder="Describe el estado de tu producto..."
+                  placeholder="Describe el producto..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-800 placeholder:text-gray-300 shadow-sm min-h-[150px] resize-none"
+                  className="w-full pl-9 sm:pl-12 pr-4 sm:pr-6 py-3 sm:py-4 bg-gray-50 border-2 border-transparent focus:border-red-500/20 focus:bg-white rounded-xl sm:rounded-2xl outline-none transition-all font-bold text-gray-800 text-[10px] sm:text-xs placeholder:text-gray-300 shadow-sm min-h-[80px] sm:min-h-[120px] resize-none"
                 />
               </div>
             </div>
@@ -217,15 +217,15 @@ const ProductUpload = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-5 bg-red-600 text-white rounded-[1.5rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-red-500/40 hover:bg-red-700 hover:-translate-y-1 transition-all disabled:bg-gray-200 disabled:shadow-none disabled:translate-y-0"
+          className="w-full py-3.5 sm:py-4 bg-red-600 text-white rounded-[1.2rem] sm:rounded-[1.5rem] font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-lg sm:shadow-2xl shadow-red-500/40 hover:bg-red-700 hover:-translate-y-0.5 transition-all disabled:bg-gray-200 disabled:shadow-none disabled:translate-y-0"
         >
           {loading ? (
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex items-center justify-center gap-2 sm:gap-3">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 sm:border-4 border-white border-t-transparent rounded-full animate-spin"></div>
               Publicando...
             </div>
           ) : (
-            'Publicar Producto Ahora'
+            'Publicar Ahora'
           )}
         </button>
       </form>

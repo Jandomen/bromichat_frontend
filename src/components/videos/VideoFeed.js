@@ -248,42 +248,42 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
             {/* Gradient Overlay */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-            {/* NEW: Integrated Social Dashboard (Moving away from TikTok style) */}
-            <div className={`absolute bottom-6 inset-x-4 sm:inset-x-8 transition-all duration-700 transform ${showInfo && !showComments ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
-                <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 p-4 sm:p-6 shadow-2xl">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            {/* NEW: Integrated Social Dashboard (Responsive Design) */}
+            <div className={`absolute bottom-4 sm:bottom-6 inset-x-2 sm:inset-x-8 transition-all duration-700 transform ${showInfo && !showComments ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+                <div className="bg-white/5 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-white/10 p-2.5 sm:p-5 shadow-2xl">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
 
                         {/* User & Description Info */}
-                        <div className="flex items-center gap-4 flex-grow">
-                            <div className="relative group/avatar cursor-pointer">
+                        <div className="flex items-center gap-2.5 sm:gap-4 flex-grow min-w-0">
+                            <div className="relative group/avatar cursor-pointer shrink-0">
                                 <img
                                     src={getFullImageUrl(video.user?.profilePicture)}
-                                    className="w-14 h-14 rounded-[1.25rem] border-2 border-red-500/50 shadow-lg object-cover transform transition-transform group-hover/avatar:scale-105"
+                                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-full border border-red-500/50 shadow-md object-cover transform transition-transform group-hover/avatar:scale-105"
                                     alt=""
                                     onError={e => e.target.src = defaultProfile}
                                 />
-                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-zinc-900 rounded-full" />
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-zinc-900 rounded-full" />
                             </div>
 
-                            <div className="flex flex-col min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-black text-white text-lg tracking-tight truncate">@{video.user?.username}</span>
+                            <div className="flex flex-col min-w-0 w-full">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-black text-white text-xs sm:text-sm tracking-tight truncate max-w-[120px] sm:max-w-[200px]">@{video.user?.username}</span>
                                     {/* Small animated music tag */}
-                                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-600/20 text-red-400 text-[9px] font-black uppercase rounded-md border border-red-600/30">
-                                        <Music size={10} className="animate-pulse" />
-                                        <span>Audio Original</span>
+                                    <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 py-0.5 bg-red-600/20 text-red-400 text-[8px] sm:text-[9px] font-black uppercase rounded border border-red-600/30 whitespace-nowrap">
+                                        <Music size={8} className="animate-pulse" />
+                                        <span>Audio Org.</span>
                                     </div>
                                 </div>
 
-                                <div className="mt-1">
-                                    <p className="text-zinc-300 text-sm leading-relaxed font-medium">
-                                        {showFullDescription ? (video.description || video.title) : truncateDescription(video.description || video.title)}
-                                        {(video.description || video.title)?.length > 80 && (
+                                <div className="mt-0.5">
+                                    <p className="text-zinc-300 text-[10px] sm:text-xs leading-snug font-medium line-clamp-2">
+                                        {showFullDescription ? (video.description || video.title) : truncateDescription(video.description || video.title, 50)}
+                                        {(video.description || video.title)?.length > 50 && (
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setShowFullDescription(!showFullDescription); }}
-                                                className="ml-2 text-red-400 hover:text-red-300 font-bold text-xs uppercase tracking-widest"
+                                                className="ml-1.5 text-red-400 hover:text-red-300 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider"
                                             >
-                                                {showFullDescription ? 'Ver menos' : 'Ver más'}
+                                                {showFullDescription ? 'Menos' : 'Más'}
                                             </button>
                                         )}
                                     </p>
@@ -291,60 +291,64 @@ const VideoCard = ({ video, token, currentUser, isFullscreen, onToggleFullscreen
                             </div>
                         </div>
 
-                        {/* NEW: Horizontal Interaction Bar (Consistent with PhotoFeed) */}
-                        <div className="flex items-center justify-center gap-2 sm:gap-4 bg-black/40 p-2 rounded-[1.75rem] border border-white/5 self-center md:self-auto">
-                            {/* Reaction Button Case */}
-                            <div className="relative group/react">
+                        {/* Integrated Horizontal Interaction Bar (Sophisticated Design) */}
+                        <div className="flex flex-row items-center justify-between gap-1.5 sm:gap-3 bg-white/10 backdrop-blur-3xl p-1.5 sm:p-2.5 rounded-2xl border border-white/20 w-full md:w-auto mt-2 md:mt-0 shadow-2xl">
+                            
+                            {/* Reactions: "ME LATE" */}
+                            <div className="relative group/react flex-1 md:flex-none">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         const userReaction = localVideo.reactions?.find(r => r.user === currentUser?._id);
-                                        if (userReaction) {
-                                            handleReact(userReaction.type);
-                                        } else {
-                                            handleReact('like');
-                                        }
+                                        if (userReaction) handleReact(userReaction.type);
+                                        else handleReact('like');
                                     }}
-                                    className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                    className="flex items-center justify-center w-full gap-2 px-3 py-2 sm:px-5 sm:py-3 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
                                 >
                                     <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
-                                        {currentReactionData ? <span className="text-2xl drop-shadow-md">{currentReactionData.emoji}</span> : <Heart className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-all" />}
+                                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white/50 group-hover/btn:text-white transition-all" />}
                                     </div>
-                                    <span className="text-xs font-black text-white">{localVideo.reactions?.length || 0}</span>
+                                    <div className="flex flex-col items-start leading-none">
+                                        <span className="text-[7.5px] sm:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">ME LATE</span>
+                                        <span className="text-[10px] sm:text-xs font-black text-white">{localVideo.reactions?.length || 0}</span>
+                                    </div>
                                 </button>
-
-                                <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-1 group-hover/react:translate-y-0 z-[150]">
+                                <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-2 group-hover/react:translate-y-0 z-[150] absolute bottom-full mb-3 -left-10 md:left-auto">
                                     <ReactionPicker
                                         onSelect={(type) => handleReact(type)}
                                         currentReaction={localVideo.reactions?.find(r => r.user === currentUser?._id)?.type}
-                                        align="center"
                                     />
                                 </div>
                             </div>
 
-                            <div className="w-[1px] h-8 bg-white/10 mx-1" />
+                            <div className="w-[1.5px] h-6 sm:h-8 bg-white/20 shrink-0" />
 
-                            {/* Comment Button */}
+                            {/* Comments: "OPINAR" */}
                             <button
                                 onClick={() => setShowComments(true)}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                className="flex items-center justify-center flex-1 md:flex-none gap-2 px-3 py-2 sm:px-5 sm:py-3 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
                             >
-                                <MessageCircle className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-xs font-black text-white">{localVideo.comments?.length || 0}</span>
+                                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white/50 group-hover/btn:text-white transition-colors" />
+                                <div className="flex flex-col items-start leading-none">
+                                    <span className="text-[7.5px] sm:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">OPINAR</span>
+                                    <span className="text-[10px] sm:text-xs font-black text-white">{localVideo.comments?.length || 0}</span>
+                                </div>
                             </button>
 
-                            <div className="w-[1px] h-8 bg-white/10 mx-1" />
+                            <div className="w-[1.5px] h-6 sm:h-8 bg-white/20 shrink-0" />
 
-                            {/* Share Button */}
+                            {/* Share: "VIRALIZAR" */}
                             <button
                                 onClick={() => setIsShareModalOpen(true)}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white/5 group/btn"
+                                className="flex items-center justify-center flex-1 md:flex-none gap-2 px-3 py-2 sm:px-5 sm:py-3 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
                             >
-                                <Share2 className="w-5 h-5 text-zinc-400 group-hover/btn:text-white transition-colors" />
-                                <span className="text-xs font-black text-white uppercase tracking-tighter">Compartir</span>
+                                <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-white/50 group-hover/btn:text-white transition-colors" />
+                                <div className="flex flex-col items-start leading-none">
+                                    <span className="text-[7.5px] sm:text-[9px] font-black text-white/40 uppercase tracking-widest mb-0.5">VIRALIZAR</span>
+                                    <span className="text-[10px] sm:text-xs font-black text-white px-1">Gogogo!</span>
+                                </div>
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>

@@ -197,14 +197,14 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
 
   // Layout selection
   const gridClasses = type === 'pinterest'
-    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-    : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6";
+    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-4 sm:gap-8"
+    : "grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-6";
 
   const cardClasses = type === 'pinterest'
     ? "bg-white overflow-hidden transition-all duration-500 group cursor-pointer"
-    : "group relative aspect-square bg-zinc-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 cursor-pointer";
+    : "group relative aspect-square bg-zinc-900 rounded-lg xs:rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 cursor-pointer";
 
-  const imageAspect = type === 'pinterest' ? "aspect-[4/3] rounded-[2.5rem]" : "w-full h-full";
+  const imageAspect = type === 'pinterest' ? "aspect-[4/3] rounded-2xl xs:rounded-[2.5rem]" : "w-full h-full";
 
   return (
     <div>
@@ -262,20 +262,20 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
 
             {/* Pinterest Style Info */}
             {type === 'pinterest' && (
-              <div className="mt-5 px-1 flex gap-4">
+              <div className="mt-2 xs:mt-3 sm:mt-5 px-1 flex gap-2 xs:gap-3 sm:gap-4">
                 <img
                   src={getFullImageUrl(photo.user?.profilePicture)}
-                  className="w-12 h-12 rounded-[1.5rem] object-cover border-2 border-white shadow-sm flex-shrink-0 mt-1 transition-transform group-hover:scale-110"
+                  className="w-6 h-6 xs:w-8 xs:h-8 sm:w-12 sm:h-12 rounded-lg xs:rounded-xl sm:rounded-[1.5rem] object-cover border xs:border-2 border-white shadow-sm flex-shrink-0 mt-0.5 xs:mt-1 transition-transform group-hover:scale-110"
                   alt=""
                   onError={e => e.target.src = defaultProfile}
                 />
-                <div className="flex-1 min-w-0 pr-6 relative">
-                  <h3 className="font-bold text-zinc-900 text-lg leading-tight line-clamp-2 uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
+                <div className="flex-1 min-w-0 pr-4 xs:pr-6 relative">
+                  <h3 className="font-bold text-zinc-900 text-[9.5px] xs:text-[11px] sm:text-lg leading-tight line-clamp-2 uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                     {photo.description || 'Capturando el momento'}
                   </h3>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">@{photo.user?.username}</span>
-                    <span className="text-[10px] font-bold text-zinc-300 mt-1">{new Date(photo.createdAt).toLocaleDateString()}</span>
+                  <div className="flex flex-col mt-0.5 xs:mt-1 sm:mt-2">
+                    <span className="text-[7.5px] xs:text-[9px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em] truncate">@{photo.user?.username}</span>
+                    <span className="text-[7px] xs:text-[8px] sm:text-[10px] font-bold text-zinc-300 mt-0.5 xs:mt-1">{new Date(photo.createdAt).toLocaleDateString()}</span>
                   </div>
 
                   {/* Options in Pinterest Mode */}
@@ -365,51 +365,67 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
             </div>
 
             <div className="w-full md:w-96 bg-zinc-900 flex flex-col border-l border-white/5" onClick={e => e.stopPropagation()}>
-              <div className="p-6 border-b border-white/5">
-                <div className="flex items-center gap-3 mb-4">
-                  <img src={getFullImageUrl(currentPhotoDetails?.user?.profilePicture)} className="w-10 h-10 rounded-full object-cover border border-white/10" alt="" onError={e => e.target.src = defaultProfile} />
-                  <div>
-                    <h2 className="text-white font-black text-sm uppercase truncate">@{currentPhotoDetails?.user?.username || 'Cargando...'}</h2>
-                    <span className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">{new Date(photos[lightboxIndex].createdAt).toLocaleDateString()}</span>
+              <div className="p-4 sm:p-6 border-b border-white/5">
+                <div className="flex items-center gap-2 xs:gap-3 mb-2 xs:mb-4">
+                  <img src={getFullImageUrl(currentPhotoDetails?.user?.profilePicture)} className="w-8 h-8 xs:w-10 xs:h-10 rounded-full object-cover border border-white/10" alt="" onError={e => e.target.src = defaultProfile} />
+                  <div className="min-w-0">
+                    <h2 className="text-white font-black text-[11px] xs:text-sm uppercase truncate">@{currentPhotoDetails?.user?.username || 'Cargando...'}</h2>
+                    <span className="text-[8.5px] xs:text-[10px] text-zinc-500 font-bold tracking-widest uppercase truncate block">{new Date(photos[lightboxIndex].createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <p className="text-zinc-300 text-sm leading-relaxed mb-4">{photos[lightboxIndex].description || 'Sin descripción'}</p>
+                <p className="text-zinc-300 text-[11px] xs:text-sm leading-relaxed mb-6">{photos[lightboxIndex].description || 'Sin descripción'}</p>
 
-                <div className="flex items-center justify-around py-4 border-t border-b border-white/5">
-                  <div className="relative group/react">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Si ya hay reacción, la quitamos mandando el mismo tipo
-                        if (currentReactionData) {
-                          handleReact(currentReactionData.type);
-                        } else {
-                          handleReact('like');
-                        }
-                      }}
-                      className="flex flex-col items-center gap-1 group/btn"
-                    >
-                      <div className={`p-3 rounded-full transition-all ${currentReactionData ? 'bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200' : 'hover:bg-white/5 text-zinc-400'}`}>
-                        {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile size={20} />}
-                      </div>
-                      <span className="text-[10px] font-black text-zinc-500">{currentPhotoDetails?.reactions?.length || 0}</span>
+                {/* Integrated Horizontal Interaction Bar (Sophisticated Design) */}
+                <div className="flex flex-row items-center justify-around gap-2 bg-black/40 backdrop-blur-2xl p-2.5 rounded-2xl border border-white/10 mb-6 shadow-2xl">
+                    
+                    {/* Reactions: "ME LATE" */}
+                    <div className="relative group/react flex-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (currentReactionData) handleReact(currentReactionData.type);
+                            else handleReact('like');
+                          }}
+                          className="flex items-center justify-center w-full gap-2 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn"
+                        >
+                          <div className={`transition-all duration-300 transform group-hover/btn:scale-110 ${currentReactionData ? 'scale-110' : ''}`}>
+                            {currentReactionData ? <span className="text-xl drop-shadow-md">{currentReactionData.emoji}</span> : <Smile size={20} className="text-white/50 group-hover/btn:text-white transition-all" />}
+                          </div>
+                          <div className="flex flex-col items-start leading-none">
+                            <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">ME LATE</span>
+                            <span className="text-[10px] font-black text-white">{currentPhotoDetails?.reactions?.length || 0}</span>
+                          </div>
+                        </button>
+
+                        <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-2 group-hover/react:translate-y-0 z-[150] absolute bottom-full mb-3 left-0">
+                          <ReactionPicker
+                            onSelect={(type) => handleReact(type)}
+                            currentReaction={currentPhotoDetails?.reactions?.find(r => (r.user?._id || r.user) === currentUser?._id)?.type}
+                          />
+                        </div>
+                    </div>
+
+                    <div className="w-[1px] h-6 bg-white/20 shrink-0" />
+
+                    {/* Comments: "OPINAR" */}
+                    <button className="flex flex-col items-center justify-center flex-1 gap-1 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn text-zinc-400">
+                        <Lightbulb size={20} className="text-white/50 group-hover:text-white transition-colors" />
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">OPINAR</span>
+                            <span className="text-[10px] font-black text-white">{currentPhotoDetails?.comments?.length || 0}</span>
+                        </div>
                     </button>
 
-                    <div className="opacity-0 invisible group-hover/react:opacity-100 group-hover/react:visible transition-all duration-500 delay-150 transform translate-y-1 group-hover/react:translate-y-0 z-40">
-                      <ReactionPicker
-                        onSelect={(type) => handleReact(type)}
-                        currentReaction={currentPhotoDetails?.reactions?.find(r => (r.user?._id || r.user) === currentUser?._id)?.type}
-                      />
-                    </div>
-                  </div>
-                  <button className="flex flex-col items-center gap-1 text-zinc-400 hover:text-indigo-500 transition-colors">
-                    <Lightbulb size={20} />
-                    <span className="text-[10px] font-black text-zinc-500 uppercase">Opinar</span>
-                  </button>
-                  <button onClick={() => setIsShareModalOpen(true)} className="flex flex-col items-center gap-1 text-zinc-400 hover:text-green-500 transition-colors">
-                    <Users size={20} />
-                    <span className="text-[10px] font-black text-zinc-500 uppercase">Viralizar</span>
-                  </button>
+                    <div className="w-[1px] h-6 bg-white/20 shrink-0" />
+
+                    {/* Viral: "VIRALIZAR" */}
+                    <button onClick={() => setIsShareModalOpen(true)} className="flex flex-col items-center justify-center flex-1 gap-1 px-3 py-2 rounded-xl transition-all duration-300 hover:bg-white/10 group/btn text-zinc-400">
+                        <Users size={20} className="text-white/50 group-hover:text-white transition-colors" />
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="text-[7.5px] font-black text-white/40 uppercase tracking-widest mb-0.5">VIRALIZAR</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-tighter">Go!</span>
+                        </div>
+                    </button>
                 </div>
               </div>
 
@@ -435,7 +451,7 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                 )}
               </div>
 
-              <form onSubmit={handleComment} className="p-4 bg-black/40 border-t border-white/5 flex gap-2 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-4">
+              <form onSubmit={handleComment} className="p-2 xs:p-4 bg-black/40 border-t border-white/5 flex gap-1.5 xs:gap-2 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:pb-4">
                 <input
                   type="text"
                   value={commentText}
@@ -446,10 +462,10 @@ const PhotoList = ({ photos, setPhotos, token, initialPhotoId, type = 'grid' }) 
                     }
                   }}
                   placeholder="Añade un comentario..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-600/50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-full px-3 xs:px-4 py-1.5 xs:py-2 text-[10px] xs:text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-600/50"
                 />
-                <button type="submit" className="p-2.5 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 transition-colors flex items-center justify-center">
-                  <Send size={14} />
+                <button type="submit" className="p-2 xs:p-2.5 bg-indigo-600 rounded-full text-white hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                  <Send size={12} className="xs:w-[14px] xs:h-[14px]" />
                 </button>
               </form>
             </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const REACTION_TYPES = [
-    { type: 'like', emoji: '👍', label: 'Me gusta', color: 'text-blue-600' },
+    { type: 'like', emoji: '👍', label: 'Me late', color: 'text-blue-600' },
     { type: 'love', emoji: '❤️', label: 'Me encanta', color: 'text-red-500' },
     { type: 'haha', emoji: '😂', label: 'Me divierte', color: 'text-yellow-500' },
     { type: 'wow', emoji: '😮', label: '¡Wow!', color: 'text-yellow-500' },

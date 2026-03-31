@@ -16,9 +16,7 @@ const PermissionSettings = () => {
             const cameraStatus = await navigator.permissions.query({ name: 'camera' }).catch(() => ({ state: 'unknown' }));
             const micStatus = await navigator.permissions.query({ name: 'microphone' }).catch(() => ({ state: 'unknown' }));
             const geoStatus = await navigator.permissions.query({ name: 'geolocation' }).catch(() => ({ state: 'unknown' }));
-            // Not properly supported in all browsers via query
 
-            // Notifications special handling
             let notifState = 'prompt';
             if (Notification.permission === 'granted') notifState = 'granted';
             else if (Notification.permission === 'denied') notifState = 'denied';
@@ -103,37 +101,37 @@ const PermissionSettings = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 mb-6">
-                <div className="flex gap-3">
-                    <Smartphone className="w-6 h-6 text-blue-600 flex-shrink-0" />
+        <div className="space-y-4 xs:space-y-6">
+            <div className="p-3 xs:p-4 bg-blue-50/50 rounded-xl xs:rounded-2xl border border-blue-100 mb-4 xs:mb-6">
+                <div className="flex gap-2.5 xs:gap-3">
+                    <Smartphone className="w-5 h-5 xs:w-6 xs:h-6 text-blue-600 flex-shrink-0" />
                     <div>
-                        <h4 className="font-bold text-blue-900">Permisos del Dispositivo</h4>
-                        <p className="text-sm text-blue-700 mt-1">
-                            Aquí puedes verificar y solicitar acceso a las funciones de hardware de tu dispositivo para asegurar que BromiChat funcione correctamente.
+                        <h4 className="font-bold text-blue-900 text-sm xs:text-base">Permisos del Dispositivo</h4>
+                        <p className="text-[10px] xs:text-xs sm:text-sm text-blue-700 mt-0.5 xs:mt-1">
+                            Aquí puedes verificar y solicitar acceso a las funciones de hardware de tu dispositivo para asegurar que Bromichat funcione correctamente.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-3 xs:gap-4">
                 {/* Camera */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl ${permissions.camera === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                            <Camera size={24} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 xs:p-4 bg-white border border-gray-100 rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 xs:gap-4">
+                        <div className={`p-2 xs:p-3 rounded-lg xs:rounded-xl ${permissions.camera === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <Camera size={20} className="xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Cámara</h3>
-                            <p className="text-xs text-gray-500">Para historias y videollamadas</p>
+                            <h3 className="font-bold text-gray-900 text-xs xs:text-sm">Cámara</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-500">Para historias y videollamadas</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-end sm:justify-start gap-2 xs:gap-3">
                         {renderStatusText(permissions.camera)}
                         {permissions.camera !== 'granted' && (
                             <button
                                 onClick={requestCamera}
-                                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition-colors"
+                                className="px-3 xs:px-4 py-1.5 xs:py-2 bg-gray-900 text-white text-[10px] xs:text-xs font-bold rounded-lg xs:rounded-xl hover:bg-gray-800 transition-colors"
                             >
                                 Solicitar
                             </button>
@@ -142,22 +140,22 @@ const PermissionSettings = () => {
                 </div>
 
                 {/* Microphone */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl ${permissions.microphone === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                            <Mic size={24} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 xs:p-4 bg-white border border-gray-100 rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 xs:gap-4">
+                        <div className={`p-2 xs:p-3 rounded-lg xs:rounded-xl ${permissions.microphone === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <Mic size={20} className="xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Micrófono</h3>
-                            <p className="text-xs text-gray-500">Para notas de voz y llamadas</p>
+                            <h3 className="font-bold text-gray-900 text-xs xs:text-sm">Micrófono</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-500">Para notas de voz y llamadas</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-end sm:justify-start gap-2 xs:gap-3">
                         {renderStatusText(permissions.microphone)}
                         {permissions.microphone !== 'granted' && (
                             <button
                                 onClick={requestMicrophone}
-                                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition-colors"
+                                className="px-3 xs:px-4 py-1.5 xs:py-2 bg-gray-900 text-white text-[10px] xs:text-xs font-bold rounded-lg xs:rounded-xl hover:bg-gray-800 transition-colors"
                             >
                                 Solicitar
                             </button>
@@ -166,22 +164,22 @@ const PermissionSettings = () => {
                 </div>
 
                 {/* Notifications */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl ${permissions.notifications === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                            <Bell size={24} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 xs:p-4 bg-white border border-gray-100 rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 xs:gap-4">
+                        <div className={`p-2 xs:p-3 rounded-lg xs:rounded-xl ${permissions.notifications === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <Bell size={20} className="xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Notificaciones</h3>
-                            <p className="text-xs text-gray-500">Para mensajes y alertas</p>
+                            <h3 className="font-bold text-gray-900 text-xs xs:text-sm">Notificaciones</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-500">Para mensajes y alertas</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-end sm:justify-start gap-2 xs:gap-3">
                         {renderStatusText(permissions.notifications)}
                         {permissions.notifications !== 'granted' && (
                             <button
                                 onClick={requestNotifications}
-                                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition-colors"
+                                className="px-3 xs:px-4 py-1.5 xs:py-2 bg-gray-900 text-white text-[10px] xs:text-xs font-bold rounded-lg xs:rounded-xl hover:bg-gray-800 transition-colors"
                             >
                                 Solicitar
                             </button>
@@ -190,22 +188,22 @@ const PermissionSettings = () => {
                 </div>
 
                 {/* Geolocation */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl ${permissions.geolocation === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                            <MapPin size={24} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 xs:p-4 bg-white border border-gray-100 rounded-xl xs:rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 xs:gap-4">
+                        <div className={`p-2 xs:p-3 rounded-lg xs:rounded-xl ${permissions.geolocation === 'granted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <MapPin size={20} className="xs:w-6 xs:h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Ubicación</h3>
-                            <p className="text-xs text-gray-500">Para mapas y lugares cercanos</p>
+                            <h3 className="font-bold text-gray-900 text-xs xs:text-sm">Ubicación</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-500">Para mapas y lugares cercanos</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-end sm:justify-start gap-2 xs:gap-3">
                         {renderStatusText(permissions.geolocation)}
                         {permissions.geolocation !== 'granted' && (
                             <button
                                 onClick={requestGeolocation}
-                                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition-colors"
+                                className="px-3 xs:px-4 py-1.5 xs:py-2 bg-gray-900 text-white text-[10px] xs:text-xs font-bold rounded-lg xs:rounded-xl hover:bg-gray-800 transition-colors"
                             >
                                 Solicitar
                             </button>
@@ -214,7 +212,7 @@ const PermissionSettings = () => {
                 </div>
             </div>
 
-            <p className="text-xs text-gray-400 text-center mt-4">
+            <p className="text-[10px] xs:text-xs text-gray-400 text-center mt-3 xs:mt-4">
                 Nota: Si has denegado permanentemente un permiso, deberás habilitarlo desde la configuración de tu navegador o sistema operativo.
             </p>
         </div>

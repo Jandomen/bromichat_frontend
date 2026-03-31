@@ -95,16 +95,16 @@ export default function GroupChatInput({ onSend, conversationId }) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-gray-400 hover:text-indigo-500 transition-colors focus:outline-none rounded-full hover:bg-white/50"
+          className="p-1.5 xs:p-2 text-gray-400 hover:text-indigo-500 transition-colors focus:outline-none rounded-full hover:bg-white/50"
           aria-label="Attach file"
           disabled={isSending}
         >
-          <PaperClipIcon className="w-6 h-6" />
+          <PaperClipIcon className="w-5 h-5 xs:w-6 xs:h-6" />
         </button>
 
         <input
           type="text"
-          className="flex-1 px-2 py-3 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-sm sm:text-base"
+          className="flex-1 px-1 xs:px-2 py-1.5 xs:py-2.5 sm:py-3 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-[13px] xs:text-sm sm:text-base"
           placeholder="Manda un mensaje..."
           value={text}
           onChange={(e) => setText(e.target.value)}

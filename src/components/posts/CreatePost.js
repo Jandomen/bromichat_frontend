@@ -4,6 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { FaPaperclip, FaTimes } from 'react-icons/fa';
 import { getFullImageUrl } from '../../utils/getProfilePicture';
 import { useOfflineQueue } from '../../hooks/useOfflineQueue';
+import { useNetwork } from '../../hooks/useNetwork';
 
 const CreatePost = ({ onPostCreated, groupId }) => {
   const [content, setContent] = useState('');
@@ -13,7 +14,7 @@ const CreatePost = ({ onPostCreated, groupId }) => {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
   const { addToQueue } = useOfflineQueue();
-  const isOnline = window.navigator.onLine;
+  const { isOnline } = useNetwork();
 
   const maxFiles = 10;
   const maxImagePdfSize = 10 * 1024 * 1024;
@@ -211,9 +212,14 @@ const CreatePost = ({ onPostCreated, groupId }) => {
 
           <div className="flex-1">
             <textarea
-              placeholder="¿Qué tienes en mente hoy?"
+              placeholder="Comparte algo..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  handleSubmit(e);
+                }
+              }}
               rows="2"
               className="w-full p-1 text-gray-800 placeholder-gray-400 bg-transparent border-none focus:ring-0 resize-none text-[16px] font-normal leading-normal outline-none"
             />

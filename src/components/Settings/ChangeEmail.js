@@ -35,28 +35,28 @@ const ChangeEmail = () => {
             {message && <div className="mb-4 p-3 rounded-xl bg-green-50 text-green-700 text-sm border border-green-100">{message}</div>}
             {error && <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-100">{error}</div>}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 xs:space-y-4">
                 <div>
-                    <label className="block text-gray-700 text-sm font-medium mb-1.5 ml-1">Nuevo Correo</label>
+                    <label className="block text-[10px] xs:text-xs sm:text-sm text-gray-700 font-medium mb-1 xs:mb-1.5 ml-1">Nuevo Correo</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all outline-none"
+                        className="w-full px-3 xs:px-4 py-2 xs:py-2.5 text-xs xs:text-sm rounded-lg xs:rounded-xl border border-gray-200 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all outline-none"
                         required
                         placeholder="tu@correo.com"
                     />
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-1 xs:pt-2">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium bg-gray-900 text-white shadow-lg shadow-gray-500/30 hover:shadow-gray-500/50 hover:bg-black transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
+                        className="w-full sm:w-auto flex items-center justify-center gap-1.5 xs:gap-2 px-4 xs:px-6 py-2 xs:py-2.5 rounded-lg xs:rounded-xl text-xs xs:text-sm sm:text-base font-medium bg-gray-900 text-white shadow-lg shadow-gray-500/30 hover:shadow-gray-500/50 hover:bg-black transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
                     >
                         {loading ? 'Guardando...' : (
                             <>
-                                <Mail className="w-4 h-4" />
+                                <Mail className="w-3 h-3 xs:w-4 xs:h-4" />
                                 Guardar Email
                             </>
                         )}

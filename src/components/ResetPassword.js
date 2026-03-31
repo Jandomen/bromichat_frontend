@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useUI } from '../context/UIContext';
 import { Lock, ShieldCheck, Sparkles } from 'lucide-react';
 
@@ -45,7 +45,7 @@ const ResetPassword = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_BACKEND}/auth/reset-password`, {
+            const response = await api.post('/auth/reset-password', {
                 token,
                 newPassword
             });
@@ -66,29 +66,29 @@ const ResetPassword = () => {
                 <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[50%] bg-red-900/10 blur-[120px] rounded-full"></div>
             </div>
 
-            <div className="w-full max-w-md p-10 bg-black/40 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white">
+            <div className="w-full max-w-[320px] p-6 bg-black/40 backdrop-blur-3xl rounded-[2rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white">
                 <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-1 mb-6 transform group-hover:scale-110 transition-transform duration-700">
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-6 group cursor-pointer transition-all duration-300">
                         {logoImages.map((img, idx) => (
                             <img
                                 key={idx}
                                 src={img}
                                 alt="Logo"
-                                className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 object-contain transition-all hover:scale-125 hover:-translate-y-1 filter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] brightness-125"
                             />
                         ))}
                     </div>
-                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px] mt-2 mb-6">Seguridad de Cuenta</p>
+                    <p className="text-gray-400 font-bold uppercase tracking-[0.2em] xs:tracking-widest text-[8px] xs:text-[9px] mt-2 mb-6">Seguridad de Cuenta</p>
 
                     <p className="text-sm text-gray-400 leading-relaxed max-w-[280px] mx-auto font-medium">
-                        Crea una contraseña fuerte y segura para proteger tu cuenta de <span className="text-red-500">BromiChat</span>.
+                        Crea una contraseña fuerte y segura para proteger tu cuenta de <span className="text-red-500">Bromichat</span>.
                     </p>
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-2 group/field">
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-red-500 transition-colors" htmlFor="newPassword">
-                            Nueva Contraseña
+                    <div className="space-y-1 group/field">
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 group-focus-within/field:text-red-500 transition-colors" htmlFor="newPassword">
+                            Nueva Clave
                         </label>
                         <div className="relative">
                             <input
@@ -97,16 +97,16 @@ const ResetPassword = () => {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
-                                className="w-full pl-12 pr-6 py-4 border border-white/10 rounded-2xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all font-medium"
+                                className="w-full pl-10 pr-4 py-2 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 transition-all text-xs font-medium"
                                 placeholder="••••••••"
                             />
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
                         </div>
                     </div>
 
-                    <div className="space-y-2 group/field">
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-red-500 transition-colors" htmlFor="confirmPassword">
-                            Confirmar Contraseña
+                    <div className="space-y-1 group/field">
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 group-focus-within/field:text-red-500 transition-colors" htmlFor="confirmPassword">
+                            Confirmar
                         </label>
                         <div className="relative">
                             <input
@@ -115,24 +115,24 @@ const ResetPassword = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                className="w-full pl-12 pr-6 py-4 border border-white/10 rounded-2xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all font-medium"
+                                className="w-full pl-10 pr-4 py-2 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 transition-all text-xs font-medium"
                                 placeholder="••••••••"
                             />
-                            <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
+                            <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
                         </div>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 px-6 flex items-center justify-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-xl shadow-red-900/20 hover:shadow-red-600/40 hover:-translate-y-1 active:scale-95 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 disabled:opacity-50"
+                        className="w-full py-3 px-6 flex items-center justify-center gap-3 text-white text-[10px] font-black uppercase tracking-widest bg-gradient-to-br from-red-600 to-red-800 rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300 disabled:opacity-50"
                     >
                         {loading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                         ) : (
                             <>
-                                <Sparkles className="w-4 h-4" />
-                                <span>Restablecer Contraseña</span>
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Restablecer</span>
                             </>
                         )}
                     </button>
@@ -140,7 +140,7 @@ const ResetPassword = () => {
 
                 <div className="mt-10 text-center">
                     <p className="text-[10px] text-gray-600 uppercase font-black tracking-[0.2em]">
-                        BromiChat © {new Date().getFullYear()}
+                        Bromichat © {new Date().getFullYear()}
                     </p>
                 </div>
             </div>

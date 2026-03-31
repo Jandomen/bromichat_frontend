@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
 import { Mail, ChevronLeft, Sparkles } from 'lucide-react';
@@ -27,7 +27,7 @@ const ForgotPassword = () => {
 
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_BACKEND}/auth/forgot-password`, { email });
+            const response = await api.post('/auth/forgot-password', { email });
             showToast(response.data.message || 'Se ha enviado un correo para restablecer tu contraseña.', 'success');
             navigate('/login');
         } catch (error) {
@@ -45,19 +45,19 @@ const ForgotPassword = () => {
                 <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[50%] bg-red-900/10 blur-[120px] rounded-full"></div>
             </div>
 
-            <div className="w-full max-w-md p-10 bg-black/40 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white">
+            <div className="w-full max-w-[320px] p-6 bg-black/40 backdrop-blur-3xl rounded-[2rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group text-white">
                 <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-1 mb-6 transform group-hover:scale-110 transition-transform duration-700">
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-6 group cursor-pointer transition-all duration-300">
                         {logoImages.map((img, idx) => (
                             <img
                                 key={idx}
                                 src={img}
                                 alt="Logo"
-                                className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 object-contain transition-all hover:scale-125 hover:-translate-y-1 filter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] brightness-125"
                             />
                         ))}
                     </div>
-                    <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[9px] mt-2 mb-6">Restablecer Acceso</p>
+                    <p className="text-gray-400 font-bold uppercase tracking-[0.2em] xs:tracking-[0.3em] text-[8px] xs:text-[10px] mt-2 mb-6">Restablecer Acceso</p>
 
                     <p className="text-sm text-gray-400 leading-relaxed max-w-[280px] mx-auto font-medium">
                         Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
@@ -65,9 +65,9 @@ const ForgotPassword = () => {
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-2 group/field">
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-red-500 transition-colors" htmlFor="email">
-                            Correo Electrónico
+                    <div className="space-y-1 group/field">
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 group-focus-within/field:text-red-500 transition-colors" htmlFor="email">
+                            Correo
                         </label>
                         <div className="relative">
                             <input
@@ -76,18 +76,18 @@ const ForgotPassword = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full pl-12 pr-6 py-4 border border-white/10 rounded-2xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all font-medium"
+                                className="w-full pl-10 pr-4 py-2 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 transition-all text-xs font-medium"
                                 placeholder="tu@email.com"
                             />
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within/field:text-red-500 transition-colors" />
                         </div>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full py-4 px-6 flex items-center justify-center gap-3 text-white text-xs font-black uppercase tracking-[0.2em] bg-red-600 hover:bg-red-500 rounded-2xl shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20"
+                        className="w-full py-3 px-6 flex items-center justify-center gap-3 text-white text-[10px] font-black uppercase tracking-widest bg-gradient-to-br from-red-600 to-red-800 rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
                     >
-                        <Sparkles className="w-4 h-4" />
+                        <Sparkles className="w-3.5 h-3.5" />
                         Enviar Enlace
                     </button>
                 </form>

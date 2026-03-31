@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useUI } from '../context/UIContext';
 
 import bImg from '../assets/b-removebg-preview.png';
@@ -39,10 +39,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BACKEND}/auth/register`,
-        formData
-      );
+      const response = await api.post('/auth/register', formData);
 
       if (response.data) {
         showToast('¡Registro exitoso! Por favor, verifica tu correo electrónico para activar tu cuenta.', 'success');
@@ -66,33 +63,33 @@ const Register = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-black via-red-900 to-black py-16 px-6 selection:bg-red-500/30 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-black via-red-900 to-black py-10 xs:py-16 px-4 xs:px-6 selection:bg-red-500/30 relative overflow-hidden">
       {/* Background Decorative Element */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-red-800/10 blur-[120px] rounded-full animate-pulse-slow"></div>
         <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] bg-red-900/10 blur-[100px] rounded-full"></div>
       </div>
 
-      <div className="w-full max-w-2xl p-10 bg-black/40 backdrop-blur-3xl rounded-[3rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group">
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-1 mb-6 transform group-hover:scale-110 transition-transform duration-700">
+      <div className="w-full max-w-[340px] p-4 xs:p-6 bg-black/40 backdrop-blur-3xl rounded-[2rem] shadow-2xl border border-white/10 relative z-10 animate-fade-in group">
+        <div className="text-center mb-8 xs:mb-10">
+          <div className="flex items-center justify-center gap-[0.5px] xs:gap-0.5 sm:gap-1.5 mb-6 group cursor-pointer transition-all duration-300">
             {logoImages.map((img, idx) => (
               <img
                 key={idx}
                 src={img}
                 alt="Logo"
-                className="h-10 w-10 sm:h-12 sm:w-12 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                className="h-6 w-6 xs:h-8 xs:w-8 sm:h-12 sm:w-12 object-contain transition-all hover:scale-125 hover:-translate-y-1 filter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] brightness-125"
               />
             ))}
           </div>
-          <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-2">Comienza tu viaje social premium hoy</p>
+          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] xs:tracking-[0.3em] text-[8px] xs:text-[10px] mt-2">Comienza tu viaje social premium hoy</p>
         </div>
 
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
           {fields.map((field) => (
             <div key={field.name} className={`space-y-2 group/field ${field.name === 'email' || field.name === 'password' ? 'md:col-span-2' : ''}`}>
               <label
-                className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 group-focus-within/field:text-red-500 transition-colors"
+                className="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 group-focus-within/field:text-red-500 transition-colors"
                 htmlFor={field.name}
               >
                 {field.label}
@@ -104,7 +101,7 @@ const Register = () => {
                 value={formData[field.name]}
                 onChange={handleChange}
                 required
-                className="w-full px-6 py-3.5 border border-white/10 rounded-2xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 focus:bg-white/10 transition-all font-medium"
+                className="w-full px-4 py-2 border border-white/10 rounded-xl bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 transition-all text-xs font-medium"
               />
             </div>
           ))}
@@ -112,9 +109,9 @@ const Register = () => {
           <div className="md:col-span-2 pt-4">
             <button
               type="submit"
-              className="w-full py-4 px-6 text-white text-xs font-black uppercase tracking-[0.2em] bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-xl shadow-red-900/30 hover:shadow-red-600/40 hover:-translate-y-1 active:scale-95 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-100/10"
+              className="w-full py-3 px-6 text-white text-[10px] font-black uppercase tracking-widest bg-gradient-to-br from-red-600 to-red-800 rounded-xl shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
             >
-              Inicializar Cuenta
+              Registrarme
             </button>
           </div>
         </form>

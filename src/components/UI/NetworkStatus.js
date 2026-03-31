@@ -1,104 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff, Wifi, RefreshCw, Signal } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import { useOfflineQueue } from '../../hooks/useOfflineQueue';
 import { useUI } from '../../context/UIContext';
+import { useNetwork } from '../../hooks/useNetwork';
 
 const NetworkStatus = () => {
     const { token } = React.useContext(AuthContext);
     const { queue, removeFromQueue } = useOfflineQueue();
     const { showToast } = useUI();
-    const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+    const { isOnline, type: connectionType, effectiveType } = useNetwork();
+    
     const [isSyncing, setIsSyncing] = useState(false);
-    const [showStatus, setShowStatus] = useState(!window.navigator.onLine);
-    const [isLocalMesh, setIsLocalMesh] = useState(false);
-    const [showMesh, setShowMesh] = useState(false);
-    const [connectionType, setConnectionType] = useState(navigator.connection?.type || 'unknown');
-    const [effectiveType, setEffectiveType] = useState(navigator.connection?.effectiveType || '4g');
+    const [showStatus, setShowStatus] = useState(!isOnline);
+
+    const [lastConnectionState, setLastConnectionState] = useState(isOnline);
+    const [isInitialMount, setIsInitialMount] = useState(true);
 
     useEffect(() => {
-        // Detectar si estamos en una IP privada (Heurística simple para "Mesh Local")
-        const checkLocalMesh = async () => {
-            // Nota: En una app real esto vendría de un ping al backend o WebRTC
-            setIsLocalMesh(true);
-            setShowMesh(true);
-            setTimeout(() => setShowMesh(false), 5000); // Desaparece tras 5 segundos
-        };
-        checkLocalMesh();
-
-        // Si entramos y estamos offline, ocultar tras unos segundos
-        if (!window.navigator.onLine) {
-            setTimeout(() => setShowStatus(false), 5000);
+        if (isInitialMount) {
+            setIsInitialMount(false);
+            return;
         }
 
-        const processQueue = async () => {
-            if (queue.length === 0 || !token) return;
-            setIsSyncing(true);
-            showToast(`Sincronizando ${queue.length} historias pendientes...`, 'info');
+        if (!isOnline) {
+            setShowStatus(true);
+            const timer = setTimeout(() => setShowStatus(false), 5000);
+            setLastConnectionState(false);
+            return () => clearTimeout(timer);
+        } else if (isOnline && lastConnectionState === false) {
+            // SOLO si venimos de estar offline (recuperación real)
+            setShowStatus(true);
+            const timer = setTimeout(() => setShowStatus(false), 5000);
+            
+            const processQueue = async () => {
+                if (queue.length === 0 || !token) return;
+                setIsSyncing(true);
+                showToast(`Sincronizando ${queue.length} historias pendientes...`, 'info');
 
-            for (const item of queue) {
-                try {
-                    if (item.type === 'CREATE_POST') {
-                        const url = item.groupId
-                            ? `${process.env.REACT_APP_API_BACKEND}/communities/${item.groupId}/posts`
-                            : `${process.env.REACT_APP_API_BACKEND}/posts`;
+                for (const item of queue) {
+                    try {
+                        if (item.type === 'CREATE_POST') {
+                            const url = item.groupId
+                                ? `/communities/${item.groupId}/posts`
+                                : `/posts`;
 
-                        await axios.post(url, { content: item.content }, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        removeFromQueue(item.id);
+                            await api.post(url, { content: item.content });
+                            removeFromQueue(item.id);
+                        }
+                    } catch (err) {
+                        console.error("Error syncing item", item.id, err);
                     }
-                } catch (err) {
-                    console.error("Error syncing item", item.id, err);
                 }
-            }
-            setIsSyncing(false);
-            showToast('¡Brumi-Mesh sincronizado con éxito!', 'success');
-        };
-
-        const handleOnline = () => {
-            setIsOnline(true);
-            setShowStatus(true);
+                setIsSyncing(false);
+                showToast('¡Brumi-Mesh sincronizado con éxito!', 'success');
+            };
+            
             processQueue();
-            setTimeout(() => setShowStatus(false), 5000);
-        };
-        const handleOffline = () => {
-            setIsOnline(false);
-            setShowStatus(true);
-            setTimeout(() => setShowStatus(false), 5000); // El aviso de Offline ahora también es temporal
-        };
-
-        const handleConnectionChange = () => {
-            setConnectionType(navigator.connection?.type || 'unknown');
-            setEffectiveType(navigator.connection?.effectiveType || '4g');
-        };
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-        if (navigator.connection) {
-            navigator.connection.addEventListener('change', handleConnectionChange);
+            setLastConnectionState(true);
+            return () => clearTimeout(timer);
         }
-
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-            if (navigator.connection) {
-                navigator.connection.removeEventListener('change', handleConnectionChange);
-            }
-        };
-    }, [queue, token, showToast, removeFromQueue]);
-
-    if (!showStatus && isOnline) return (
-        <div className="fixed top-6 right-6 z-[1000] flex items-center gap-2 pointer-events-none">
-            {isLocalMesh && showMesh && (
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-2xl animate-in fade-in slide-in-from-right duration-700">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
-                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Brumi-Mesh Activo</span>
-                </div>
-            )}
-        </div>
-    );
+    }, [isOnline, queue, token, showToast, removeFromQueue, isInitialMount, lastConnectionState]);
 
     if (!showStatus) return null;
 

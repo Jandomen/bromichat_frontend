@@ -38,7 +38,7 @@ const CurrentUserInfo = () => {
 
     return (
         <div className="flex flex-col space-y-4">
-            <div className="flex items-center space-x-4 p-4 bg-white/50 backdrop-blur-md rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40">
+            <div className="flex items-center space-x-3 p-2 sm:p-3 bg-white/50 backdrop-blur-md rounded-2xl sm:rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/40">
                 <div className="relative group">
                     <div className={`p-1 rounded-2xl transition-all duration-500 shadow-lg ${user?.hasStories
                         ? user.allStoriesViewed
@@ -46,7 +46,7 @@ const CurrentUserInfo = () => {
                             : 'bg-gradient-to-tr from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/20 p-1.5'
                         : 'bg-gray-100'}`}>
                         <div
-                            className="w-16 h-16 rounded-xl overflow-hidden cursor-pointer relative"
+                            className="w-10 h-10 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden cursor-pointer relative"
                             onClick={(e) => {
                                 if (user?.hasStories) {
                                     e.preventDefault();
@@ -78,10 +78,10 @@ const CurrentUserInfo = () => {
                     to={`/user/${user._id}`}
                     className="flex-1 flex flex-col justify-center hover:translate-x-1 transition-transform"
                 >
-                    <h2 className="font-black text-xl text-gray-900 leading-tight">
+                    <h2 className="font-black text-xs xs:text-sm sm:text-lg text-gray-900 leading-tight">
                         {user.name} {user.lastName}
                     </h2>
-                    <p className="text-xs font-bold text-primary-600 uppercase tracking-widest">@{user.username}</p>
+                    <p className="text-[9px] xs:text-[10px] sm:text-xs font-bold text-primary-600 uppercase tracking-widest">@{user.username}</p>
                 </Link>
             </div>
 
